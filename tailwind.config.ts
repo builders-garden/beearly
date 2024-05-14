@@ -1,3 +1,4 @@
+import { nextui } from "@nextui-org/react";
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -17,6 +18,9 @@ const config = {
     "../../node_modules/frames.js/dist/render/next/*.{ts,tsx,js,css}",
     "../../node_modules/frames.js/dist/render/*.{ts,tsx,js,css}",
     "../../node_modules/frames.js/dist/**/*.{ts,tsx,js,css}",
+
+    // nextui
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   prefix: "",
   theme: {
@@ -84,7 +88,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), nextui()],
 } satisfies Config;
 
 export default config;

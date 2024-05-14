@@ -1,35 +1,30 @@
+"use client";
 import { fetchMetadata } from "frames.js/next";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createDebugUrl } from "./debug";
 import { appURL, currentURL } from "./utils";
-
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "frames.js starter",
-    description: "This is a frames.js starter template",
-    other: {
-      ...(await fetchMetadata(new URL("/frames", appURL()))),
-    },
-  };
-}
+import { Button } from "@nextui-org/button";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // This is a react server component only
-export default async function Home() {
-  const url = currentURL("/");
-
-  // then, when done, return next frame
+export default function Home() {
+  const { isConnected } = useAccount();
   return (
-    <div className="p-4">
-      frames.js starter kit. The Template Frame is on this page, it&apos;s in
-      the html meta tags (inspect source).{" "}
-      <Link href={createDebugUrl(url)} className="underline">
-        Debug
-      </Link>{" "}
-      or see{" "}
-      <Link href="/examples" className="underline">
-        other examples
-      </Link>
+    <div className="text-center flex flex-col items-center justify-center gap-4">
+      <div className="flex flex-col gap-1">
+        <div className="text-6xl font-black">Waitlist</div>
+        <div className="text-2xl font-semibold">
+          Launch a waiting list on Farcaster
+        </div>
+      </div>
+      {isConnected ? (
+        <Button color="primary">
+          <Link href="/waitlists">Get started</Link>
+        </Button>
+      ) : (
+        <ConnectButton />
+      )}
     </div>
   );
 }
