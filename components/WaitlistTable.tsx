@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Waitlist } from "./WaitlistDetail";
 import {
   TableHeader,
   TableColumn,
@@ -11,6 +10,7 @@ import {
   Table,
 } from "@nextui-org/react";
 import { ChevronRight, Hash, LinkIcon, Users } from "lucide-react";
+import { Waitlist } from "@prisma/client";
 
 export default function WaitlistTable({
   waitlists,

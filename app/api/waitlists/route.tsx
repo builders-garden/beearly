@@ -23,9 +23,8 @@ export const POST = async (req: NextRequest) => {
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
 
-  console.log(body.get("file"));
   const landingImage: File | null = body.get("files[0]") as unknown as File;
-  const sucessImage: File | null = body.get("files[0]") as unknown as File;
+  const sucessImage: File | null = body.get("files[1]") as unknown as File;
   if (
     !name ||
     !endDate ||
