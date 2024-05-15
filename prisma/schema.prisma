@@ -7,31 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model waitlist {
-  id               String             @id(map: "waitlist_pk") @db.Uuid
-  name             String?            @db.VarChar
-  slug             String?
-  external_url     String?
-  end_date         DateTime?          @db.Date
-  start_date       DateTime?          @db.Date
-  image_landing    String?
-  image_success    String?
-  user_address     String?
-  created_at       DateTime?          @db.Date
-  updated_at       DateTime?          @db.Date
-  waitlisted_users waitlisted_users[]
-}
-
-model waitlisted_users {
-  id            String    @id(map: "waitlisted_users_pk") @db.Uuid
-  waitlist_id   String?   @db.Uuid
-  fid           Int?
-  display_name  String?   @db.VarChar
-  username      String?   @db.VarChar
-  avatar_url    String?
-  power_badge   Boolean?
-  waitlisted_at DateTime? @db.Date
+model User {
+  id            String    @id @default(cuid())
+  address       String
   created_at    DateTime? @db.Date
   updated_at    DateTime? @db.Date
-  waitlist      waitlist? @relation(fields: [waitlist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "waitlisted_users_waitlist_id_fk")
+}
+
+model Waitlist {
+  id               String           @id(map: "waitlist_pk") @db.Uuid
+  name             String           @db.VarChar
+  slug             String
+  externalUrl     String            @map("external_url")  
+  endDate         DateTime          @db.Date @map("end_date")
+  imageLanding    String            @map("image_landing")
+  imageSuccess    String            @map("image_success")
+  userAddress     String            @map("user_address")
+  createdAt       DateTime          @db.Date @map("created_at")
+  updatedAt       DateTime          @db.Date @map("updated_at")
+  waitlistedUsers WaitlistedUser[]
+}
+
+model WaitlistedUser {
+  id            String     @id(map: "waitlisted_users_pk") @db.Uuid
+  waitlistId    String     @db.Uuid @map("waitlist_id")
+  fid           Int?
+  displayName   String     @db.VarChar @map("display_name")
+  username      String     @db.VarChar
+  avatarUrl     String?    @map("avatar_url")
+  powerBadge    Boolean?   @default(false) @map("power_badge")
+  waitlistedAt  DateTime   @db.Date
+  createdAt     DateTime   @db.Date @map("created_at")
+  updatedAt     DateTime   @db.Date @map("updated_at")
+  waitlist      Waitlist?  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "waitlisted_users_waitlist_id_fk")
 }
