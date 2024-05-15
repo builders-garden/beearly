@@ -8,10 +8,12 @@ import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Waitlist } from "@prisma/client";
 import { useAccount } from "wagmi";
 import { redirect } from "next/navigation";
+import { CreateWaitlistModal } from "../../components/CreateWaitlistModal";
 
 const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<Waitlist[]>([]);
   const [selectedWaitlist, setSelectedWaitlist] = useState<Waitlist | null>();
+  const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
   const { isConnected, isConnecting } = useAccount();
   useEffect(() => {
@@ -42,7 +44,14 @@ const Waitlists = () => {
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4 justify-between">
         <div className="text-6xl font-bold">Your waitlists</div>
-        <Button size="lg" color="primary" className="font-semibold text-xl">
+        <Button
+          size="lg"
+          color="primary"
+          className="font-semibold text-xl"
+          onPress={() => {
+            setIsOpen(true);
+          }}
+        >
           <PlusCircle />
           Create a new waitlist
         </Button>
@@ -53,7 +62,13 @@ const Waitlists = () => {
           waitlists.length === 0 ? (
             <div className="flex flex-col mx-auto my-auto justify-center items-center gap-2 mt-24">
               <div className="text-2xl">You have no waitlists yet</div>
-              <Button color="primary" className="w-fit">
+              <Button
+                color="primary"
+                className="w-fit"
+                onPress={() => {
+                  setIsOpen(true);
+                }}
+              >
                 Create your first waitlist
               </Button>
             </div>
@@ -73,6 +88,7 @@ const Waitlists = () => {
           </div>
         )}
       </div>
+      <CreateWaitlistModal isOpen={isOpen} onOpenChange={setIsOpen} />
     </div>
   );
 };
