@@ -12,6 +12,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@dynamic-labs/ethereum": "^2.0.6",
+    "@dynamic-labs/sdk-react-core": "^2.0.6",
+    "@dynamic-labs/wagmi-connector": "^2.0.6",
     "@nextui-org/react": "^2.3.6",
     "@prisma/client": "^5.14.0",
     "@rainbow-me/rainbowkit": "^2.0.7",

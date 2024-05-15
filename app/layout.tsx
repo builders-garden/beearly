@@ -1,5 +1,4 @@
 import "./globals.css";
-import "@rainbow-me/rainbowkit/styles.css";
 
 import { Navbar } from "../components/Navbar";
 import Providers from "../components/Providers";
