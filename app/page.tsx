@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 // This is a react server component only
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
           <Link href="/waitlists">Get started</Link>
         </Button>
       ) : (
-        <ConnectButton />
+        <DynamicWidget />
       )}
     </div>
   );

@@ -1,7 +1,8 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+"use client";
 import Link from "next/link";
 import { Raleway } from "next/font/google";
 const raleway = Raleway({ subsets: ["latin"] });
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 export const Navbar = () => {
   return (
@@ -12,7 +13,7 @@ export const Navbar = () => {
             <div className={raleway.className}>WAITLISTS</div>
           </div>
         </Link>
-        <ConnectButton />
+        <DynamicWidget />
       </nav>
     </div>
   );
