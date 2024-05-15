@@ -7,11 +7,13 @@ import {
   Button,
   Input,
   DatePicker,
+  Image,
 } from "@nextui-org/react";
-import { ImageIcon, Info, PlusSquare } from "lucide-react";
+import { Frame, ImageIcon, Info, PlusSquare } from "lucide-react";
 import { useState } from "react";
 import slugify from "slugify";
 import { parseAbsoluteToLocal } from "@internationalized/date";
+import { FrameImage } from "./FrameImage";
 
 export const CreateWaitlistModal = ({
   isOpen,
@@ -30,9 +32,30 @@ export const CreateWaitlistModal = ({
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
   );
+
+  const [uploadedLandingImage, setUploadedLandingImage] = useState<string>("");
   const [selectedFileSuccess, setSelectedFileSuccess] = useState<File | null>(
     null
   );
+  const [uploadedSuccessImage, setUploadedSuccessImage] = useState<string>("");
+  const onSelectedLandingImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedLandingImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileLanding(event?.target.files[0]);
+  };
+  const onSelectedSuccessImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedSuccessImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileSuccess(event?.target.files[0]);
+  };
   const [error, setError] = useState<string>("");
 
   return (
@@ -110,38 +133,22 @@ export const CreateWaitlistModal = ({
                       Recommended 955x500 px
                     </div>
                   </div>
-                  <div className="flex flex-row gap-4">
-                    <div className="w-[50%] m-2 bg-gray-100 h-48 rounded-md flex flex-col">
-                      <div className="text-gray-400 bg-white m-2 h-36 rounded-md hover:border-blue-400 hover:border-2 hover:border-dashed hover:text-blue-400 ">
-                        {selectedFileLanding ? (
-                          <></>
-                        ) : (
-                          <div className="flex flex-col gap-1 justify-center items-center h-full my-auto  hover:text-blue-400">
-                            <PlusSquare size={24} />
-                            <div className="text-lg">Add image</div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-row gap-2 items-center justify-center">
-                        <ImageIcon size={16} className="text-gray-500" />
-                        <div className="text-gray-500 text-sm">Cover</div>
-                      </div>
+                  <div className="flex flex-row gap-2">
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileLanding!}
+                        uploadedImage={uploadedLandingImage}
+                        onSelectedFile={onSelectedLandingImageFile}
+                        label="Cover"
+                      />
                     </div>
-                    <div className="w-[50%] m-2 bg-gray-100 h-48 rounded-md flex flex-col">
-                      <div className="text-gray-400 bg-white m-2 h-36 rounded-md hover:border-blue-400 hover:border-2 hover:border-dashed hover:text-blue-400 ">
-                        {selectedFileSuccess ? (
-                          <></>
-                        ) : (
-                          <div className="flex flex-col gap-1 justify-center items-center h-full my-auto  hover:text-blue-400">
-                            <PlusSquare size={24} />
-                            <div className="text-lg">Add image</div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-row gap-2 items-center justify-center">
-                        <ImageIcon size={16} className="text-gray-500" />
-                        <div className="text-gray-500 text-sm">Success</div>
-                      </div>
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileSuccess!}
+                        uploadedImage={uploadedSuccessImage}
+                        onSelectedFile={onSelectedSuccessImageFile}
+                        label="Success"
+                      />
                     </div>
                   </div>
                 </div>
