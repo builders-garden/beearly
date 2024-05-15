@@ -38,7 +38,7 @@ const Waitlists = () => {
   );
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-row gap-4 items-center">
+      <div className="flex flex-row gap-4 justify-between">
         <div className="text-6xl font-bold">Your waitlists</div>
         <Button size="lg" color="primary" className="font-semibold text-xl">
           <PlusCircle />
