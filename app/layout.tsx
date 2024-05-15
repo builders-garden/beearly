@@ -1,17 +1,25 @@
-import type { Metadata } from "next";
-import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
-import Providers from "../components/Providers";
+import "@rainbow-me/rainbowkit/styles.css";
+
 import { Navbar } from "../components/Navbar";
+import Providers from "../components/Providers";
 
 import { Raleway } from "next/font/google";
 const raleway = Raleway({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  // without a title, warpcast won't validate your frame
-  title: "frames.js starter",
-  description: "...",
-};
+import type { Metadata } from "next";
+import { fetchMetadata } from "frames.js/next";
+import { FRAMES_BASE_PATH, vercelURL } from "./utils";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Waitlist frame",
+    description: "Your product's waitlist on Farcaster",
+    other: {
+      ...(await fetchMetadata(new URL(FRAMES_BASE_PATH, vercelURL()))),
+    },
+  };
+}
 
 export default function RootLayout({
   children,

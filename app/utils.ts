@@ -1,5 +1,13 @@
 import { headers } from "next/headers";
 
+const DEFAULT_DEBUGGER_URL =
+  process.env.DEBUGGER_URL ?? "http://localhost:3010/";
+
+export const DEFAULT_DEBUGGER_HUB_URL =
+  process.env.NODE_ENV === "development"
+    ? new URL("/hub", DEFAULT_DEBUGGER_URL).toString()
+    : undefined;
+
 export function currentURL(pathname: string): URL {
   const headersList = headers();
   const host = headersList.get("x-forwarded-host") || headersList.get("host");
@@ -27,5 +35,7 @@ export function appURL() {
 export function vercelURL() {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : undefined;
+    : "http://localhost:3000";
 }
+
+export const FRAMES_BASE_PATH = "/frames";

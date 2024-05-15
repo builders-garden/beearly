@@ -1,8 +1,6 @@
 "use client";
-import { fetchMetadata } from "frames.js/next";
-import type { Metadata } from "next";
+
 import Link from "next/link";
-import { appURL, currentURL } from "./utils";
 import { Button } from "@nextui-org/button";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -10,6 +8,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 // This is a react server component only
 export default function Home() {
   const { isConnected } = useAccount();
+
   return (
     <div className="text-center flex flex-col items-center justify-center gap-4">
       <div className="flex flex-col gap-1">
