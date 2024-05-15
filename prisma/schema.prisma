@@ -15,9 +15,9 @@ model User {
 }
 
 model Waitlist {
-  id               String           @id(map: "waitlist_pk") @db.Uuid
-  name             String           @db.VarChar
-  slug             String
+  id              Int              @default(autoincrement()) @unique
+  name            String           @db.VarChar
+  slug            String
   externalUrl     String            @map("external_url")  
   endDate         DateTime          @db.Date @map("end_date")
   imageLanding    String            @map("image_landing")
@@ -29,8 +29,8 @@ model Waitlist {
 }
 
 model WaitlistedUser {
-  id            String     @id(map: "waitlisted_users_pk") @db.Uuid
-  waitlistId    String     @db.Uuid @map("waitlist_id")
+  id            Int        @default(autoincrement()) @unique
+  waitlistId    Int        @map("waitlist_id")
   fid           Int?
   displayName   String     @db.VarChar @map("display_name")
   username      String     @db.VarChar
@@ -39,5 +39,5 @@ model WaitlistedUser {
   waitlistedAt  DateTime   @db.Date
   createdAt     DateTime   @db.Date @map("created_at")
   updatedAt     DateTime   @db.Date @map("updated_at")
-  waitlist      Waitlist?  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "waitlisted_users_waitlist_id_fk")
+  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

@@ -41,10 +41,10 @@ export async function middleware(req: NextRequest) {
     }
     // If authentication is successful, continue processing the request
     const response = NextResponse.next();
-    response.headers.set(
-      "x-address",
-      isAuthenticated.payload.address as string
-    );
+    const address = (
+      isAuthenticated.payload as any
+    ).verified_credentials[0].address.toLowerCase();
+    response.headers.set("x-address", address);
     return response;
   } catch (error: any) {
     // Handle errors related to token verification or other issues

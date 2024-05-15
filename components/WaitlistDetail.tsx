@@ -2,37 +2,8 @@
 import { Button, Card, CardBody, Image, Tab, Tabs } from "@nextui-org/react";
 import { Edit, Link, Users } from "lucide-react";
 import { useState } from "react";
-import { User, UsersTable } from "./UsersTable";
-
-export interface Waitlist {
-  id: string;
-  name: string;
-  slug: string;
-  images: string[];
-  externalUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const users: User[] = [
-  {
-    displayName: "John Doe",
-    username: "johndoe",
-    avatarUrl: "https://placehold.co/512x512/EEE/31343C",
-    powerBadge: true,
-    fid: "1",
-    date: "2022-01-01T00:00:00Z",
-  },
-  {
-    displayName: "Jane Doe",
-    username: "janedoe",
-    avatarUrl: "https://placehold.co/512x512/EEE/31343C",
-    powerBadge: false,
-    fid: "2",
-    date: "2022-01-02T00:00:00Z",
-  },
-  // add more user objects here...
-];
+import { UsersTable } from "./UsersTable";
+import { Waitlist } from "@prisma/client";
 
 // this is a card like element that displays a waitlist
 export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
@@ -66,21 +37,23 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
             <div className="text-xl font-medium">Images</div>
             <div className="flex flex-row gap-16 items-center">
               <Image
-                src={waitlist.images[0]}
+                src={waitlist.imageLanding}
                 alt="waitlist-img"
                 className="h-48 w-48"
               />
               <Image
-                src={waitlist.images[1]}
+                src={waitlist.imageSuccess}
                 alt="waitlist-img"
                 className="h-48 w-48"
               />
             </div>
           </div>
         </Tab>
-        <Tab key="list" title="Users">
-          <UsersTable users={users} />
-        </Tab>
+        {
+          //<Tab key="list" title="Users">
+          //<UsersTable users={users} />
+          //</Tab>
+        }
       </Tabs>
     </div>
   );
