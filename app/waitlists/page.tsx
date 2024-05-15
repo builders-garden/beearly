@@ -1,13 +1,11 @@
 "use client";
-import { Button } from "@nextui-org/react";
-import { PlusCircle } from "lucide-react";
+import { Button, Spinner } from "@nextui-org/react";
 import WaitlistTable from "../../components/WaitlistTable";
 import { WaitlistDetail } from "../../components/WaitlistDetail";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Waitlist } from "@prisma/client";
 import { useAccount } from "wagmi";
-import { redirect } from "next/navigation";
 import { CreateWaitlistModal } from "../../components/CreateWaitlistModal";
 
 const Waitlists = () => {
@@ -15,18 +13,27 @@ const Waitlists = () => {
   const [selectedWaitlist, setSelectedWaitlist] = useState<Waitlist | null>();
   const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
+  const [waitlistsLoading, setWaitlistsLoading] = useState(false);
   const { isConnected, isConnecting } = useAccount();
+
+  const fetchWaitlists = useCallback(() => {
+    setWaitlistsLoading(true);
+    fetch("/api/waitlists", {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setWaitlists(data);
+        setWaitlistsLoading(false);
+      });
+  }, [jwt]);
   useEffect(() => {
     if (jwt && isConnected) {
-      fetch("/api/waitlists", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => setWaitlists(data));
+      fetchWaitlists();
     }
-  }, [jwt, isConnected]);
+  }, [jwt, isConnected, fetchWaitlists]);
 
   if (!isConnected) {
     return (
@@ -56,8 +63,17 @@ const Waitlists = () => {
       </div>
       <div className="flex flex-row gap-4">
         {
+          // if waitlists are loading, show a loading message
+          waitlistsLoading && (
+            <div className="flex flex-col mx-auto my-auto justify-center items-center gap-2 mt-24">
+              <Spinner />
+              <div className="text-2xl">Loading your waitlists...</div>
+            </div>
+          )
+        }
+        {
           // if there are no waitlists, show a message
-          waitlists.length === 0 ? (
+          waitlists.length === 0 && !waitlists ? (
             <div className="flex flex-col mx-auto my-auto justify-center items-center gap-2 mt-24">
               <div className="text-2xl">You have no waitlists yet</div>
               <Button
@@ -81,13 +97,17 @@ const Waitlists = () => {
           )
         }
 
-        {selectedWaitlist && (
+        {selectedWaitlist && !waitlistsLoading && (
           <div className="w-[50%]">
             <WaitlistDetail waitlist={selectedWaitlist} />
           </div>
         )}
       </div>
-      <CreateWaitlistModal isOpen={isOpen} onOpenChange={setIsOpen} />
+      <CreateWaitlistModal
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        refetchWaitlists={fetchWaitlists}
+      />
     </div>
   );
 };

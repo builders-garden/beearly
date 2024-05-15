@@ -14,8 +14,6 @@ const frameHandler = frames(async (ctx) => {
       ? ctx.message?.requesterVerifiedAddresses[0]
       : ctx.message?.verifiedWalletAddress; // XMTP user address
 
-  console.log("slug", slug, "fid", fid, "userAddress", userAddress);
-
   return {
     image: (
       <div style={{ display: "flex", color: "red" }}>

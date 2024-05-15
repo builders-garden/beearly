@@ -23,18 +23,26 @@ export const POST = async (req: NextRequest) => {
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
 
-  const files = body.get("files") as unknown as File[];
-
-  if (!name || !endDate || !externalUrl || !address || !files) {
+  console.log(body.get("file"));
+  const landingImage: File | null = body.get("files[0]") as unknown as File;
+  const sucessImage: File | null = body.get("files[0]") as unknown as File;
+  if (
+    !name ||
+    !endDate ||
+    !externalUrl ||
+    !address ||
+    !landingImage ||
+    !sucessImage
+  ) {
     return NextResponse.json(
       { success: false, message: "Missing required fields" },
       { status: 400 }
     );
   }
 
-  const landingBytes = await files[0]!.arrayBuffer();
+  const landingBytes = await landingImage!.arrayBuffer();
   const landingBuffer = Buffer.from(landingBytes);
-  const successBytes = await files[1]!.arrayBuffer();
+  const successBytes = await sucessImage!.arrayBuffer();
   const successBuffer = Buffer.from(successBytes);
   const [landing, success] = await Promise.all([
     uploadImage(landingBuffer, `${name}-landing.png`),

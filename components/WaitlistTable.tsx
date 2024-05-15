@@ -20,7 +20,11 @@ export default function WaitlistTable({
   setSelectedWaitlist: (waitlist: Waitlist) => void;
 }) {
   return (
-    <Table aria-label="Example static collection table">
+    <Table
+      aria-label="Example static collection table"
+      shadow="none"
+      border={1}
+    >
       <TableHeader>
         <TableColumn>
           <div className="flex flex-row items-center gap-1">
