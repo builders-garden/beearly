@@ -1,7 +1,9 @@
+"use client";
 import { Button } from "@nextui-org/react";
 import { PlusCircle } from "lucide-react";
-import WaitlistList from "../../components/WaitlistList";
-import { Waitlist } from "../../components/WaitlistItem";
+import WaitlistTable from "../../components/WaitlistTable";
+import { Waitlist, WaitlistDetail } from "../../components/WaitlistDetail";
+import { useState } from "react";
 
 const waitlists: Waitlist[] = [
   {
@@ -31,6 +33,9 @@ const waitlists: Waitlist[] = [
 ];
 
 const Waitlists = () => {
+  const [selectedWaitlist, setSelectedWaitlist] = useState<Waitlist | null>(
+    waitlists[0]!
+  );
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4 items-center">
@@ -40,7 +45,19 @@ const Waitlists = () => {
           Create a new waitlist
         </Button>
       </div>
-      <WaitlistList waitlists={waitlists} />
+      <div className="flex flex-row gap-4">
+        <div className="w-[50%]">
+          <WaitlistTable
+            waitlists={waitlists}
+            setSelectedWaitlist={setSelectedWaitlist}
+          />
+        </div>
+        {selectedWaitlist && (
+          <div className="w-[50%]">
+            <WaitlistDetail waitlist={selectedWaitlist} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
