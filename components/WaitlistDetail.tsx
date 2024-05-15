@@ -2,7 +2,6 @@
 import { Button, Card, CardBody, Image, Tab, Tabs } from "@nextui-org/react";
 import { Edit, Link, Users } from "lucide-react";
 import { useState } from "react";
-import { UsersTable } from "./UsersTable";
 import { Waitlist } from "@prisma/client";
 
 // this is a card like element that displays a waitlist
