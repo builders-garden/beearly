@@ -45,14 +45,12 @@ const Waitlists = () => {
       <div className="flex flex-row gap-4 justify-between">
         <div className="text-6xl font-bold">Your waitlists</div>
         <Button
-          size="lg"
           color="primary"
-          className="font-semibold text-xl"
+          radius="sm"
           onPress={() => {
             setIsOpen(true);
           }}
         >
-          <PlusCircle />
           Create a new waitlist
         </Button>
       </div>
@@ -68,6 +66,7 @@ const Waitlists = () => {
                 onPress={() => {
                   setIsOpen(true);
                 }}
+                radius="sm"
               >
                 Create your first waitlist
               </Button>

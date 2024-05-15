@@ -6,10 +6,12 @@ import {
   ModalFooter,
   Button,
   Input,
+  DatePicker,
 } from "@nextui-org/react";
 import { ImageIcon, Info, PlusSquare } from "lucide-react";
 import { useState } from "react";
 import slugify from "slugify";
+import { parseAbsoluteToLocal } from "@internationalized/date";
 
 export const CreateWaitlistModal = ({
   isOpen,
@@ -19,8 +21,10 @@ export const CreateWaitlistModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const [name, setName] = useState<string>("");
-  const [endDate, setEndDate] = useState<Date>(
-    new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
+  const [endDate, setEndDate] = useState(
+    parseAbsoluteToLocal(
+      new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString()
+    )
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
@@ -66,16 +70,18 @@ export const CreateWaitlistModal = ({
                       </div>
                     </div>
                     <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="text-sm text-gray-500">
-                        Closing time (UTC)
-                      </div>
-                      <Input
-                        type="text"
-                        variant={"bordered"}
-                        value={endDate.toDateString()}
-                        onValueChange={setName}
-                        placeholder="May"
+                      <div className="text-sm text-gray-500">Closing time</div>
+                      <DatePicker
+                        className="max-w-md"
+                        granularity="minute"
+                        variant="bordered"
+                        minValue={parseAbsoluteToLocal(
+                          new Date().toISOString()
+                        )}
+                        value={endDate}
+                        onChange={setEndDate}
                       />
+
                       <div className="text-xs text-gray-500">
                         The time you want your waitlist to close
                       </div>
@@ -123,7 +129,7 @@ export const CreateWaitlistModal = ({
                     </div>
                     <div className="w-[50%] m-2 bg-gray-100 h-48 rounded-md flex flex-col">
                       <div className="text-gray-400 bg-white m-2 h-36 rounded-md hover:border-blue-400 hover:border-2 hover:border-dashed hover:text-blue-400 ">
-                        {selectedFileLanding ? (
+                        {selectedFileSuccess ? (
                           <></>
                         ) : (
                           <div className="flex flex-col gap-1 justify-center items-center h-full my-auto  hover:text-blue-400">
@@ -144,10 +150,12 @@ export const CreateWaitlistModal = ({
             <ModalFooter className="text-center justify-end flex flex-col">
               <div className="text-red-500">{error}</div>
               <div className="flex flex-row justify-end items-end gap-4">
-                <Button color="primary" variant="light">
+                <Button color="primary" variant="light" radius="sm">
                   Cancel
                 </Button>
-                <Button color="primary">Create</Button>
+                <Button color="primary" radius="sm">
+                  Create
+                </Button>
               </div>
               <div className="text-xs text-right text-gray-500 flex flex-row justify-end">
                 *you can edit it at any time later
