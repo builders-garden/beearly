@@ -5,10 +5,14 @@ export const BeearlyButton = ({
   onPress,
   icon,
   text,
+  isLoading,
+  isDisabled,
 }: {
   onPress: () => void;
   icon?: ReactNode;
   text: string;
+  isLoading?: boolean;
+  isDisabled?: boolean;
 }) => {
   return (
     <Button
@@ -16,6 +20,8 @@ export const BeearlyButton = ({
       className="w-fit text-black p-4"
       onPress={onPress}
       radius="sm"
+      isLoading={isLoading}
+      isDisabled={isDisabled}
     >
       <div className="flex flex-row gap-1 items-center">
         {icon}

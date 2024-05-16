@@ -80,6 +80,7 @@ export const CreateWaitlistModal = ({
       !selectedFileSuccess
     ) {
       setError("Please fill all the fields");
+      setLoading(false);
       return;
     }
     const formData = new FormData();
@@ -100,7 +101,8 @@ export const CreateWaitlistModal = ({
       refetchWaitlists();
       setIsSuccess(true);
     } else {
-      setError("Error creating waitlist");
+      const data = await res.json();
+      setError(data.message);
     }
     setLoading(false);
   };
@@ -235,10 +237,6 @@ export const CreateWaitlistModal = ({
                         onClick={copyWaitlistFrameLink}
                       />
                     </div>
-                    <div className="text-sm text-gray-300">or</div>
-                    <Button color="primary" radius="sm" className="w-[33%]">
-                      Visit Waitlist Page
-                    </Button>
                   </div>
                 </div>
               )}
@@ -246,9 +244,22 @@ export const CreateWaitlistModal = ({
             <ModalFooter className="text-center justify-end flex flex-col">
               {!isSuccess ? (
                 <>
-                  <div className="text-red-500">{error}</div>
+                  {error && (
+                    <div className="flex flex-row justify-between">
+                      <div></div>
+                      <div className="text-xs flex flex-row bg-danger-500/10 text-danger-400 p-1 items-center rounded-md gap-1">
+                        <Info size={12} className="text-danger-400" />
+                        {error}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex flex-row justify-end items-end gap-4">
-                    <Button color="primary" variant="light" radius="sm">
+                    <Button
+                      color="primary"
+                      variant="light"
+                      radius="sm"
+                      onPress={() => onOpenChange(false)}
+                    >
                       Cancel
                     </Button>
                     <Button
@@ -262,7 +273,7 @@ export const CreateWaitlistModal = ({
                     </Button>
                   </div>
                   <div className="text-xs text-right text-gray-500 flex flex-row justify-end">
-                    *you can edit it at any time later
+                    *you can edit this at any time later
                   </div>
                 </>
               ) : (

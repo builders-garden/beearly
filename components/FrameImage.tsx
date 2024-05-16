@@ -17,7 +17,7 @@ export const FrameImage = ({
       className="m-2 bg-gray-100 w-full rounded-md flex flex-col items-center justify-center cursor-pointer"
       onClick={() => document.getElementById(fileInputId)!.click()}
     >
-      {selectedFile ? (
+      {selectedFile || uploadedImage ? (
         <div className="m-2">
           <Image
             src={uploadedImage}

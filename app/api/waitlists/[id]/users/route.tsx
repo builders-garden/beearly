@@ -12,7 +12,6 @@ export const GET = async (
   const address = req.headers.get("x-address");
 
   const { searchParams } = new URL(req.url);
-  console.log(searchParams.get("page"));
   const limit = searchParams.get("limit") || "10";
   const page = searchParams.get("page") || "0";
   const orderBy = searchParams.get("orderBy") || "waitlistedAt";

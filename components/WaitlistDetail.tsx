@@ -16,9 +16,19 @@ import { BASE_FRAME_URL } from "../lib/constants";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
 import { UsersTable } from "./UsersTable";
+import { EditWaitlistModal } from "./EditWaitlistModal";
 
 // this is a card like element that displays a waitlist
-export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
+export const WaitlistDetail = ({
+  waitlist,
+  setSelectedWaitlist,
+  refetchWaitlists
+}: {
+  waitlist: Waitlist;
+  setSelectedWaitlist: (waitlist: Waitlist) => void;
+  refetchWaitlists: () => void;
+}) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("list");
   const [usersLoading, setUsersLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<WaitlistedUser[]>([]);
@@ -45,10 +55,6 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
       fetchUsers();
     }
   }, [jwt, isConnected, fetchUsers, page]);
-  const copyWaitlistFrameLink = () => {
-    navigator.clipboard.writeText(`${BASE_FRAME_URL}/${waitlist.slug}`);
-  };
-
   return (
     <div className="flex flex-col border-2 border-gray-200 rounded-xl">
       <div className="flex flex-col p-4 gap-2">
@@ -56,7 +62,11 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
           <div className="flex flex-row gap-8 items-center">
             <div className="text-2xl font-semibold">{waitlist.name}</div>
           </div>
-          <Button variant="light" className="text-gray-300">
+          <Button
+            variant="light"
+            className="text-gray-300"
+            onPress={() => setIsEditModalOpen(true)}
+          >
             <Edit />
             Edit
           </Button>
@@ -132,6 +142,13 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
           </div>
         </Tab>
       </Tabs>
+      <EditWaitlistModal
+        isOpen={isEditModalOpen}
+        waitlist={waitlist}
+        onOpenChange={setIsEditModalOpen}
+        setSelectedWaitlist={setSelectedWaitlist}
+        refetchWaitlists={refetchWaitlists}
+      />
     </div>
   );
 };

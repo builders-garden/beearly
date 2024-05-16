@@ -127,7 +127,11 @@ const Waitlists = () => {
 
             {selectedWaitlist && !waitlistsLoading && (
               <div className="w-[50%]">
-                <WaitlistDetail waitlist={selectedWaitlist} />
+                <WaitlistDetail
+                  waitlist={selectedWaitlist}
+                  setSelectedWaitlist={setSelectedWaitlist}
+                  refetchWaitlists={fetchWaitlists}
+                />
               </div>
             )}
           </div>

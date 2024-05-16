@@ -25,7 +25,6 @@ export function appURL() {
     return process.env.BASE_URL;
   } else {
     const url = process.env.BASE_URL || vercelURL() || "http://localhost:3000";
-    console.log(url);
     console.warn(
       `Warning: APP_URL environment variable is not set. Falling back to ${url}.`
     );

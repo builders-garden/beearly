@@ -17,8 +17,6 @@ export const GET = async (req: NextRequest) => {
     },
   });
 
-  console.log(waitlists);
-
   return NextResponse.json(waitlists);
 };
 
@@ -46,6 +44,25 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
+  const slugName = slugify(name as string, {
+    lower: true,
+    trim: true,
+    replacement: "-",
+  });
+
+  const existingWaitlist = await prisma.waitlist.findFirst({
+    where: {
+      slug: slugName,
+    },
+  });
+
+  if (existingWaitlist) {
+    return NextResponse.json(
+      { message: "Waitlist with that name already exists" },
+      { status: 400 }
+    );
+  }
+
   const landingBytes = await landingImage!.arrayBuffer();
   const landingBuffer = Buffer.from(landingBytes);
   const successBytes = await sucessImage!.arrayBuffer();
@@ -58,11 +75,7 @@ export const POST = async (req: NextRequest) => {
   const waitlist = await prisma.waitlist.create({
     data: {
       name: name as string,
-      slug: slugify(name as string, {
-        lower: true,
-        trim: true,
-        replacement: "-",
-      }),
+      slug: slugName,
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
       userAddress: address!,
