@@ -26,7 +26,7 @@ const frameHandler = frames(async (ctx) => {
     // TODO: show error frame
     throw new Error("Invalid farcaster profile");
   }
-  const newWaitlistUser = await prisma.waitlistedUser.create({
+  await prisma.waitlistedUser.create({
     data: {
       waitlistId: waitlist.id,
       fid,

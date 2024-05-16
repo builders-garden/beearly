@@ -1,12 +1,7 @@
 import { farcasterHubContext, openframes } from "frames.js/middleware";
 import { createFrames } from "frames.js/next";
 import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
-import {
-  vercelURL,
-  DEFAULT_DEBUGGER_HUB_URL,
-  FRAMES_BASE_PATH,
-  appURL,
-} from "../utils";
+import { FRAMES_BASE_PATH, appURL } from "../utils";
 
 export const frames = createFrames({
   basePath: FRAMES_BASE_PATH,

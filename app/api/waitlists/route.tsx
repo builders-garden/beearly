@@ -10,7 +10,14 @@ export const GET = async (req: NextRequest) => {
     where: {
       userAddress: address!,
     },
+    include: {
+      _count: {
+        select: { waitlistedUsers: true },
+      },
+    },
   });
+
+  console.log(waitlists);
 
   return NextResponse.json(waitlists);
 };

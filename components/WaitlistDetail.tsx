@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   Image,
+  Pagination,
   Spinner,
   Tab,
   Tabs,
@@ -21,26 +22,29 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
   const [selected, setSelected] = useState<string>("list");
   const [usersLoading, setUsersLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<WaitlistedUser[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
   const jwt = getAuthToken();
   const { isConnected } = useAccount();
   const fetchUsers = useCallback(() => {
     setUsersLoading(true);
-    fetch(`/api/waitlists/${waitlist.id}/users`, {
+    fetch(`/api/waitlists/${waitlist.id}/users?page=${page - 1}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsers(data);
+        setUsers(data.results);
+        setTotalPages(data.pages);
         setUsersLoading(false);
       });
-  }, [jwt, waitlist]);
+  }, [jwt, waitlist, page]);
   useEffect(() => {
     if (jwt && isConnected) {
       fetchUsers();
     }
-  }, [jwt, isConnected, fetchUsers]);
+  }, [jwt, isConnected, fetchUsers, page]);
   const copyWaitlistFrameLink = () => {
     navigator.clipboard.writeText(`${BASE_FRAME_URL}/${waitlist.slug}`);
   };
@@ -50,18 +54,9 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
       <div className="flex flex-col p-4 gap-2">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-8 items-center">
-            <div className="text-3xl font-bold">{waitlist.name}</div>
-            <div
-              className="flex flex-row gap-1 items-center cursor-pointer"
-              onClick={copyWaitlistFrameLink}
-            >
-              <Link size={12} />
-              <div className="text-sm">
-                {BASE_FRAME_URL}/{waitlist.slug}
-              </div>
-            </div>
+            <div className="text-2xl font-semibold">{waitlist.name}</div>
           </div>
-          <Button variant="light" color="primary">
+          <Button variant="light" className="text-gray-300">
             <Edit />
             Edit
           </Button>
@@ -75,7 +70,28 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
         onSelectionChange={(value) => setSelected(value as string)}
       >
         <Tab key="list" title="Users">
-          {usersLoading ? <Spinner /> : <UsersTable users={users} />}
+          {usersLoading ? (
+            <div className="flex flex-row justify-center items-center p-16">
+              <Spinner />
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              <UsersTable users={users} />
+              <div className="flex flex-row justify-center items-center mb-4">
+                <Pagination
+                  isCompact
+                  showControls
+                  total={totalPages}
+                  initialPage={1}
+                  page={page}
+                  onChange={setPage}
+                  classNames={{
+                    cursor: "text-black rounded-sm",
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </Tab>
         <Tab key="images" title="Images">
           <div className="flex flex-col gap-2 p-4">

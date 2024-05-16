@@ -9,7 +9,6 @@ import {
   Image,
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
-import { User, Edit } from "lucide-react";
 
 export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
   return (
@@ -18,9 +17,6 @@ export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
         <TableColumn>NAME</TableColumn>
         <TableColumn>FID</TableColumn>
         <TableColumn>DATE</TableColumn>
-        <TableColumn>
-          <div></div>
-        </TableColumn>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
@@ -51,12 +47,6 @@ export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
             </TableCell>
             <TableCell>{user.fid}</TableCell>
             <TableCell>{new Date(user.waitlistedAt).toDateString()}</TableCell>
-            <TableCell>
-              <Button variant="bordered" color="primary">
-                <Edit />
-                Edit
-              </Button>
-            </TableCell>
           </TableRow>
         ))}
       </TableBody>

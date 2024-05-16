@@ -59,16 +59,18 @@ export default function WaitlistTable({
               <Link href={`/waitlists/${waitlist.slug}`}>{waitlist.name}</Link>
             </TableCell>
             <TableCell>
-              <div className="text-blue-500">250</div>
+              <div className="text-blue-500">
+                {(waitlist as any)?._count?.waitlistedUsers}
+              </div>
             </TableCell>
             <TableCell>
               <a
                 href={waitlist.externalUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary hover:underline"
+                className="hover:underline"
               >
-                {waitlist.externalUrl}
+                {waitlist.externalUrl.replace("https://", "")}
               </a>
             </TableCell>
             <TableCell>
