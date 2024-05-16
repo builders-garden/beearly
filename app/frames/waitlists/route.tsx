@@ -6,7 +6,7 @@ const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }
-  const slug = ctx.url.pathname.replace("/frames/waitlist", "");
+  const slug = ctx.url.pathname.replace("/frames/waitlists", "");
   console.log("slug", slug);
 
   return {

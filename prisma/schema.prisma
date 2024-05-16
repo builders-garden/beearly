@@ -17,7 +17,7 @@ model User {
 model Waitlist {
   id              Int              @default(autoincrement()) @unique
   name            String           @db.VarChar
-  slug            String
+  slug            String            @unique
   externalUrl     String            @map("external_url")  
   endDate         DateTime          @db.Date @map("end_date")
   imageLanding    String            @map("image_landing")

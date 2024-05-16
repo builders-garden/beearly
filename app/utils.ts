@@ -21,10 +21,10 @@ export function currentURL(pathname: string): URL {
 }
 
 export function appURL() {
-  if (process.env.APP_URL) {
-    return process.env.APP_URL;
+  if (process.env.BASE_URL) {
+    return process.env.BASE_URL;
   } else {
-    const url = process.env.APP_URL || vercelURL() || "http://localhost:3000";
+    const url = process.env.BASE_URL || vercelURL() || "http://localhost:3000";
     console.warn(
       `Warning: APP_URL environment variable is not set. Falling back to ${url}.`
     );
@@ -33,8 +33,8 @@ export function appURL() {
 }
 
 export function vercelURL() {
-  return process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
+  return process.env.BASE_URL
+    ? `https://${process.env.BASE_URL}`
     : "http://localhost:3000";
 }
 

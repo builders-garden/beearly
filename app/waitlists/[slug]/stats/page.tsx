@@ -13,6 +13,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+
+
 const Stats = ({ params: { slug } }: { params: { slug: string } }) => {
   const [opacity, setOpacity] = useState({
     amount: 1,

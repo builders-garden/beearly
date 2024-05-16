@@ -26,7 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function WaitlistShortPage({
+export default async function WaitlistPage({
   params: { slug },
 }: {
   params: { slug: string };
