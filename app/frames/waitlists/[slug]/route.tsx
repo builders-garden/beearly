@@ -2,20 +2,21 @@
 import { Button } from "frames.js/next";
 import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
+import { getFrameMessage } from "frames.js/getFrameMessage";
 
 const frameHandler = frames(async (ctx) => {
-  if (!ctx?.message?.isValid) {
-    console.log(ctx.message?.isValid);
+  console.log("Here");
+  /*if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
-  }
-  const slug = ctx.url.pathname.replace("/frames/waitlist/", "");
+  }*/
+  const slug = ctx.url.pathname.split("/").pop();
   const waitlist = await prisma.waitlist.findUnique({
     where: {
       slug,
     },
   });
   if (!waitlist) {
-    // TODO: show a basic metadata
+    // TODO: show an error image
     throw new Error("Invalid waitlist");
   }
 

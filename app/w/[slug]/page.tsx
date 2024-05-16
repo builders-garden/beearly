@@ -17,6 +17,7 @@ export async function generateMetadata({
       slug,
     },
   });
+  console.log(new URL(`/frames/waitlists/${slug}`, appURL()));
   return {
     title: `Beearly - ${waitlist?.name}`,
     description: `Beearly - Launch your waiting list on Farcaster.`,
@@ -39,5 +40,5 @@ export default async function WaitlistShortPage({
   if (!waitlist) {
     return redirect("/waitlists");
   }
-  redirect(waitlist?.externalUrl!);
+  return <div>{waitlist.name}</div>;
 }

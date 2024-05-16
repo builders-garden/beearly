@@ -9,9 +9,13 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "generate": "npx graphql-codegen",
+    "prestart": "yarn generate",
+    "predev": "yarn generate"
   },
   "dependencies": {
+    "@airstack/node": "^0.0.7",
     "@dynamic-labs/ethereum": "^2.0.6",
     "@dynamic-labs/sdk-react-core": "^2.0.6",
     "@dynamic-labs/wagmi-connector": "^2.0.6",
@@ -47,6 +51,10 @@
   },
   "devDependencies": {
     "@frames.js/debugger": "^0.2.8",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript": "^4.0.6",
+    "@graphql-codegen/typescript-operations": "^4.2.0",
+    "@parcel/watcher": "^2.4.1",
     "@types/node": "^18.17.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

@@ -32,6 +32,7 @@ model WaitlistedUser {
   id            Int        @default(autoincrement()) @unique
   waitlistId    Int        @map("waitlist_id")
   fid           Int?
+  address       String
   displayName   String     @db.VarChar @map("display_name")
   username      String     @db.VarChar
   avatarUrl     String?    @map("avatar_url")

@@ -8,17 +8,17 @@ const raleway = Raleway({ subsets: ["latin"] });
 
 import type { Metadata } from "next";
 import { fetchMetadata } from "frames.js/next";
-import { FRAMES_BASE_PATH, vercelURL } from "./utils";
+import { FRAMES_BASE_PATH, appURL, vercelURL } from "./utils";
 
-export async function generateMetadata(): Promise<Metadata> {
+/*export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Waitlist frame",
     description: "Your product's waitlist on Farcaster",
     other: {
-      ...(await fetchMetadata(new URL(FRAMES_BASE_PATH, vercelURL()))),
+      ...(await fetchMetadata(new URL(FRAMES_BASE_PATH, appURL()))),
     },
   };
-}
+}*/
 
 export default function RootLayout({
   children,

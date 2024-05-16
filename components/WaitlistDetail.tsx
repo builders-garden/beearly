@@ -1,16 +1,50 @@
 "use client";
-import { Button, Card, CardBody, Image, Tab, Tabs } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Image,
+  Spinner,
+  Tab,
+  Tabs,
+} from "@nextui-org/react";
 import { Edit, ExternalLink, ImageIcon, Link, Users } from "lucide-react";
-import { useState } from "react";
-import { Waitlist } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
+import { Waitlist, WaitlistedUser } from "@prisma/client";
 import { BASE_FRAME_URL } from "../lib/constants";
+import { getAuthToken } from "@dynamic-labs/sdk-react-core";
+import { useAccount } from "wagmi";
+import { UsersTable } from "./UsersTable";
 
 // this is a card like element that displays a waitlist
 export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
   const [selected, setSelected] = useState<string>("list");
+  const [usersLoading, setUsersLoading] = useState<boolean>(false);
+  const [users, setUsers] = useState<WaitlistedUser[]>([]);
+  const jwt = getAuthToken();
+  const { isConnected } = useAccount();
+  const fetchUsers = useCallback(() => {
+    setUsersLoading(true);
+    fetch(`/api/waitlists/${waitlist.id}/users`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        setUsersLoading(false);
+      });
+  }, [jwt, waitlist]);
+  useEffect(() => {
+    if (jwt && isConnected) {
+      fetchUsers();
+    }
+  }, [jwt, isConnected, fetchUsers]);
   const copyWaitlistFrameLink = () => {
     navigator.clipboard.writeText(`${BASE_FRAME_URL}/${waitlist.slug}`);
   };
+
   return (
     <div className="flex flex-col border-2 border-gray-200 rounded-xl">
       <div className="flex flex-col p-4 gap-2">
@@ -40,7 +74,9 @@ export const WaitlistDetail = ({ waitlist }: { waitlist: Waitlist }) => {
         color="primary"
         onSelectionChange={(value) => setSelected(value as string)}
       >
-        <Tab key="list" title="Users"></Tab>
+        <Tab key="list" title="Users">
+          {usersLoading ? <Spinner /> : <UsersTable users={users} />}
+        </Tab>
         <Tab key="images" title="Images">
           <div className="flex flex-col gap-2 p-4">
             <div className="flex flex-row gap-2 items-center w-full">

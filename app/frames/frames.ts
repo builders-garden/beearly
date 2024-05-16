@@ -5,14 +5,26 @@ import {
   vercelURL,
   DEFAULT_DEBUGGER_HUB_URL,
   FRAMES_BASE_PATH,
+  appURL,
 } from "../utils";
 
 export const frames = createFrames({
   basePath: FRAMES_BASE_PATH,
-  baseUrl: vercelURL(),
+  baseUrl: appURL(),
   middleware: [
     farcasterHubContext({
-      hubHttpUrl: DEFAULT_DEBUGGER_HUB_URL,
+      ...(process.env.NODE_ENV === "production"
+        ? {
+            hubHttpUrl: "https://hubs.airstack.xyz",
+            hubRequestOptions: {
+              headers: {
+                "x-airstack-hubs": process.env.AIRSTACK_API_KEY as string,
+              },
+            },
+          }
+        : {
+            hubHttpUrl: "http://localhost:3010/hub",
+          }),
     }),
     openframes({
       clientProtocol: {

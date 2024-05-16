@@ -8,18 +8,10 @@ import {
   Button,
   Image,
 } from "@nextui-org/react";
+import { WaitlistedUser } from "@prisma/client";
 import { User, Edit } from "lucide-react";
 
-export interface User {
-  displayName: string;
-  username: string;
-  avatarUrl: string;
-  powerBadge?: boolean;
-  fid: string;
-  date: string;
-}
-
-export const UsersTable = ({ users }: { users: User[] }) => {
+export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
   return (
     <Table aria-label="Example static collection table" shadow="none">
       <TableHeader>
@@ -37,7 +29,7 @@ export const UsersTable = ({ users }: { users: User[] }) => {
               <div className="flex flex-row gap-2 items-center">
                 <Image
                   radius="full"
-                  src={user.avatarUrl}
+                  src={user.avatarUrl!}
                   alt="user-image"
                   className="h-8 w-8"
                 />
@@ -58,7 +50,7 @@ export const UsersTable = ({ users }: { users: User[] }) => {
               </div>
             </TableCell>
             <TableCell>{user.fid}</TableCell>
-            <TableCell>{new Date(user.date).toDateString()}</TableCell>
+            <TableCell>{new Date(user.waitlistedAt).toDateString()}</TableCell>
             <TableCell>
               <Button variant="bordered" color="primary">
                 <Edit />
