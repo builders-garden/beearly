@@ -208,7 +208,7 @@ export const WaitlistDetail = ({
           <div className="flex flex-col gap-2 p-4">
             <div className="flex flex-row gap-4 w-full">
               <div className="flex flex-col gap-1 w-[50%]">
-                <div className="text-sm text-gray-500">Channel ID</div>
+                <div className="text-sm text-gray-500">Follow Channel IDs</div>
                 <Input
                   type="text"
                   variant={"bordered"}

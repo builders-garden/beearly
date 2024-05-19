@@ -176,10 +176,10 @@ export const CreateWaitlistModal = ({
             </ModalHeader>
             <ModalBody>
               {!isSuccess ? (
-                <div className="flex flex-col gap-8">
-                  <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="font-semibold text-lg">Main details</div>
-                    <div className="flex flex-row gap-4 w-full">
+                    <div className="flex flex-row gap-2 w-full">
                       <div className="flex flex-col gap-1 w-[50%]">
                         <div className="text-sm text-gray-500">Name</div>
                         <Input
@@ -237,13 +237,13 @@ export const CreateWaitlistModal = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="font-semibold text-lg">
                       Eligibility Requirements (optional)
                     </div>
-                    <div className="flex flex-row gap-4 w-full">
+                    <div className="flex flex-row gap-2 w-full">
                       <div className="flex flex-col gap-1 w-[50%]">
-                        <div className="text-sm text-gray-500">Channel ID</div>
+                        <div className="text-sm text-gray-500">Follow Channel IDs</div>
                         <Input
                           type="text"
                           variant={"bordered"}
@@ -271,7 +271,7 @@ export const CreateWaitlistModal = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="flex flex-row justify-between">
                       <div className="font-semibold text-lg">Add images</div>
                       <div className="text-xs flex flex-row bg-blue-500/10 text-blue-400 p-1 items-center rounded-md gap-1">
@@ -279,7 +279,7 @@ export const CreateWaitlistModal = ({
                         Recommended 955x500 px
                       </div>
                     </div>
-                    <div className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-1">
                       <div className="w-[50%]">
                         <FrameImage
                           selectedFile={selectedFileLanding!}
@@ -297,7 +297,7 @@ export const CreateWaitlistModal = ({
                         />
                       </div>
                     </div>
-                    <div className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-1">
                       <div className="w-[50%]">
                         <FrameImage
                           selectedFile={selectedFileNotEligible!}
@@ -318,12 +318,12 @@ export const CreateWaitlistModal = ({
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-4">
                   <div>
                     Copy the URL on Farcaster and start getting waitlist
                     registrations!
                   </div>
-                  <div className="flex flex-row gap-2 items-center">
+                  <div className="flex flex-row gap-1 items-center">
                     <div className="w-[60%] p-2 rounded-lg border-2 border-gray-200 flex flex-row justify-between items-center">
                       <div className="text-gray-400">
                         {BASE_FRAME_URL}/
@@ -358,7 +358,7 @@ export const CreateWaitlistModal = ({
                       </div>
                     </div>
                   )}
-                  <div className="flex flex-row justify-end items-end gap-4">
+                  <div className="flex flex-row justify-end items-end gap-2">
                     <Button
                       color="primary"
                       variant="light"
