@@ -46,9 +46,6 @@
     "viem": "^2.10.5",
     "wagmi": "^2.8.7"
   },
-  "engines": {
-    "node": ">=18.17.0"
-  },
   "devDependencies": {
     "@frames.js/debugger": "^0.2.8",
     "@graphql-codegen/cli": "^5.0.2",
