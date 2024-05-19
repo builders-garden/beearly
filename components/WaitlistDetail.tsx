@@ -83,7 +83,7 @@ export const WaitlistDetail = ({
         <Tab
           key="list"
           title={`Waitlisted Users · ${
-            (waitlist as any)?._count?.waitlistedUsers
+            (waitlist as any)?._count?.waitlistedUsers || 0
           }`}
         >
           {usersLoading ? (
@@ -134,6 +134,45 @@ export const WaitlistDetail = ({
                 </div>
                 <Image
                   src={waitlist.imageSuccess}
+                  alt="waitlist-img"
+                  className="w-[287px] h-[150px] rounded-lg"
+                />
+                <div className="w-full bg-gray-200 p-2 text-gray-400 rounded-md text-center">
+                  <div className="flex flex-row gap-2 items-center justify-center">
+                    <div>Learn more</div>
+                    <ExternalLink size={16} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row gap-2 items-center w-full">
+              <div className="flex flex-col gap-1 p-2 bg-gray-100 rounded-md">
+                <div className="flex flex-row gap-2 items-center justify-center">
+                  <ImageIcon size={16} className="text-gray-500" />
+                  <div className="text-gray-500 text-sm">Landing image</div>
+                </div>
+                <Image
+                  src={waitlist.imageNotEligible}
+                  alt="waitlist-img"
+                  className="w-[287px] h-[150px] rounded-lg"
+                />
+                <div className="w-full bg-gray-200 p-2 text-gray-400 rounded-md text-center">
+                  <div className="flex flex-row gap-2 items-center justify-center">
+                    <div>Learn more</div>
+                    <ExternalLink size={16} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1 p-2 bg-gray-100 rounded-md">
+                <div className="flex flex-row gap-2 items-center justify-center">
+                  <ImageIcon size={16} className="text-gray-500" />
+                  <div className="text-gray-500 text-sm">
+                    Closed / Error image
+                  </div>
+                </div>
+                <Image
+                  src={waitlist.imageError}
                   alt="waitlist-img"
                   className="w-[287px] h-[150px] rounded-lg"
                 />

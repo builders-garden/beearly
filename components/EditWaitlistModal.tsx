@@ -59,6 +59,16 @@ export const EditWaitlistModal = ({
   const [uploadedSuccessImage, setUploadedSuccessImage] = useState<string>(
     waitlist.imageSuccess
   );
+  const [selectedFileNotEligible, setSelectedFileNotEligible] =
+    useState<File | null>(null);
+  const [uploadedNotEligibleImage, setUploadedNotEligibleImage] =
+    useState<string>(waitlist.imageNotEligible);
+  const [selectedFileClosed, setSelectedFileClosed] = useState<File | null>(
+    null
+  );
+  const [uploadedClosedImage, setUploadedClosedImage] = useState<string>(
+    waitlist.imageError
+  );
   const onSelectedLandingImageFile = (event: any) => {
     if (!event?.target?.files[0]) return;
     const reader = new FileReader();
@@ -77,12 +87,32 @@ export const EditWaitlistModal = ({
     reader.readAsDataURL(event.target.files[0]);
     setSelectedFileSuccess(event?.target.files[0]);
   };
+  const onSelectedNotEligibleImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedNotEligibleImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileNotEligible(event?.target.files[0]);
+  };
+  const onSelectedClosedImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedClosedImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileClosed(event?.target.files[0]);
+  };
   const isDisabled =
     !name ||
     !endDate ||
     !externalUrl ||
     (!selectedFileLanding && !uploadedLandingImage) ||
-    (!selectedFileSuccess && !uploadedSuccessImage);
+    (!selectedFileSuccess && !uploadedSuccessImage) ||
+    (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
+    (!selectedFileClosed && !uploadedClosedImage);
 
   const [error, setError] = useState<string>();
   const updateWaitlist = async () => {
@@ -92,7 +122,9 @@ export const EditWaitlistModal = ({
       !endDate ||
       !externalUrl ||
       (!selectedFileLanding && !uploadedLandingImage) ||
-      (!selectedFileSuccess && !uploadedSuccessImage)
+      (!selectedFileSuccess && !uploadedSuccessImage) ||
+      (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
+      (!selectedFileClosed && !uploadedClosedImage)
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -104,6 +136,9 @@ export const EditWaitlistModal = ({
     formData.append("externalUrl", externalUrl);
     if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
     if (selectedFileSuccess) formData.append("files[1]", selectedFileSuccess);
+    if (selectedFileNotEligible)
+      formData.append("files[2]", selectedFileNotEligible);
+    if (selectedFileClosed) formData.append("files[3]", selectedFileClosed);
     const res = await fetch(`/api/waitlists/${waitlist.id}`, {
       method: "PUT",
       body: formData,
@@ -224,6 +259,24 @@ export const EditWaitlistModal = ({
                         uploadedImage={uploadedSuccessImage}
                         onSelectedFile={onSelectedSuccessImageFile}
                         label="Success"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileNotEligible!}
+                        uploadedImage={uploadedNotEligibleImage}
+                        onSelectedFile={onSelectedNotEligibleImageFile}
+                        label="Not Eligible"
+                      />
+                    </div>
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileClosed!}
+                        uploadedImage={uploadedClosedImage}
+                        onSelectedFile={onSelectedClosedImageFile}
+                        label="Closed / Error"
                       />
                     </div>
                   </div>

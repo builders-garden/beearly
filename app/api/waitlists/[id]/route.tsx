@@ -44,6 +44,8 @@ export const PUT = async (
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
+  const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
+  const errorImage: File | null = body.get("files[3]") as unknown as File;
 
   if (!name || !endDate || !externalUrl) {
     return NextResponse.json(
@@ -95,6 +97,25 @@ export const PUT = async (
     success = { url: successUpload.url };
   }
 
+  let notEligible: { url: string } = { url: "" };
+  if (notEligibleImage) {
+    const notEligibleBytes = await notEligibleImage!.arrayBuffer();
+    const notEligibleBuffer = Buffer.from(notEligibleBytes);
+    const notEligibleUpload = await uploadImage(
+      notEligibleBuffer,
+      `${name}-not-eligible.png`
+    );
+    notEligible = { url: notEligibleUpload.url };
+  }
+
+  let error: { url: string } = { url: "" };
+  if (errorImage) {
+    const errorBytes = await errorImage!.arrayBuffer();
+    const errorBuffer = Buffer.from(errorBytes);
+    const errorUpload = await uploadImage(errorBuffer, `${name}-error.png`);
+    error = { url: errorUpload.url };
+  }
+
   const waitlist = await prisma.waitlist.update({
     where: {
       userAddress: address!,
@@ -106,6 +127,8 @@ export const PUT = async (
       externalUrl: externalUrl as string,
       ...(landing.url ? { imageLanding: landing.url } : {}),
       ...(success.url ? { imageSuccess: success.url } : {}),
+      ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
+      ...(error.url ? { imageError: error.url } : {}),
       updatedAt: new Date(),
     },
   });

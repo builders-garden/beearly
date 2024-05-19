@@ -20,6 +20,20 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  if (Date.now() > waitlist.endDate.getTime()) {
+    return {
+      image: waitlist.imageError,
+      imageOptions: {
+        aspectRatio: "1.91:1",
+      },
+      buttons: [
+        <Button action="link" key="1" target={waitlist.externalUrl}>
+          Learn more
+        </Button>,
+      ],
+    };
+  }
+
   const fid = ctx.message?.requesterFid;
   const farcasterProfile = await fetchFarcasterProfile(fid.toString());
   if (!farcasterProfile) {

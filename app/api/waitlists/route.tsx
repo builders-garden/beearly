@@ -29,14 +29,18 @@ export const POST = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
-  const sucessImage: File | null = body.get("files[1]") as unknown as File;
+  const successImage: File | null = body.get("files[1]") as unknown as File;
+  const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
+  const errorImage: File | null = body.get("files[3]") as unknown as File;
   if (
     !name ||
     !endDate ||
     !externalUrl ||
     !address ||
     !landingImage ||
-    !sucessImage
+    !successImage ||
+    !notEligibleImage ||
+    !errorImage
   ) {
     return NextResponse.json(
       { success: false, message: "Missing required fields" },
@@ -65,11 +69,17 @@ export const POST = async (req: NextRequest) => {
 
   const landingBytes = await landingImage!.arrayBuffer();
   const landingBuffer = Buffer.from(landingBytes);
-  const successBytes = await sucessImage!.arrayBuffer();
+  const successBytes = await successImage!.arrayBuffer();
   const successBuffer = Buffer.from(successBytes);
-  const [landing, success] = await Promise.all([
+  const notEligibleBytes = await notEligibleImage!.arrayBuffer();
+  const notEligibleBuffer = Buffer.from(notEligibleBytes);
+  const errorBytes = await errorImage!.arrayBuffer();
+  const errorBuffer = Buffer.from(errorBytes);
+  const [landing, success, notEligible, error] = await Promise.all([
     uploadImage(landingBuffer, `${name}-landing.png`),
     uploadImage(successBuffer, `${name}-success.png`),
+    uploadImage(notEligibleBuffer, `${name}-not-eligible.png`),
+    uploadImage(errorBuffer, `${name}-error.png`),
   ]);
 
   const waitlist = await prisma.waitlist.create({
@@ -81,6 +91,8 @@ export const POST = async (req: NextRequest) => {
       userAddress: address!,
       imageLanding: landing.url,
       imageSuccess: success.url,
+      imageNotEligible: notEligible.url,
+      imageError: error.url,
       createdAt: new Date(),
       updatedAt: new Date(),
     },

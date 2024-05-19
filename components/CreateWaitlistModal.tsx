@@ -16,6 +16,7 @@ import { parseAbsoluteToLocal } from "@internationalized/date";
 import { FrameImage } from "./FrameImage";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { BASE_FRAME_URL } from "../lib/constants";
+import { BeearlyButton } from "./BeearlyButton";
 
 export const CreateWaitlistModal = ({
   isOpen,
@@ -44,6 +45,14 @@ export const CreateWaitlistModal = ({
     null
   );
   const [uploadedSuccessImage, setUploadedSuccessImage] = useState<string>("");
+  const [selectedFileNotEligible, setSelectedFileNotEligible] =
+    useState<File | null>(null);
+  const [uploadedNotEligibleImage, setUploadedNotEligibleImage] =
+    useState<string>("");
+  const [selectedFileClosed, setSelectedFileClosed] = useState<File | null>(
+    null
+  );
+  const [uploadedClosedImage, setUploadedClosedImage] = useState<string>("");
   const onSelectedLandingImageFile = (event: any) => {
     if (!event?.target?.files[0]) return;
     const reader = new FileReader();
@@ -62,12 +71,32 @@ export const CreateWaitlistModal = ({
     reader.readAsDataURL(event.target.files[0]);
     setSelectedFileSuccess(event?.target.files[0]);
   };
+  const onSelectedNotEligibleImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedNotEligibleImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileNotEligible(event?.target.files[0]);
+  };
+  const onSelectedClosedImageFile = (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedClosedImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFileClosed(event?.target.files[0]);
+  };
   const isDisabled =
     !name ||
     !endDate ||
     !externalUrl ||
     !selectedFileLanding ||
-    !selectedFileSuccess;
+    !selectedFileSuccess ||
+    !selectedFileNotEligible ||
+    !selectedFileClosed;
 
   const [error, setError] = useState<string>("");
   const createWaitlist = async () => {
@@ -77,7 +106,9 @@ export const CreateWaitlistModal = ({
       !endDate ||
       !externalUrl ||
       !selectedFileLanding ||
-      !selectedFileSuccess
+      !selectedFileSuccess ||
+      !selectedFileNotEligible ||
+      !selectedFileClosed
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -89,23 +120,30 @@ export const CreateWaitlistModal = ({
     formData.append("externalUrl", externalUrl);
     formData.append("files[0]", selectedFileLanding);
     formData.append("files[1]", selectedFileSuccess);
-    const res = await fetch("/api/waitlists", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${await getAuthToken()}`,
-      },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      refetchWaitlists();
-      setIsSuccess(true);
-    } else {
-      const data = await res.json();
-      setError(data.message);
+    formData.append("files[2]", selectedFileNotEligible);
+    formData.append("files[3]", selectedFileClosed);
+    try {
+      const res = await fetch("/api/waitlists", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${await getAuthToken()}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        refetchWaitlists();
+        setIsSuccess(true);
+      } else {
+        const data = await res.json();
+        setError(data.message);
+      }
+    } catch (e) {
+      setError("An error occurred");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+      };
 
   const copyWaitlistFrameLink = () => {
     navigator.clipboard.writeText(
@@ -210,6 +248,24 @@ export const CreateWaitlistModal = ({
                         />
                       </div>
                     </div>
+                    <div className="flex flex-row gap-2">
+                      <div className="w-[50%]">
+                        <FrameImage
+                          selectedFile={selectedFileNotEligible!}
+                          uploadedImage={uploadedNotEligibleImage}
+                          onSelectedFile={onSelectedNotEligibleImageFile}
+                          label="Not Eligible"
+                        />
+                      </div>
+                      <div className="w-[50%]">
+                        <FrameImage
+                          selectedFile={selectedFileClosed!}
+                          uploadedImage={uploadedClosedImage}
+                          onSelectedFile={onSelectedClosedImageFile}
+                          label="Closed / Error"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -262,15 +318,12 @@ export const CreateWaitlistModal = ({
                     >
                       Cancel
                     </Button>
-                    <Button
-                      color="primary"
-                      radius="sm"
+                    <BeearlyButton
                       onPress={createWaitlist}
                       isLoading={loading}
                       isDisabled={isDisabled}
-                    >
-                      Create
-                    </Button>
+                      text="Create"
+                    />
                   </div>
                   <div className="text-xs text-right text-gray-500 flex flex-row justify-end">
                     *you can edit this at any time later

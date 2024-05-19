@@ -22,6 +22,8 @@ model Waitlist {
   endDate         DateTime          @db.Date @map("end_date")
   imageLanding    String            @map("image_landing")
   imageSuccess    String            @map("image_success")
+  imageNotEligible String          @map("image_not_eligible")
+  imageError      String            @map("image_error")
   userAddress     String            @map("user_address")
   createdAt       DateTime          @db.Date @map("created_at")
   updatedAt       DateTime          @db.Date @map("updated_at")
