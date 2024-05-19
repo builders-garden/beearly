@@ -10,14 +10,14 @@ import {
   Table,
 } from "@nextui-org/react";
 import { ChevronRight, Hash, LinkIcon, Users } from "lucide-react";
-import { Waitlist } from "@prisma/client";
+import { WaitlistWithRequirements } from "./WaitlistDetail";
 
 export default function WaitlistTable({
   waitlists,
   setSelectedWaitlist,
 }: {
-  waitlists: Waitlist[];
-  setSelectedWaitlist: (waitlist: Waitlist) => void;
+  waitlists: WaitlistWithRequirements[];
+  setSelectedWaitlist: (waitlist: WaitlistWithRequirements) => void;
 }) {
   return (
     <Table

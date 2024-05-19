@@ -1,7 +1,7 @@
 "use client";
 import { Button, Image, Spinner } from "@nextui-org/react";
 import WaitlistTable from "../../components/WaitlistTable";
-import { WaitlistDetail } from "../../components/WaitlistDetail";
+import { WaitlistDetail, WaitlistWithRequirements } from "../../components/WaitlistDetail";
 import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Waitlist } from "@prisma/client";
@@ -11,8 +11,8 @@ import { BeearlyButton } from "../../components/BeearlyButton";
 import { PlusSquare } from "lucide-react";
 
 const Waitlists = () => {
-  const [waitlists, setWaitlists] = useState<Waitlist[]>([]);
-  const [selectedWaitlist, setSelectedWaitlist] = useState<Waitlist | null>();
+  const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
+  const [selectedWaitlist, setSelectedWaitlist] = useState<WaitlistWithRequirements | null>();
   const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
   const [waitlistsLoading, setWaitlistsLoading] = useState(true);

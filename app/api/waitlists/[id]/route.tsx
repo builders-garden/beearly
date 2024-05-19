@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 import { uploadImage } from "../../../../lib/imagekit";
 import slugify from "slugify";
+import { WaitlistRequirementType } from "@prisma/client";
 
 export const GET = async (
   req: NextRequest,
@@ -41,6 +42,8 @@ export const PUT = async (
   const endDate = body.get("endDate");
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
+  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
+  const requiredChannels = body.get("requiredChannels");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
@@ -133,7 +136,52 @@ export const PUT = async (
     },
   });
 
-  return NextResponse.json(waitlist);
+  await prisma.waitlistRequirement.deleteMany({
+    where: {
+      waitlistId: waitlist.id,
+    },
+  });
+
+  if (isPowerBadgeRequired) {
+    await prisma.waitlistRequirement.create({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.POWER_BADGE,
+        value: (isPowerBadgeRequired === "true").toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  if (requiredChannels?.toString()?.length! > 0) {
+    const channels = requiredChannels
+      ?.toString()
+      .split(",")
+      .map((c) => c?.trim()?.toLowerCase());
+    await Promise.all(
+      channels!.map((channel) =>
+        prisma.waitlistRequirement.create({
+          data: {
+            waitlistId: waitlist.id,
+            type: WaitlistRequirementType.CHANNEL_FOLLOW,
+            value: channel,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        })
+      )
+    );
+  }
+  const waitlistRequirements = await prisma.waitlistRequirement.findMany({
+    where: {
+      waitlistId: waitlist.id,
+    },
+  });
+  return NextResponse.json({
+    ...waitlist,
+    waitlistRequirements,
+  });
 };
 
 export const DELETE = async (

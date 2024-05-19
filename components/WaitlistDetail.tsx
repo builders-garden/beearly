@@ -3,7 +3,9 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Image,
+  Input,
   Pagination,
   Spinner,
   Tab,
@@ -11,21 +13,29 @@ import {
 } from "@nextui-org/react";
 import { Edit, ExternalLink, ImageIcon, Link, Users } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Waitlist, WaitlistedUser } from "@prisma/client";
+import {
+  Waitlist,
+  WaitlistRequirement,
+  WaitlistRequirementType,
+  WaitlistedUser,
+} from "@prisma/client";
 import { BASE_FRAME_URL } from "../lib/constants";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
 import { UsersTable } from "./UsersTable";
 import { EditWaitlistModal } from "./EditWaitlistModal";
 
+export type WaitlistWithRequirements = Waitlist & {
+  waitlistRequirements: WaitlistRequirement[];
+};
 // this is a card like element that displays a waitlist
 export const WaitlistDetail = ({
   waitlist,
   setSelectedWaitlist,
   refetchWaitlists,
 }: {
-  waitlist: Waitlist;
-  setSelectedWaitlist: (waitlist: Waitlist) => void;
+  waitlist: WaitlistWithRequirements;
+  setSelectedWaitlist: (waitlist: WaitlistWithRequirements) => void;
   refetchWaitlists: () => void;
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -55,6 +65,14 @@ export const WaitlistDetail = ({
       fetchUsers();
     }
   }, [jwt, isConnected, fetchUsers, page]);
+  const requiredChannels = waitlist.waitlistRequirements
+    ?.filter((r) => r.type === WaitlistRequirementType.CHANNEL_FOLLOW)
+    ?.map((r) => r.value)
+    ?.join(",");
+  const isPowerBadgeRequired =
+    waitlist.waitlistRequirements?.find(
+      (r) => r.type === WaitlistRequirementType.POWER_BADGE
+    )?.value || false;
   return (
     <div className="flex flex-col border-2 border-gray-200 rounded-xl">
       <div className="flex flex-col p-4 gap-2">
@@ -186,10 +204,45 @@ export const WaitlistDetail = ({
             </div>
           </div>
         </Tab>
+        <Tab key="requirements" title="Requirements">
+          <div className="flex flex-col gap-2 p-4">
+            <div className="flex flex-row gap-4 w-full">
+              <div className="flex flex-col gap-1 w-[50%]">
+                <div className="text-sm text-gray-500">Channel ID</div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={requiredChannels}
+                  placeholder="build,base,farcaster"
+                  isDisabled
+                />
+                <div className="text-xs text-gray-500">
+                  Comma separated list of channel IDs that the users must follow
+                  to be eligible
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 w-[50%]">
+                <div className="text-sm text-gray-500">Power Badge</div>
+                <Checkbox
+                  isSelected={isPowerBadgeRequired === "true"}
+                  isDisabled
+                >
+                  Power Badge required
+                </Checkbox>
+
+                <div className="text-xs text-gray-500">
+                  Users must have a Warpcast power badge to be eligible
+                </div>
+              </div>
+            </div>
+          </div>
+        </Tab>
       </Tabs>
       <EditWaitlistModal
         isOpen={isEditModalOpen}
-        waitlist={waitlist}
+        waitlist={
+          waitlist as Waitlist & { waitlistRequirements: WaitlistRequirement[] }
+        }
         onOpenChange={setIsEditModalOpen}
         setSelectedWaitlist={setSelectedWaitlist}
         refetchWaitlists={refetchWaitlists}

@@ -8,6 +8,7 @@ import {
   Input,
   DatePicker,
   Image,
+  Checkbox,
 } from "@nextui-org/react";
 import { CopyIcon, Frame, ImageIcon, Info, PlusSquare } from "lucide-react";
 import { useState } from "react";
@@ -36,6 +37,8 @@ export const CreateWaitlistModal = ({
     )
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
+  const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>();
+  const [requiredChannels, setRequiredChannels] = useState<string>();
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
   );
@@ -122,6 +125,12 @@ export const CreateWaitlistModal = ({
     formData.append("files[1]", selectedFileSuccess);
     formData.append("files[2]", selectedFileNotEligible);
     formData.append("files[3]", selectedFileClosed);
+    if (isPowerBadgeRequired?.toString()) {
+      formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
+    }
+    if (requiredChannels) {
+      formData.append("requiredChannels", requiredChannels.toString());
+    }
     try {
       const res = await fetch("/api/waitlists", {
         method: "POST",
@@ -143,7 +152,7 @@ export const CreateWaitlistModal = ({
     } finally {
       setLoading(false);
     }
-      };
+  };
 
   const copyWaitlistFrameLink = () => {
     navigator.clipboard.writeText(
@@ -152,7 +161,13 @@ export const CreateWaitlistModal = ({
   };
 
   return (
-    <Modal size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal
+      size="2xl"
+      placement="bottom-center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      onClose={() => setIsSuccess(false)}
+    >
       <ModalContent>
         {(onClose) => (
           <>
@@ -219,6 +234,40 @@ export const CreateWaitlistModal = ({
                       <div className="text-xs text-gray-500">
                         This is the website you want your users to visit after
                         being whitelist
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <div className="font-semibold text-lg">
+                      Eligibility Requirements (optional)
+                    </div>
+                    <div className="flex flex-row gap-4 w-full">
+                      <div className="flex flex-col gap-1 w-[50%]">
+                        <div className="text-sm text-gray-500">Channel ID</div>
+                        <Input
+                          type="text"
+                          variant={"bordered"}
+                          value={requiredChannels}
+                          onValueChange={setRequiredChannels}
+                          placeholder="build,base,farcaster"
+                        />
+                        <div className="text-xs text-gray-500">
+                          Comma separated list of channel IDs that the users
+                          must follow to be eligible
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1 w-[50%]">
+                        <div className="text-sm text-gray-500">Power Badge</div>
+                        <Checkbox
+                          isSelected={isPowerBadgeRequired}
+                          onValueChange={setIsPowerBadgeRequired}
+                        >
+                          Power Badge required
+                        </Checkbox>
+
+                        <div className="text-xs text-gray-500">
+                          Users must have a Warpcast power badge to be eligible
+                        </div>
                       </div>
                     </div>
                   </div>

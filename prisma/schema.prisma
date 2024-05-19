@@ -28,6 +28,7 @@ model Waitlist {
   createdAt       DateTime          @db.Date @map("created_at")
   updatedAt       DateTime          @db.Date @map("updated_at")
   waitlistedUsers WaitlistedUser[]
+  waitlistRequirements WaitlistRequirement[]
 }
 
 model WaitlistedUser {
@@ -40,6 +41,22 @@ model WaitlistedUser {
   avatarUrl     String?    @map("avatar_url")
   powerBadge    Boolean?   @default(false) @map("power_badge")
   waitlistedAt  DateTime   @db.Date
+  createdAt     DateTime   @db.Date @map("created_at")
+  updatedAt     DateTime   @db.Date @map("updated_at")
+  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([waitlistId, fid], name: "waitlistId_fid")
+}
+
+enum WaitlistRequirementType {
+  CHANNEL_FOLLOW
+  POWER_BADGE
+}
+model WaitlistRequirement {
+  id            Int        @default(autoincrement()) @unique
+  waitlistId    Int        @map("waitlist_id")
+  value         String 
+  type   WaitlistRequirementType     
   createdAt     DateTime   @db.Date @map("created_at")
   updatedAt     DateTime   @db.Date @map("updated_at")
   waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)

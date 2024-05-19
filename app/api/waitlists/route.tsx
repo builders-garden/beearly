@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
+import { WaitlistRequirementType } from "@prisma/client";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
@@ -14,6 +15,7 @@ export const GET = async (req: NextRequest) => {
       _count: {
         select: { waitlistedUsers: true },
       },
+      waitlistRequirements: true,
     },
   });
 
@@ -26,12 +28,15 @@ export const POST = async (req: NextRequest) => {
   const name = body.get("name");
   const endDate = body.get("endDate");
   const externalUrl = body.get("externalUrl");
+  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
+  const requiredChannels = body.get("requiredChannels");
   const address = req.headers.get("x-address");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
+
   if (
     !name ||
     !endDate ||
@@ -97,6 +102,54 @@ export const POST = async (req: NextRequest) => {
       updatedAt: new Date(),
     },
   });
+
+  console.log(isPowerBadgeRequired, requiredChannels);
+
+  if (isPowerBadgeRequired) {
+    console.log({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.POWER_BADGE,
+        value: (isPowerBadgeRequired === "true").toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+    await prisma.waitlistRequirement.create({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.POWER_BADGE,
+        value: (isPowerBadgeRequired === "true").toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  if (requiredChannels?.toString()?.length! > 0) {
+    const channels = requiredChannels
+      ?.toString()
+      .split(",")
+      .map((c) => c?.trim()?.toLowerCase());
+    console.log({
+      data: channels!.map((channel) => ({
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.CHANNEL_FOLLOW,
+        value: channel,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })),
+    });
+    await prisma.waitlistRequirement.createMany({
+      data: channels!.map((channel) => ({
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.CHANNEL_FOLLOW,
+        value: channel,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })),
+    });
+  }
 
   return NextResponse.json(waitlist);
 };
