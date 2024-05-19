@@ -52,7 +52,7 @@ export default function WaitlistTable({
         {waitlists.map((waitlist) => (
           <TableRow
             key={waitlist.id}
-            className="cursor-pointer"
+            className="cursor-pointer border-bottom-2 border-gray-200"
             onClick={() => setSelectedWaitlist(waitlist)}
           >
             <TableCell>

@@ -1,4 +1,4 @@
-import { Button } from "@nextui-org/react";
+import { Button, Link } from "@nextui-org/react";
 import { ReactNode } from "react";
 
 export const BeearlyButton = ({
@@ -7,12 +7,14 @@ export const BeearlyButton = ({
   text,
   isLoading,
   isDisabled,
+  link,
 }: {
   onPress: () => void;
   icon?: ReactNode;
   text: string;
   isLoading?: boolean;
   isDisabled?: boolean;
+  link?: string;
 }) => {
   return (
     <Button
@@ -25,7 +27,13 @@ export const BeearlyButton = ({
     >
       <div className="flex flex-row gap-1 items-center">
         {icon}
-        <div className="font-semibold">{text}</div>
+        {link ? (
+          <Link href={link}>
+            <div className="font-semibold text-black">{text}</div>
+          </Link>
+        ) : (
+          <div className="font-semibold">{text}</div>
+        )}
       </div>
     </Button>
   );

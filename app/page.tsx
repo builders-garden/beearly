@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { useAccount } from "wagmi";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { BeearlyButton } from "../components/BeearlyButton";
 
 // This is a react server component only
 export default function Home() {
@@ -18,9 +19,11 @@ export default function Home() {
         </div>
       </div>
       {isConnected ? (
-        <Button color="primary">
-          <Link href="/waitlists">Get started</Link>
-        </Button>
+        <BeearlyButton
+          text="Get started"
+          link="/waitlists"
+          onPress={() => {}}
+        />
       ) : (
         <DynamicWidget />
       )}

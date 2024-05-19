@@ -3,22 +3,8 @@ import "./globals.css";
 import { Navbar } from "../components/Navbar";
 import Providers from "../components/Providers";
 
-import { Raleway } from "next/font/google";
-const raleway = Raleway({ subsets: ["latin"] });
-
-import type { Metadata } from "next";
-import { fetchMetadata } from "frames.js/next";
-import { FRAMES_BASE_PATH, appURL, vercelURL } from "./utils";
-
-/*export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Waitlist frame",
-    description: "Your product's waitlist on Farcaster",
-    other: {
-      ...(await fetchMetadata(new URL(FRAMES_BASE_PATH, appURL()))),
-    },
-  };
-}*/
+import { DM_Sans } from "next/font/google";
+const dmSans = DM_Sans({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -26,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={raleway.className}>
+    <html lang="en" className={dmSans.className}>
       <body className="p-4">
         <Providers>
           <Navbar />

@@ -1299,6 +1299,7 @@ export type SocialFollowingsArgs = {
 };
 
 export type SocialCapital = {
+  socialCapitalRank: Maybe<Scalars['Int']['output']>;
   socialCapitalScore: Maybe<Scalars['Float']['output']>;
   socialCapitalScoreRaw: Maybe<Scalars['String']['output']>;
 };
@@ -1342,6 +1343,7 @@ export type SocialFilter = {
   isDefault: InputMaybe<Boolean_Comparator_Exp>;
   profileCreatedAtBlockTimestamp: InputMaybe<Time_Comparator_Exp>;
   profileName: InputMaybe<Regex_String_Comparator_Exp>;
+  socialCapitalRank: InputMaybe<Int_Comparator_Exp>;
   socialCapitalScore: InputMaybe<Float_Comparator_Exp>;
   updatedAt: InputMaybe<Time_Comparator_Exp>;
   userAssociatedAddresses: InputMaybe<Address_Comparator_Exp>;
@@ -1450,6 +1452,7 @@ export type SocialOrderBy = {
   followerCount: InputMaybe<OrderBy>;
   followingCount: InputMaybe<OrderBy>;
   profileCreatedAtBlockTimestamp: InputMaybe<OrderBy>;
+  socialCapitalRank: InputMaybe<OrderBy>;
   socialCapitalScore: InputMaybe<OrderBy>;
   updatedAt: InputMaybe<OrderBy>;
 };

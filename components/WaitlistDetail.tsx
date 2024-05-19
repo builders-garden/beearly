@@ -22,7 +22,7 @@ import { EditWaitlistModal } from "./EditWaitlistModal";
 export const WaitlistDetail = ({
   waitlist,
   setSelectedWaitlist,
-  refetchWaitlists
+  refetchWaitlists,
 }: {
   waitlist: Waitlist;
   setSelectedWaitlist: (waitlist: Waitlist) => void;
@@ -75,11 +75,17 @@ export const WaitlistDetail = ({
       <Tabs
         className="px-4"
         aria-label="tabs"
+        variant="underlined"
         selectedKey={selected}
         color="primary"
         onSelectionChange={(value) => setSelected(value as string)}
       >
-        <Tab key="list" title="Users">
+        <Tab
+          key="list"
+          title={`Waitlisted Users · ${
+            (waitlist as any)?._count?.waitlistedUsers
+          }`}
+        >
           {usersLoading ? (
             <div className="flex flex-row justify-center items-center p-16">
               <Spinner />

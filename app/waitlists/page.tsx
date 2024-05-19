@@ -51,7 +51,7 @@ const Waitlists = () => {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4 justify-between">
-        <div className="text-3xl font-semibold">Waitlists</div>
+        <div className="text-4xl font-medium">Waitlists</div>
         <BeearlyButton
           onPress={() => {
             setIsOpen(true);
@@ -114,7 +114,7 @@ const Waitlists = () => {
                   />
                 </div>
               ) : (
-                <div className="w-[50%]">
+                <div className="w-[50%] border-2 border-gray-200 rounded-xl">
                   {!waitlistsLoading && (
                     <WaitlistTable
                       waitlists={waitlists}
