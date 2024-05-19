@@ -24,12 +24,11 @@ export const GET = async (
   });
 
   if (!waitlist) {
-    return {
+    return NextResponse.json({
+      message: "Waitlist not found",
+    }, {
       status: 404,
-      body: {
-        message: "Waitlist not found",
-      },
-    };
+    })
   }
 
   const totalItems = await prisma.waitlistedUser.count({
