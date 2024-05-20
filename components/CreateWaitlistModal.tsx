@@ -167,6 +167,7 @@ export const CreateWaitlistModal = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       onClose={() => setIsSuccess(false)}
+      scrollBehavior="outside"
     >
       <ModalContent>
         {(onClose) => (
@@ -243,7 +244,9 @@ export const CreateWaitlistModal = ({
                     </div>
                     <div className="flex flex-row gap-2 w-full">
                       <div className="flex flex-col gap-1 w-[50%]">
-                        <div className="text-sm text-gray-500">Follow Channel IDs</div>
+                        <div className="text-sm text-gray-500">
+                          Follow Channel IDs
+                        </div>
                         <Input
                           type="text"
                           variant={"bordered"}
@@ -274,8 +277,8 @@ export const CreateWaitlistModal = ({
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-row justify-between">
                       <div className="font-semibold text-lg">Add images</div>
-                      <div className="text-xs flex flex-row bg-blue-500/10 text-blue-400 p-1 items-center rounded-md gap-1">
-                        <Info size={12} className="text-blue-400" />
+                      <div className="text-xs flex flex-row  text-gray-600 p-1 items-center rounded-md gap-1">
+                        <Info size={12} className="text-gray-600" />
                         Recommended 955x500 px
                       </div>
                     </div>

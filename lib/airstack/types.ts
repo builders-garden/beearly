@@ -567,6 +567,7 @@ export enum FarcasterReactionCriteria {
 export type FarcasterReactionsFilter = {
   castHash: InputMaybe<String_Eq_In_Comparator_Exp>;
   castUrl: InputMaybe<String_Eq_In_Comparator_Exp>;
+  channelId: InputMaybe<String_Comparator_Exp>;
   criteria: FarcasterReactionCriteria;
   frameUrl: InputMaybe<String_Eq_In_Comparator_Exp>;
   reactedBy: InputMaybe<Identity_Comparator_Exp>;
@@ -714,6 +715,52 @@ export type Mentions = {
   fid: Maybe<Scalars['String']['output']>;
   position: Maybe<Scalars['Int']['output']>;
   profile: Maybe<Social>;
+};
+
+export type NativeBalance = {
+  /** Token amount the address currently holds */
+  amount: Scalars['String']['output'];
+  /** Blockchain where the token smart contract is deployed */
+  blockchain: Maybe<NativeBalanceBlockchain>;
+  /** Unique identifier for the blockchain */
+  chainId: Scalars['String']['output'];
+  /** Formatted token balance in decimals */
+  formattedAmount: Maybe<Scalars['Float']['output']>;
+  /** Airstack unique identifier for the data point */
+  id: Scalars['ID']['output'];
+  /** Block number of the latest token balance change happened */
+  lastUpdatedBlock: Scalars['Int']['output'];
+  /** Timestamp of the latest token balance change happened */
+  lastUpdatedTimestamp: Maybe<Scalars['Time']['output']>;
+  /** Nested Query allowing to retrieve address, domain names, social profiles of the owner */
+  owner: Wallet;
+};
+
+export enum NativeBalanceBlockchain {
+  Degen = 'degen'
+}
+
+export type NativeBalanceFilter = {
+  formattedAmount: InputMaybe<Float_Comparator_Exp>;
+  lastUpdatedTimestamp: InputMaybe<Time_Comparator_Exp>;
+  owner: InputMaybe<Identity_Comparator_Exp>;
+};
+
+export type NativeBalanceOrderBy = {
+  lastUpdatedTimestamp: InputMaybe<OrderBy>;
+};
+
+export type NativeBalancesInput = {
+  blockchain: NativeBalanceBlockchain;
+  cursor: InputMaybe<Scalars['String']['input']>;
+  filter: NativeBalanceFilter;
+  limit: InputMaybe<Scalars['Int']['input']>;
+  order: InputMaybe<Array<NativeBalanceOrderBy>>;
+};
+
+export type NativeBalancesOutput = {
+  NativeBalance: Maybe<Array<NativeBalance>>;
+  pageInfo: Maybe<PageInfo>;
 };
 
 export type NftAttribute = {
@@ -1743,7 +1790,7 @@ export type TokenNftsNestedInput = {
   blockchain: InputMaybe<TokenBlockchain>;
   filter: InputMaybe<TokenNftFilter>;
   limit: InputMaybe<Scalars['Int']['input']>;
-  order: InputMaybe<Array<TokenNftOrderBy>>;
+  order: InputMaybe<Array<InputMaybe<TokenNftOrderBy>>>;
 };
 
 export type TokenNftsOutput = {

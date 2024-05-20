@@ -184,7 +184,12 @@ export const EditWaitlistModal = ({
   };
 
   return (
-    <Modal size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal
+      size="2xl"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      scrollBehavior="outside"
+    >
       <ModalContent>
         {(onClose) => (
           <>
