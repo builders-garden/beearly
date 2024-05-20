@@ -74,7 +74,7 @@ export const WaitlistDetail = ({
       (r) => r.type === WaitlistRequirementType.POWER_BADGE
     )?.value || false;
   return (
-    <div className="flex flex-col border-2 border-gray-200 rounded-xl">
+    <div className="flex flex-col border-2 border-gray-200 rounded-xl h-lvh">
       <div className="flex flex-col p-4 gap-2">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-8 items-center">

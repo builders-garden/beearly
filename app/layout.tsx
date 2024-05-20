@@ -16,7 +16,7 @@ export default function RootLayout({
       <body className="p-4">
         <Providers>
           <Navbar />
-          <div className="p-16">{children}</div>
+          <div className="px-8 py-4">{children}</div>
         </Providers>
       </body>
     </html>

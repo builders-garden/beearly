@@ -1,7 +1,10 @@
 "use client";
 import { Button, Image, Spinner } from "@nextui-org/react";
 import WaitlistTable from "../../components/WaitlistTable";
-import { WaitlistDetail, WaitlistWithRequirements } from "../../components/WaitlistDetail";
+import {
+  WaitlistDetail,
+  WaitlistWithRequirements,
+} from "../../components/WaitlistDetail";
 import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Waitlist } from "@prisma/client";
@@ -12,7 +15,8 @@ import { PlusSquare } from "lucide-react";
 
 const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
-  const [selectedWaitlist, setSelectedWaitlist] = useState<WaitlistWithRequirements | null>();
+  const [selectedWaitlist, setSelectedWaitlist] =
+    useState<WaitlistWithRequirements | null>();
   const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
   const [waitlistsLoading, setWaitlistsLoading] = useState(true);
@@ -77,7 +81,7 @@ const Waitlists = () => {
             <div className="text-2xl">Loading your waitlists...</div>
           </div>
         ) : (
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4 h-svh">
             {
               // if there are no waitlists, show a message
               waitlists.length === 0 ? (

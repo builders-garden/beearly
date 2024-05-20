@@ -26,8 +26,8 @@ export const FrameImage = ({
           />
         </div>
       ) : (
-        <div className="text-gray-400 w-[229px] bg-white my-2 h-[120px] rounded-md hover:border-blue-400 hover:border-2 hover:border-dashed hover:text-blue-400 ">
-          <div className="flex flex-col gap-1 justify-center items-center h-full my-auto  hover:text-blue-400">
+        <div className="text-gray-400 w-[287px] bg-white my-2 h-[150px] rounded-md hover:border-primary hover:border-2 hover:border-dashed hover:text-primary ">
+          <div className="flex flex-col gap-1 justify-center items-center h-full my-auto  hover:text-primary">
             <PlusSquare size={24} />
             <div className="text-lg">Add image</div>
           </div>
