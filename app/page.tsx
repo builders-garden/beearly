@@ -33,6 +33,14 @@ export default function Home() {
         ) : (
           <DynamicWidget />
         )}
+        <div className="flex flex-row gap-4 mt-16">
+          <Image
+            src="/example-waitlist.png"
+            className="h-96"
+            alt="example"
+            radius="sm"
+          />
+        </div>
       </div>
       <div>
         Made with ❤️ by{" "}
