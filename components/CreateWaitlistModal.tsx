@@ -335,8 +335,8 @@ export const CreateWaitlistModal = ({
               ) : (
                 <div className="flex flex-col gap-4">
                   <div>
-                    Copy the URL on Farcaster and start getting waitlist
-                    registrations!
+                    Copy the URL on your favourite Farcaster client and start
+                    getting waitlist registrations!
                   </div>
                   <div className="flex flex-row gap-2 items-center">
                     <div className="w-[60%] p-2 rounded-lg border-2 border-gray-200 flex flex-row justify-between items-center">
