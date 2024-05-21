@@ -213,7 +213,6 @@ export const WaitlistDetail = ({
                   type="text"
                   variant={"bordered"}
                   value={requiredChannels}
-                  placeholder="build,base,farcaster"
                   isDisabled
                 />
                 <div className="text-xs text-gray-500">
