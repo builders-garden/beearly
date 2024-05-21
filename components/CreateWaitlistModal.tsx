@@ -10,7 +10,14 @@ import {
   Image,
   Checkbox,
 } from "@nextui-org/react";
-import { CopyIcon, Frame, ImageIcon, Info, PlusSquare } from "lucide-react";
+import {
+  CheckCircleIcon,
+  CopyIcon,
+  Frame,
+  ImageIcon,
+  Info,
+  PlusSquare,
+} from "lucide-react";
 import { useState } from "react";
 import slugify from "slugify";
 import { parseAbsoluteToLocal } from "@internationalized/date";
@@ -29,6 +36,7 @@ export const CreateWaitlistModal = ({
   refetchWaitlists: () => void;
 }) => {
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [endDate, setEndDate] = useState(
@@ -158,6 +166,10 @@ export const CreateWaitlistModal = ({
     navigator.clipboard.writeText(
       `${BASE_FRAME_URL}/${slugify(name, { lower: true })}`
     );
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 5000);
   };
 
   return (
@@ -326,7 +338,7 @@ export const CreateWaitlistModal = ({
                     Copy the URL on Farcaster and start getting waitlist
                     registrations!
                   </div>
-                  <div className="flex flex-row gap-1 items-center">
+                  <div className="flex flex-row gap-2 items-center">
                     <div className="w-[60%] p-2 rounded-lg border-2 border-gray-200 flex flex-row justify-between items-center">
                       <div className="text-gray-400">
                         {BASE_FRAME_URL}/
@@ -345,6 +357,17 @@ export const CreateWaitlistModal = ({
                         onClick={copyWaitlistFrameLink}
                       />
                     </div>
+                    {isCopied && (
+                      <div className="flex flex-row gap-2 items-center">
+                        <CheckCircleIcon
+                          className="text-success-400"
+                          size={16}
+                        />
+                        <div className="text-success-400">
+                          Copied to clipboard!
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
