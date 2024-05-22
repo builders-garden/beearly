@@ -326,7 +326,7 @@ export const CreateWaitlistModal = ({
                           selectedFile={selectedFileClosed!}
                           uploadedImage={uploadedClosedImage}
                           onSelectedFile={onSelectedClosedImageFile}
-                          label="Closed / Error"
+                          label="Closed"
                         />
                       </div>
                     </div>
@@ -401,7 +401,7 @@ export const CreateWaitlistModal = ({
                     />
                   </div>
                   <div className="text-xs text-right text-gray-500 flex flex-row justify-end">
-                    *you can edit this at any time later
+                    you can edit this at any time later
                   </div>
                 </>
               ) : (

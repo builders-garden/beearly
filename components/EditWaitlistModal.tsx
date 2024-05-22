@@ -342,7 +342,7 @@ export const EditWaitlistModal = ({
                         selectedFile={selectedFileClosed!}
                         uploadedImage={uploadedClosedImage}
                         onSelectedFile={onSelectedClosedImageFile}
-                        label="Closed / Error"
+                        label="Closed"
                       />
                     </div>
                   </div>

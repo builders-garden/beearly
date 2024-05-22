@@ -5,7 +5,6 @@ import prisma from "../../../../lib/prisma";
 import { getFrameMessage } from "frames.js/getFrameMessage";
 
 const frameHandler = frames(async (ctx) => {
-  console.log("Here");
   /*if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }*/
