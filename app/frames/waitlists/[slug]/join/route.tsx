@@ -85,7 +85,14 @@ const frameHandler = frames(async (ctx) => {
             aspectRatio: "1.91:1",
           },
           buttons: [
-            <Button action="link" key="1" target={waitlist.externalUrl}>
+            <Button
+              action="post"
+              key="1"
+              target={`/waitlists/${waitlist.slug}/join`}
+            >
+              Try again
+            </Button>,
+            <Button action="link" key="2" target={waitlist.externalUrl}>
               Learn more
             </Button>,
           ],
@@ -104,6 +111,13 @@ const frameHandler = frames(async (ctx) => {
             aspectRatio: "1.91:1",
           },
           buttons: [
+            <Button
+              action="post"
+              key="1"
+              target={`/waitlists/${waitlist.slug}/join`}
+            >
+              Try again
+            </Button>,
             <Button action="link" key="1" target={waitlist.externalUrl}>
               Learn more
             </Button>,

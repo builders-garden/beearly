@@ -30,7 +30,7 @@ const frameHandler = frames(async (ctx) => {
         key="1"
         target={{ pathname: `/waitlists/${waitlist.slug}/join` }}
       >
-        Join waitlist
+        Join Waitlist
       </Button>,
     ],
   };

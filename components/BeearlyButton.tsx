@@ -9,7 +9,7 @@ export const BeearlyButton = ({
   isDisabled,
   link,
 }: {
-  onPress: () => void;
+  onPress?: () => void;
   icon?: ReactNode;
   text: string;
   isLoading?: boolean;

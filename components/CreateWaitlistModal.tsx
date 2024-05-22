@@ -291,7 +291,7 @@ export const CreateWaitlistModal = ({
                       <div className="font-semibold text-lg">Add images</div>
                       <div className="text-xs flex flex-row  text-gray-600 p-1 items-center rounded-md gap-1">
                         <Info size={12} className="text-gray-600" />
-                        Recommended 955x500px (.jpg, .png, .gif)
+                        Recommended 955x500px - max 1MB (.jpg, .png, .gif)
                       </div>
                     </div>
                     <div className="flex flex-row gap-1">

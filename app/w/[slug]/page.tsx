@@ -3,6 +3,9 @@ import { Metadata } from "next";
 import { appURL } from "../../utils";
 import prisma from "../../../lib/prisma";
 import { redirect } from "next/navigation";
+import { BeearlyButton } from "../../../components/BeearlyButton";
+import { ExternalLinkIcon } from "lucide-react";
+import { Image } from "@nextui-org/react";
 
 export async function generateMetadata({
   params,
@@ -17,7 +20,6 @@ export async function generateMetadata({
       slug,
     },
   });
-  console.log(new URL(`/frames/waitlists/${slug}`, appURL()));
   return {
     title: `Beearly - ${waitlist?.name}`,
     description: `Beearly - Launch your waiting list on Farcaster.`,
@@ -40,5 +42,14 @@ export default async function WaitlistShortPage({
   if (!waitlist) {
     return redirect("/waitlists");
   }
-  return <div>{waitlist.name}</div>;
+  return (
+    <div className="flex flex-col justify-center items-center gap-2">
+      <Image src={waitlist.imageLanding} alt="waitlist" />
+      <BeearlyButton
+        link={waitlist.externalUrl}
+        text="Learn more"
+        icon={<ExternalLinkIcon />}
+      />
+    </div>
+  );
 }

@@ -11,7 +11,9 @@ import { Waitlist } from "@prisma/client";
 import { useAccount } from "wagmi";
 import { CreateWaitlistModal } from "../../components/CreateWaitlistModal";
 import { BeearlyButton } from "../../components/BeearlyButton";
-import { PlusSquare } from "lucide-react";
+import { ExternalLink, PlusSquare } from "lucide-react";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
@@ -56,22 +58,32 @@ const Waitlists = () => {
     <div className="flex flex-col gap-8">
       <div className="flex flex-row gap-4 justify-between">
         <div className="text-4xl font-medium">Waitlists</div>
-        <BeearlyButton
-          onPress={() => {
-            setIsOpen(true);
-          }}
-          icon={
-            <div className="rounded-2xl">
-              <PlusSquare
-                radius={"lg"}
-                fill="black"
-                className="text-primary rounded-xl"
-                size={24}
-              />
-            </div>
-          }
-          text="New waitlist"
-        />
+        <div className="flex flex-row gap-4">
+          <Link href="https://warpcast.com/~/developers/frames" target="_blank">
+            <Button variant="light">
+              <div className="flex flex-row gap-2 items-center">
+                <div>Test your Waitlist frame</div>
+                <ExternalLink size={16} />
+              </div>
+            </Button>
+          </Link>
+          <BeearlyButton
+            onPress={() => {
+              setIsOpen(true);
+            }}
+            icon={
+              <div className="rounded-2xl">
+                <PlusSquare
+                  radius={"lg"}
+                  fill="black"
+                  className="text-primary rounded-xl"
+                  size={24}
+                />
+              </div>
+            }
+            text="New waitlist"
+          />
+        </div>
       </div>
       {
         // if waitlists are loading, show a loading message

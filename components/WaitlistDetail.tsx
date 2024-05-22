@@ -10,8 +10,18 @@ import {
   Spinner,
   Tab,
   Tabs,
+  Tooltip,
 } from "@nextui-org/react";
-import { Edit, ExternalLink, ImageIcon, Link, Users } from "lucide-react";
+import {
+  CheckCircleIcon,
+  CopyCheck,
+  CopyIcon,
+  Edit,
+  ExternalLink,
+  ImageIcon,
+  Link,
+  Users,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
   Waitlist,
@@ -40,6 +50,7 @@ export const WaitlistDetail = ({
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("list");
+  const [isCopied, setIsCopied] = useState<boolean>(false);
   const [usersLoading, setUsersLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<WaitlistedUser[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -65,6 +76,14 @@ export const WaitlistDetail = ({
       fetchUsers();
     }
   }, [jwt, isConnected, fetchUsers, page]);
+  const copyWaitlistFrameLink = () => {
+    navigator.clipboard.writeText(`${BASE_FRAME_URL}/${waitlist.slug}`);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
+
   const requiredChannels = waitlist.waitlistRequirements
     ?.filter((r) => r.type === WaitlistRequirementType.CHANNEL_FOLLOW)
     ?.map((r) => r.value)
@@ -75,7 +94,7 @@ export const WaitlistDetail = ({
     )?.value || false;
   return (
     <div className="flex flex-col border-2 border-gray-200 rounded-xl h-lvh">
-      <div className="flex flex-col p-4 gap-2">
+      <div className="flex flex-col px-4 py-2 gap-2">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-8 items-center">
             <div className="text-2xl font-semibold">{waitlist.name}</div>
@@ -89,6 +108,19 @@ export const WaitlistDetail = ({
             Edit
           </Button>
         </div>
+      </div>
+      <div className="flex flex-row px-4 items-center gap-2">
+        <div className="text-sm">Frame URL:</div>
+        <div className="text-sm font-semibold">{`${BASE_FRAME_URL}/${waitlist.slug}`}</div>
+        {isCopied ? (
+          <CopyCheck size={12} className="text-success" />
+        ) : (
+          <CopyIcon
+            size={12}
+            className="text-primary cursor-pointer"
+            onClick={copyWaitlistFrameLink}
+          />
+        )}
       </div>
       <Tabs
         className="px-4"

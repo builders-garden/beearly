@@ -26,7 +26,7 @@ export default function Home() {
         </div>
         {isConnected ? (
           <BeearlyButton
-            text="Get started"
+            text="Launch app"
             link="/waitlists"
             onPress={() => {}}
           />
