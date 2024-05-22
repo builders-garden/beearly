@@ -307,7 +307,7 @@ export const EditWaitlistModal = ({
                     <div className="font-semibold text-lg">Add images</div>
                     <div className="text-xs flex flex-row bg-blue-500/10 text-blue-400 p-1 items-center rounded-md gap-1">
                       <Info size={12} className="text-blue-400" />
-                      Recommended 955x500 px
+                      Recommended 955x500 px (.jpg, .png, .gif)
                     </div>
                   </div>
                   <div className="flex flex-row gap-1">
