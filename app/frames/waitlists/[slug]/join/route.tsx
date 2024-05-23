@@ -165,7 +165,7 @@ const frameHandler = frames(async (ctx) => {
         key="1"
         target={createCastIntent(fid, waitlist.name, waitlist.slug)}
       >
-        Share
+        Share with referral
       </Button>,
     ],
   };
