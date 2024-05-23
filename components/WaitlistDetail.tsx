@@ -49,6 +49,7 @@ export const WaitlistDetail = ({
   setSelectedWaitlist: (waitlist: WaitlistWithRequirements) => void;
   refetchWaitlists: () => void;
 }) => {
+  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("list");
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -60,7 +61,11 @@ export const WaitlistDetail = ({
   const { isConnected } = useAccount();
   const fetchUsers = useCallback(() => {
     setUsersLoading(true);
-    fetch(`/api/waitlists/${waitlist.id}/users?page=${page - 1}`, {
+    let url = `/api/waitlists/${waitlist.id}/users?page=${page - 1}`;
+    if (isPowerBadgeOnly) {
+      url += "&powerBadge=true";
+    }
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -71,7 +76,7 @@ export const WaitlistDetail = ({
         setTotalPages(data.pages);
         setUsersLoading(false);
       });
-  }, [jwt, waitlist, page]);
+  }, [waitlist.id, page, isPowerBadgeOnly, jwt]);
   useEffect(() => {
     if (jwt && isConnected) {
       fetchUsers();
@@ -153,6 +158,13 @@ export const WaitlistDetail = ({
             </div>
           ) : (
             <div className="flex flex-col">
+              <div className="flex flex-row px-4">
+                <Checkbox
+                  isSelected={isPowerBadgeOnly}
+                  onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
+                />
+                Power Badge only
+              </div>
               <UsersTable users={users} />
               <div className="flex flex-row justify-center items-center mb-4">
                 <Pagination

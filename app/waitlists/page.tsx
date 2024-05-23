@@ -60,7 +60,7 @@ const Waitlists = () => {
         <div className="text-4xl font-medium">Waitlists</div>
         <div className="flex flex-row gap-4">
           <Link href="https://warpcast.com/~/developers/frames" target="_blank">
-            <Button variant="light">
+            <Button variant="light" radius="sm">
               <div className="flex flex-row gap-2 items-center">
                 <div>Test your Waitlist frame</div>
                 <ExternalLink size={16} />

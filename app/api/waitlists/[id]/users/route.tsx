@@ -16,6 +16,7 @@ export const GET = async (
   const page = searchParams.get("page") || "0";
   const orderBy = searchParams.get("orderBy") || "waitlistedAt";
   const orderDirection = searchParams.get("orderDirection") || "desc";
+  const powerBadge = searchParams.get("powerBadge") || "";
 
   const waitlist = await prisma.waitlist.findUnique({
     where: {
@@ -24,11 +25,14 @@ export const GET = async (
   });
 
   if (!waitlist) {
-    return NextResponse.json({
-      message: "Waitlist not found",
-    }, {
-      status: 404,
-    })
+    return NextResponse.json(
+      {
+        message: "Waitlist not found",
+      },
+      {
+        status: 404,
+      }
+    );
   }
 
   const totalItems = await prisma.waitlistedUser.count({
@@ -39,6 +43,9 @@ export const GET = async (
   const waitlistedUsers = await prisma.waitlistedUser.findMany({
     where: {
       waitlistId: parseInt(id),
+      ...(powerBadge.toString().length > 0 && {
+        powerBadge: powerBadge === "true",
+      }),
     },
     take: parseInt(limit),
     skip: parseInt(page) * parseInt(limit),

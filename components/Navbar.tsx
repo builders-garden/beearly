@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Raleway } from "next/font/google";
 const raleway = Raleway({ subsets: ["latin"] });
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { Image } from "@nextui-org/react";
+import { Button, Image } from "@nextui-org/react";
 
 export const Navbar = () => {
   return (
@@ -17,7 +17,26 @@ export const Navbar = () => {
             className="rounded-none"
           />
         </Link>
-        <DynamicWidget />
+        <div className="flex flex-row gap-4 items-center">
+          <Link href={"https://warpcast.com/~/channel/beearly"} target="_blank">
+            <Button
+              color="primary"
+              variant="light"
+              radius="sm"
+              className="text-primary"
+            >
+              <div className="flex flex-row items-center gap-2">
+                <Image
+                  src="/farcaster-logo.svg"
+                  alt="farcaster-logo"
+                  className="h-4 rounded-none"
+                />
+                <div className="text-sm">Follow /beearly</div>
+              </div>
+            </Button>
+          </Link>
+          <DynamicWidget />
+        </div>
       </nav>
     </div>
   );
