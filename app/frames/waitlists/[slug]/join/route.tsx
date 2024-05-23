@@ -162,7 +162,7 @@ const frameHandler = frames(async (ctx) => {
       </Button>,
       <Button
         action="link"
-        key="1"
+        key="2"
         target={createCastIntent(fid, waitlist.name, waitlist.slug)}
       >
         Share with referral
