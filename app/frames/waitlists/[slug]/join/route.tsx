@@ -7,6 +7,7 @@ import {
   fetchFarcasterProfile,
 } from "../../../../../lib/airstack";
 import { WaitlistRequirementType } from "@prisma/client";
+import { isUserFollowingChannels } from "../../../../../lib/warpcast";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
@@ -100,11 +101,11 @@ const frameHandler = frames(async (ctx) => {
       }
     }
     if (requiredChannels.length > 0) {
-      const farcasterChannels = await fetchFarcasterChannels(
-        fid.toString(),
+      const isUserFollowingRequiredChannels = await isUserFollowingChannels(
+        fid,
         requiredChannels.map((r) => r.value)
       );
-      if (farcasterChannels.length !== requiredChannels.length) {
+      if (!isUserFollowingRequiredChannels) {
         return {
           image: waitlist.imageNotEligible,
           imageOptions: {
