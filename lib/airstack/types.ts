@@ -370,25 +370,26 @@ export type FarcasterChannel = {
   dappSlug: Scalars['String']['output'];
   description: Scalars['String']['output'];
   followerCount: Maybe<Scalars['Int']['output']>;
-  hostIds: Maybe<Array<Scalars['String']['output']>>;
-  hostProfiles: Maybe<Array<Social>>;
   /** Airstack unique identifier for the data point */
   id: Scalars['ID']['output'];
   imageUrl: Scalars['String']['output'];
+  isModerationEnabled: Maybe<Scalars['Boolean']['output']>;
   leadIds: Maybe<Array<Scalars['String']['output']>>;
   leadProfiles: Maybe<Array<Social>>;
+  moderatorIds: Maybe<Array<Scalars['String']['output']>>;
+  moderatorProfiles: Maybe<Array<Social>>;
   name: Scalars['String']['output'];
   participants: Maybe<Array<FarcasterChannelParticipant>>;
   url: Scalars['String']['output'];
 };
 
 
-export type FarcasterChannelHostProfilesArgs = {
+export type FarcasterChannelLeadProfilesArgs = {
   input: InputMaybe<SocialsNestedInput>;
 };
 
 
-export type FarcasterChannelLeadProfilesArgs = {
+export type FarcasterChannelModeratorProfilesArgs = {
   input: InputMaybe<SocialsNestedInput>;
 };
 
@@ -411,10 +412,10 @@ export type FarcasterChannelActionType_Comparator_Exp = {
 export type FarcasterChannelFilter = {
   channelId: InputMaybe<String_Comparator_Exp>;
   createdAtTimestamp: InputMaybe<Time_Comparator_Exp>;
-  hostId: InputMaybe<String_Comparator_Exp>;
-  hostIdentity: InputMaybe<Identity_Comparator_Exp>;
   leadId: InputMaybe<String_Comparator_Exp>;
   leadIdentity: InputMaybe<Identity_Comparator_Exp>;
+  moderatorId: InputMaybe<String_Comparator_Exp>;
+  moderatorIdentity: InputMaybe<Identity_Comparator_Exp>;
   name: InputMaybe<Regex_String_Comparator_Exp>;
 };
 

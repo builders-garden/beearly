@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
 
+export interface LeaderboardUser {
+  referrals: number;
+  fid: number;
+  displayName: string;
+  username: string;
+  avatarUrl: string;
+  powerBadge: string;
+}
+
 export const GET = async (
   req: NextRequest,
   { params: { idOrSlug } }: { params: { idOrSlug: string } }
@@ -24,5 +33,29 @@ export const GET = async (
     },
     take: limit ? parseInt(limit) : 10,
   });
-  return NextResponse.json(topReferrers);
+  const referrers = await prisma.waitlistedUser.findMany({
+    where: {
+      fid: {
+        in: topReferrers.map((r) => r.referrerFid!),
+      },
+    },
+    select: {
+      fid: true,
+      displayName: true,
+      username: true,
+      avatarUrl: true,
+      powerBadge: true,
+      // Include any other fields you need
+    },
+  });
+  const mergedData = topReferrers.map((referrer) => {
+    const referrerProfile = referrers.find(
+      (profile) => profile.fid === referrer.referrerFid
+    );
+    return {
+      referrals: referrer._count.referrerFid,
+      ...referrerProfile,
+    };
+  });
+  return NextResponse.json(mergedData);
 };

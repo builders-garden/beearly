@@ -16,24 +16,22 @@ import {
   MessageSquareShare,
 } from "lucide-react";
 import Link from "next/link";
+import { LeaderboardUser } from "../app/api/public/waitlists/[idOrSlug]/leaderboard/route";
 
-export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
+export const ReferrersTable = ({ users }: { users: LeaderboardUser[] }) => {
   return (
     <Table aria-label="Example static collection table" shadow="none">
       <TableHeader>
         <TableColumn>NAME</TableColumn>
         <TableColumn>FID</TableColumn>
-        <TableColumn>DATE</TableColumn>
-        <TableColumn>
-          <div></div>
-        </TableColumn>
+        <TableColumn>#REFERRALS</TableColumn>
         <TableColumn>
           <div></div>
         </TableColumn>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
-          <TableRow key={user.fid} className="cursor-pointer">
+          <TableRow key={user.fid}>
             <TableCell>
               <div className="flex flex-row gap-2 items-center">
                 <Image
@@ -48,39 +46,13 @@ export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
                       ? `${user.displayName.substring(0, 20)}...`
                       : `${user.displayName}`}
                   </div>
+
                   <div className="text-sm text-gray-500">@{user.username}</div>
                 </div>
               </div>
             </TableCell>
             <TableCell>{user.fid}</TableCell>
-            <TableCell>{new Date(user.waitlistedAt).toDateString()}</TableCell>
-            <TableCell>
-              <Tooltip
-                key={"tooltip-" + user.fid}
-                className="cursor-none"
-                radius="sm"
-                content={
-                  <div className="flex flex-row items-center gap-2">
-                    <Image
-                      className="h-4 w-4"
-                      src="/warpcast-logo.svg"
-                      alt="warpcast-logo"
-                      radius="none"
-                    />
-                    <div>Soon Warpcast Direct Cast integration!</div>
-                  </div>
-                }
-              >
-                <div className="opacity-40">
-                  <Image
-                    className="h-4 w-4"
-                    src="/warpcast-logo.svg"
-                    alt="warpcast-logo"
-                    radius="none"
-                  />
-                </div>
-              </Tooltip>
-            </TableCell>
+            <TableCell>{user.referrals}</TableCell>
             <TableCell>
               <Link
                 href={`https://warpcast.com/${user.username}`}

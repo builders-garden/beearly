@@ -1,16 +1,9 @@
 "use client";
-import {
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@nextui-org/react";
-import prisma from "../../../../lib/prisma";
+import { Spinner } from "@nextui-org/react";
 import { Waitlist } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { ReferrersTable } from "../../../components/ReferrersTable";
+import { LeaderboardUser } from "../../api/public/waitlists/[idOrSlug]/leaderboard/route";
 
 export default function PublicLeadearboardPage({
   params: { slug },
@@ -18,7 +11,7 @@ export default function PublicLeadearboardPage({
   params: { slug: string };
 }) {
   const [waitlist, setWaitlist] = useState<Waitlist>();
-  const [topReferrers, setTopReferrers] = useState<any[]>();
+  const [topReferrers, setTopReferrers] = useState<LeaderboardUser[]>();
   const [isWaitlistLoading, setIsWaitlstLoading] = useState(true);
   const [isTopReferrersLoading, setIsTopReferrersLoading] = useState(true);
 
@@ -29,18 +22,23 @@ export default function PublicLeadearboardPage({
       setWaitlist(data);
       setIsWaitlstLoading(false);
     };
+
+    fetchWaitlist();
+  }, [slug]);
+
+  useEffect(() => {
     const fetchLeaderboard = async () => {
       const response = await fetch(
-        `/api/public/waitlists/${slug}/leaderboard?limit=10`
+        `/api/public/waitlists/${waitlist!.id}/leaderboard?limit=10`
       );
       const data = await response.json();
       setTopReferrers(data);
       setIsTopReferrersLoading(false);
     };
-
-    fetchWaitlist();
-    fetchLeaderboard();
-  }, [slug]);
+    if (waitlist) {
+      fetchLeaderboard();
+    }
+  }, [waitlist]);
 
   if (isWaitlistLoading || isTopReferrersLoading) {
     return (
@@ -51,34 +49,10 @@ export default function PublicLeadearboardPage({
     );
   }
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center w-fit mx-auto">
       <div className="text-4xl font-bold">{waitlist!.name}</div>
       <div className="text-2xl font-semibold">Waitlist Top Referrers</div>
-
-      {topReferrers && (
-        <Table aria-label="Example static collection table" shadow="none">
-          <TableHeader>
-            <TableColumn>
-              <div>Referrer FID</div>
-            </TableColumn>
-            <TableColumn>
-              <div>Referrals</div>
-            </TableColumn>
-          </TableHeader>
-          <TableBody>
-            {topReferrers!.map((referrer, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <div>{referrer.referrerFid}</div>
-                </TableCell>
-                <TableCell>
-                  <div>{referrer._count.referrerFid}</div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      {topReferrers?.length! > 0 && <ReferrersTable users={topReferrers!} />}
     </div>
   );
 }
