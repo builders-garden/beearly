@@ -16,7 +16,7 @@ const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }
-  const ref = ctx.url.searchParams.get("ref");
+  const ref = ctx.url.searchParams.get("ref") || ctx.message.castId?.fid;
   const urlSplit = ctx.url.pathname.split("/");
   const slug = urlSplit[urlSplit.length - 2];
   const waitlist = await prisma.waitlist.findUnique({
