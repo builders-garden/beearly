@@ -33,6 +33,13 @@ export async function generateMetadata({
   return {
     title: `Beearly - ${waitlist?.name}`,
     description: `Beearly - Launch your waiting list on Farcaster.`,
+    openGraph: {
+      title: `Beearly - ${waitlist?.name}`,
+      description: `${waitlist!.name} waitlist, powered by Beearly`,
+      type: "website",
+      url: frameUrl.toString(),
+      images: [waitlist?.imageLanding!],
+    },
     other: {
       ...(await fetchMetadata(frameUrl)),
     },
