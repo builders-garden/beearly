@@ -52,12 +52,33 @@ export default function Home() {
           </Link>
         </div>
         <div className="flex flex-row gap-4 mt-16">
-          <Image
-            src="/example-waitlist.png"
-            className="h-96"
-            alt="example"
-            radius="sm"
-          />
+          <Link
+            href="https://warpcast.com/limone.eth/0xfb8963b9"
+            target="_blank"
+          >
+            <Image
+              src="/stringz-waitlist.png"
+              className="h-96"
+              alt="example"
+              radius="sm"
+            />
+          </Link>
+          <Link href="https://warpcast.com/yar0x/0xfc9dc826" target="_blank">
+            <Image
+              src="/powerfeed-waitlist.png"
+              className="h-96"
+              alt="example"
+              radius="sm"
+            />
+          </Link>
+          <Link href="https://warpcast.com/lottopgf/0x2c619fc5" target="_blank">
+            <Image
+              src="/otto-waitlist.png"
+              className="h-96"
+              alt="example"
+              radius="sm"
+            />
+          </Link>
         </div>
       </div>
       <div className="mt-8">
