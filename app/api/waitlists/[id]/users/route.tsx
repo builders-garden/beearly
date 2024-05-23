@@ -36,6 +36,10 @@ export const GET = async (
   }
 
   const totalItems = await prisma.waitlistedUser.count({
+    select: {
+      _all: true,
+      powerBadge: true,
+    },
     where: {
       waitlistId: parseInt(id),
     },
@@ -56,6 +60,10 @@ export const GET = async (
 
   return NextResponse.json({
     results: waitlistedUsers,
-    pages: Math.ceil(totalItems / parseInt(limit)),
+    pages:
+      powerBadge === "true"
+        ? Math.ceil(totalItems.powerBadge / parseInt(limit))
+        : Math.ceil(totalItems._all / parseInt(limit)),
+    count: totalItems,
   });
 };

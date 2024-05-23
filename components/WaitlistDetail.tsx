@@ -50,6 +50,9 @@ export const WaitlistDetail = ({
   refetchWaitlists: () => void;
 }) => {
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
+  const [count, setCount] = useState<number>(
+    (waitlist as any)?._count?.waitlistedUsers
+  );
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("list");
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -74,6 +77,7 @@ export const WaitlistDetail = ({
       .then((data) => {
         setUsers(data.results);
         setTotalPages(data.pages);
+        setCount(data.count._all);
         setUsersLoading(false);
       });
   }, [waitlist.id, page, isPowerBadgeOnly, jwt]);
@@ -146,12 +150,7 @@ export const WaitlistDetail = ({
         color="primary"
         onSelectionChange={(value) => setSelected(value as string)}
       >
-        <Tab
-          key="list"
-          title={`Waitlisted Users · ${
-            (waitlist as any)?._count?.waitlistedUsers || 0
-          }`}
-        >
+        <Tab key="list" title={`Waitlisted Users · ${count || 0}`}>
           {usersLoading ? (
             <div className="flex flex-row justify-center items-center p-16">
               <Spinner />
@@ -163,7 +162,7 @@ export const WaitlistDetail = ({
                   isSelected={isPowerBadgeOnly}
                   onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
                 />
-                Power Badge only
+                Power Badge only ({count})
               </div>
               <UsersTable users={users} />
               <div className="flex flex-row justify-center items-center mb-4">

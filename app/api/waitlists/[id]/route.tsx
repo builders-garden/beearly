@@ -28,6 +28,7 @@ export const GET = async (
       { status: 404 }
     );
   }
+
   return NextResponse.json(waitlist);
 };
 
