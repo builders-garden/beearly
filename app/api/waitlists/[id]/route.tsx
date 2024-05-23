@@ -126,6 +126,7 @@ export const PUT = async (
     },
     data: {
       name: name as string,
+      slug: slugName,
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
       ...(landing.url ? { imageLanding: landing.url } : {}),
