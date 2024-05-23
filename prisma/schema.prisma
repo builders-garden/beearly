@@ -40,6 +40,7 @@ model WaitlistedUser {
   username      String     @db.VarChar
   avatarUrl     String?    @map("avatar_url")
   powerBadge    Boolean?   @default(false) @map("power_badge")
+  referrerFid   Int?       @map("referrer_fid")
   waitlistedAt  DateTime   @db.Date
   createdAt     DateTime   @db.Date @map("created_at")
   updatedAt     DateTime   @db.Date @map("updated_at")

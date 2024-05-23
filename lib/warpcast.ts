@@ -1,3 +1,5 @@
+import { BASE_FRAME_URL } from "./constants";
+
 interface ChannelFollow {
   following: boolean;
   followedAt?: number;
@@ -22,4 +24,16 @@ export const isUserFollowingChannel = async (
   );
   const data = await response.json();
   return data.result;
+};
+
+export const createCastIntent = (
+  fid: number,
+  waitlistName: string,
+  waitlistSlug: string
+) => {
+  //const waitlistFrameUrl = `${BASE_FRAME_URL}/${waitlistSlug}?ref=${fid}`;
+  const waitlistFrameUrl = `https://beearly.club/w/${waitlistSlug}?ref=${fid}`;
+  const text = `I've joined ${waitlistName} waitlist!\n\nJoin through the frame below and help me climb up the leaderboard!\n\npowered by beearly.club 🐝`;
+  const urlFriendlyText = encodeURIComponent(text);
+  return `https://warpcast.com/~/compose?text=${urlFriendlyText}&embeds[]=${waitlistFrameUrl}`;
 };

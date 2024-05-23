@@ -7,12 +7,16 @@ import {
   fetchFarcasterProfile,
 } from "../../../../../lib/airstack";
 import { WaitlistRequirementType } from "@prisma/client";
-import { isUserFollowingChannels } from "../../../../../lib/warpcast";
+import {
+  createCastIntent,
+  isUserFollowingChannels,
+} from "../../../../../lib/warpcast";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }
+  const ref = ctx.url.searchParams.get("ref");
   const urlSplit = ctx.url.pathname.split("/");
   const slug = urlSplit[urlSplit.length - 2];
   const waitlist = await prisma.waitlist.findUnique({
@@ -141,6 +145,7 @@ const frameHandler = frames(async (ctx) => {
       username: farcasterProfile.profileName!,
       avatarUrl: farcasterProfile.profileImage!,
       powerBadge: farcasterProfile.isFarcasterPowerUser,
+      referrerFid: ref ? parseInt(ref) : null,
       waitlistedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -154,6 +159,13 @@ const frameHandler = frames(async (ctx) => {
     buttons: [
       <Button action="link" key="1" target={waitlist.externalUrl}>
         Learn more
+      </Button>,
+      <Button
+        action="link"
+        key="1"
+        target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+      >
+        Share
       </Button>,
     ],
   };

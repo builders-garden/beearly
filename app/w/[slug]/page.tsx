@@ -6,25 +6,35 @@ import { redirect } from "next/navigation";
 import { BeearlyButton } from "../../../components/BeearlyButton";
 import { ExternalLinkIcon } from "lucide-react";
 import { Image } from "@nextui-org/react";
+import { frame } from "framer-motion";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: {
     slug: string;
   };
+  searchParams: {
+    ref?: string;
+  };
 }): Promise<Metadata> {
+  const ref = searchParams.ref;
   const { slug } = params;
   const waitlist = await prisma.waitlist.findUnique({
     where: {
       slug,
     },
   });
+  const frameUrl = new URL(`/frames/waitlists/${slug}`, appURL());
+  if (ref) {
+    frameUrl.searchParams.set("ref", ref);
+  }
   return {
     title: `Beearly - ${waitlist?.name}`,
     description: `Beearly - Launch your waiting list on Farcaster.`,
     other: {
-      ...(await fetchMetadata(new URL(`/frames/waitlists/${slug}`, appURL()))),
+      ...(await fetchMetadata(frameUrl)),
     },
   };
 }
