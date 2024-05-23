@@ -51,8 +51,13 @@ export default function PublicLeadearboardPage({
   return (
     <div className="flex flex-col justify-center items-center w-fit mx-auto">
       <div className="text-4xl font-bold">{waitlist!.name}</div>
-      <div className="text-2xl font-semibold">Waitlist Top Referrers</div>
+      <div className="text-2xl font-semibold">
+        Waitlist Referrals Leaderboard
+      </div>
       {topReferrers?.length! > 0 && <ReferrersTable users={topReferrers!} />}
+      {!topReferrers?.length! && (
+        <div className="mt-16">No referrals activated so far.</div>
+      )}
     </div>
   );
 }

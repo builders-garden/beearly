@@ -6,6 +6,7 @@ import {
   Checkbox,
   Image,
   Input,
+  Link,
   Pagination,
   Spinner,
   Tab,
@@ -19,7 +20,7 @@ import {
   Edit,
   ExternalLink,
   ImageIcon,
-  Link,
+  LinkIcon,
   Users,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -29,7 +30,7 @@ import {
   WaitlistRequirementType,
   WaitlistedUser,
 } from "@prisma/client";
-import { BASE_FRAME_URL } from "../lib/constants";
+import { BASE_FRAME_URL, BASE_URL } from "../lib/constants";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
 import { UsersTable } from "./UsersTable";
@@ -101,7 +102,7 @@ export const WaitlistDetail = ({
           </div>
           <Button
             variant="light"
-            className="text-gray-300"
+            className="text-gray-500"
             onPress={() => setIsEditModalOpen(true)}
           >
             <Edit />
@@ -109,19 +110,29 @@ export const WaitlistDetail = ({
           </Button>
         </div>
       </div>
-      <div className="flex flex-row px-4 items-center gap-2">
-        <div className="text-sm">Frame URL:</div>
-        <div className="text-sm font-semibold">{`${BASE_FRAME_URL}/${waitlist.slug}`}</div>
-        {isCopied ? (
-          <CopyCheck size={12} className="text-success" />
-        ) : (
-          <CopyIcon
-            size={12}
-            className="text-primary cursor-pointer"
-            onClick={copyWaitlistFrameLink}
-          />
-        )}
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-row px-4 items-center gap-2">
+          <div className="text-sm">Frame URL:</div>
+          <div className="text-sm font-semibold">{`${BASE_FRAME_URL}/${waitlist.slug}`}</div>
+          {isCopied ? (
+            <CopyCheck size={12} className="text-success" />
+          ) : (
+            <CopyIcon
+              size={12}
+              className="text-primary cursor-pointer"
+              onClick={copyWaitlistFrameLink}
+            />
+          )}
+        </div>
+        <div className="flex flex-row px-4 items-center gap-2">
+          <div className="text-sm">Leaderboard URL:</div>
+          <div className="text-sm font-semibold">{`${BASE_URL}/leaderboards/${waitlist.slug}`}</div>
+          <Link href={`/leaderboards/${waitlist.slug}`} target="_blank">
+            <ExternalLink size={12} />
+          </Link>
+        </div>
       </div>
+
       <Tabs
         className="px-4"
         aria-label="tabs"

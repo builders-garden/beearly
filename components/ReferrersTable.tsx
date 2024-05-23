@@ -12,8 +12,6 @@ import {
 import { WaitlistedUser } from "@prisma/client";
 import {
   ExternalLink,
-  MessageCircleIcon,
-  MessageSquareShare,
 } from "lucide-react";
 import Link from "next/link";
 import { LeaderboardUser } from "../app/api/public/waitlists/[idOrSlug]/leaderboard/route";
@@ -46,7 +44,14 @@ export const ReferrersTable = ({ users }: { users: LeaderboardUser[] }) => {
                       ? `${user.displayName.substring(0, 20)}...`
                       : `${user.displayName}`}
                   </div>
-
+                  {user.powerBadge && (
+                    <Image
+                      src="/power-badge.png"
+                      className="h-4 w-4"
+                      radius="full"
+                      alt="power-badge"
+                    />
+                  )}
                   <div className="text-sm text-gray-500">@{user.username}</div>
                 </div>
               </div>
