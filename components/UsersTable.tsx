@@ -48,6 +48,14 @@ export const UsersTable = ({ users }: { users: WaitlistedUser[] }) => {
                       ? `${user.displayName.substring(0, 20)}...`
                       : `${user.displayName}`}
                   </div>
+                  {user.powerBadge && (
+                    <Image
+                      src="/power-badge.png"
+                      className="h-4 w-4"
+                      radius="full"
+                      alt="power-badge"
+                    />
+                  )}
                   <div className="text-sm text-gray-500">@{user.username}</div>
                 </div>
               </div>
