@@ -8,6 +8,11 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
+  if (req.url.includes("/api/public/")) {
+    // If the request is for a public endpoint, continue processing the request
+    return NextResponse.next();
+  }
+
   // Get the Dynamic token from the headers
   const authToken = req.headers.get("Authorization");
 
