@@ -104,18 +104,8 @@ export const POST = async (req: NextRequest) => {
     },
   });
 
-  console.log(isPowerBadgeRequired, requiredChannels);
 
   if (isPowerBadgeRequired) {
-    console.log({
-      data: {
-        waitlistId: waitlist.id,
-        type: WaitlistRequirementType.POWER_BADGE,
-        value: (isPowerBadgeRequired === "true").toString(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
     await prisma.waitlistRequirement.create({
       data: {
         waitlistId: waitlist.id,

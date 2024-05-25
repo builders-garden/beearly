@@ -210,23 +210,6 @@ const frameHandler = frames(async (ctx) => {
       }
     }
   }
-  console.log({
-    waitlistId: waitlist.id,
-    fid,
-    address:
-      ctx.message.verifiedWalletAddress ||
-      ctx.message.connectedAddress ||
-      ctx.message.requesterVerifiedAddresses[0] ||
-      ctx.message.requesterCustodyAddress,
-    displayName: farcasterProfile.profileDisplayName!,
-    username: farcasterProfile.profileName!,
-    avatarUrl: farcasterProfile.profileImage!,
-    powerBadge: farcasterProfile.isFarcasterPowerUser,
-    referrerFid: ref ? parseInt(ref) : null,
-    waitlistedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
   await prisma.waitlistedUser.create({
     data: {
       waitlistId: waitlist.id,
