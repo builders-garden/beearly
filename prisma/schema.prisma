@@ -32,9 +32,9 @@ model Waitlist {
 }
 
 model WaitlistedUser {
-  id            Int        @default(autoincrement()) @unique
+  id            Int        @default(autoincrement())
   waitlistId    Int        @map("waitlist_id")
-  fid           Int?
+  fid           Int
   address       String
   displayName   String     @db.VarChar @map("display_name")
   username      String     @db.VarChar
@@ -54,6 +54,7 @@ model WaitlistedUser {
 
 enum WaitlistRequirementType {
   CHANNEL_FOLLOW
+  USER_FOLLOW
   POWER_BADGE
 }
 model WaitlistRequirement {

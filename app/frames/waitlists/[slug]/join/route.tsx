@@ -17,8 +17,40 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid message");
   }
 
-  const ref =
+  let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
+  if (ref) {
+    const isWaitlistUser = await prisma.waitlistedUser.findFirst({
+      where: {
+        fid: parseInt(ref),
+      },
+    });
+    if (!isWaitlistUser) {
+      const farcasterProfile = await fetchFarcasterProfile(ref);
+      if (!farcasterProfile) {
+        ref = "";
+      } else {
+        await prisma.waitlistedUser.create({
+          data: {
+            waitlistId: 1,
+            fid: parseInt(ref),
+            address:
+              farcasterProfile.connectedAddresses?.length! > 0
+                ? farcasterProfile.connectedAddresses![0]!.address
+                : farcasterProfile.userAddress,
+            displayName: farcasterProfile.profileDisplayName!,
+            username: farcasterProfile.profileName!,
+            avatarUrl: farcasterProfile.profileImage!,
+            powerBadge: farcasterProfile.isFarcasterPowerUser,
+            referrerFid: null,
+            waitlistedAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+    }
+  }
   const urlSplit = ctx.url.pathname.split("/");
   const slug = urlSplit[urlSplit.length - 2];
   const waitlist = await prisma.waitlist.findUnique({

@@ -2234,7 +2234,7 @@ export type FarcasterQueryVariables = Exact<{
 }>;
 
 
-export type FarcasterQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null }> | null } | null };
+export type FarcasterQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, connectedAddresses: Array<{ address: any | null }> | null }> | null } | null };
 
 export type FarcasterChannelsQueryVariables = Exact<{
   fid: Scalars['Identity']['input'];

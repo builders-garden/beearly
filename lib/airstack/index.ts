@@ -20,6 +20,10 @@ const query = /* GraphQL */ `
         profileDisplayName
         profileImage
         isFarcasterPowerUser
+        userAddress
+        connectedAddresses {
+          address
+        }
       }
     }
   }

@@ -45,6 +45,7 @@ export const PUT = async (
   const address = req.headers.get("x-address");
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
+  const requiredUsersFollow = body.get("requiredUsersFollow");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
@@ -175,6 +176,26 @@ export const PUT = async (
       )
     );
   }
+  if (requiredUsersFollow?.toString()?.length! > 0) {
+    const users = requiredUsersFollow
+      ?.toString()
+      .split(",")
+      .map((u) => u?.trim()?.toLowerCase());
+    await Promise.all(
+      users!.map((user) =>
+        prisma.waitlistRequirement.create({
+          data: {
+            waitlistId: waitlist.id,
+            type: WaitlistRequirementType.USER_FOLLOW,
+            value: user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        })
+      )
+    );
+  }
+
   const waitlistRequirements = await prisma.waitlistRequirement.findMany({
     where: {
       waitlistId: waitlist.id,

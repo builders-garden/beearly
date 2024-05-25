@@ -46,6 +46,7 @@ export const CreateWaitlistModal = ({
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
   const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>();
+  const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>();
   const [requiredChannels, setRequiredChannels] = useState<string>();
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
@@ -138,6 +139,9 @@ export const CreateWaitlistModal = ({
     }
     if (requiredChannels) {
       formData.append("requiredChannels", requiredChannels.toString());
+    }
+    if (requiredUsersFollow) {
+      formData.append("requiredUsersFollow", requiredUsersFollow.toString());
     }
     try {
       const res = await fetch("/api/waitlists", {
@@ -250,42 +254,7 @@ export const CreateWaitlistModal = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="font-semibold text-lg">
-                      Eligibility Requirements (optional)
-                    </div>
-                    <div className="flex flex-row gap-2 w-full">
-                      <div className="flex flex-col gap-1 w-[50%]">
-                        <div className="text-sm text-gray-500">
-                          Follow Channel IDs
-                        </div>
-                        <Input
-                          type="text"
-                          variant={"bordered"}
-                          value={requiredChannels}
-                          onValueChange={setRequiredChannels}
-                          placeholder="build,base,farcaster"
-                        />
-                        <div className="text-xs text-gray-500">
-                          Comma separated list of channel IDs that the users
-                          must follow to be eligible
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-1 w-[50%]">
-                        <div className="text-sm text-gray-500">Power Badge</div>
-                        <Checkbox
-                          isSelected={isPowerBadgeRequired}
-                          onValueChange={setIsPowerBadgeRequired}
-                        >
-                          Power Badge required
-                        </Checkbox>
 
-                        <div className="text-xs text-gray-500">
-                          Users must have a Warpcast power badge to be eligible
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-row justify-between">
                       <div className="font-semibold text-lg">Add images</div>
@@ -328,6 +297,60 @@ export const CreateWaitlistModal = ({
                           onSelectedFile={onSelectedClosedImageFile}
                           label="Closed"
                         />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="font-semibold text-lg">
+                      Eligibility Requirements (optional)
+                    </div>
+                    <div className="flex flex-row gap-2 w-full">
+                      <div className="flex flex-col gap-1 w-[50%]">
+                        <div className="text-sm text-gray-500">
+                          Follow Channel IDs
+                        </div>
+                        <Input
+                          type="text"
+                          variant={"bordered"}
+                          value={requiredChannels}
+                          onValueChange={setRequiredChannels}
+                          placeholder="build,base,farcaster"
+                        />
+                        <div className="text-xs text-gray-500">
+                          Comma separated list of channel IDs that the users
+                          must follow to be eligible
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1 w-[50%]">
+                        <div className="text-sm text-gray-500">
+                          Follow Users
+                        </div>
+                        <Input
+                          type="text"
+                          variant={"bordered"}
+                          value={requiredUsersFollow}
+                          onValueChange={setRequiredUsersFollow}
+                          placeholder="dwr,v,horsefacts"
+                        />
+                        <div className="text-xs text-gray-500">
+                          Comma separated list of usernames that the users must
+                          follow to be eligible
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 w-full">
+                      <div className="flex flex-col gap-1 w-[50%]">
+                        <div className="text-sm text-gray-500">Power Badge</div>
+                        <Checkbox
+                          isSelected={isPowerBadgeRequired}
+                          onValueChange={setIsPowerBadgeRequired}
+                        >
+                          Power Badge required
+                        </Checkbox>
+
+                        <div className="text-xs text-gray-500">
+                          Users must have a Warpcast power badge to be eligible
+                        </div>
                       </div>
                     </div>
                   </div>
