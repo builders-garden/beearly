@@ -263,7 +263,7 @@ const frameHandler = frames(async (ctx) => {
         Share with referral
       </Button>,
       <Button action="link" key="3" target={"https://warpcast.com/beearlybot"}>
-        Follow @beearlybot for launch notifications
+        Follow @beearlybot for updates
       </Button>,
     ],
   };
