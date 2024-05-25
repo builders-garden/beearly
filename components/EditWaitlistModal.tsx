@@ -349,7 +349,7 @@ export const EditWaitlistModal = ({
                         variant={"bordered"}
                         value={requiredUsersFollow}
                         onValueChange={setRequiredUsersFollow}
-                        placeholder="dwr,v,horsefacts"
+                        placeholder="dwr.eth,v,horsefacts"
                       />
                       <div className="text-xs text-gray-500">
                         Comma separated list of usernames that the users must
