@@ -14,6 +14,7 @@ export const GET = async (
   req: NextRequest,
   { params: { idOrSlug } }: { params: { idOrSlug: string } }
 ) => {
+  const page = new URL(req.url).searchParams.get("page") || "0";
   const limit = new URL(req.url).searchParams.get("limit") || "10";
   const topReferrers = await prisma.waitlistedUser.groupBy({
     by: ["referrerFid"],
@@ -32,6 +33,7 @@ export const GET = async (
       },
     },
     take: limit ? parseInt(limit) : 10,
+    skip: page ? parseInt(page) * parseInt(limit) : 0,
   });
   const referrers = await prisma.waitlistedUser.findMany({
     where: {

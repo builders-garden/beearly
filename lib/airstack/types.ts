@@ -588,6 +588,7 @@ export type FarcasterReactionsOutput = {
 };
 
 export type FarcasterRepliesFilter = {
+  hash: InputMaybe<String_Eq_In_Comparator_Exp>;
   parentCastedBy: InputMaybe<Identity_Comparator_Exp>;
   parentHash: InputMaybe<String_Eq_In_Comparator_Exp>;
   parentUrl: InputMaybe<String_Eq_In_Comparator_Exp>;

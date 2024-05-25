@@ -49,43 +49,9 @@ export const WaitlistDetail = ({
   setSelectedWaitlist: (waitlist: WaitlistWithRequirements) => void;
   refetchWaitlists: () => void;
 }) => {
-  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
-  const [count, setCount] = useState<number>(
-    (waitlist as any)?._count?.waitlistedUsers
-  );
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("list");
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [usersLoading, setUsersLoading] = useState<boolean>(false);
-  const [users, setUsers] = useState<WaitlistedUser[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const jwt = getAuthToken();
-  const { isConnected } = useAccount();
-  const fetchUsers = useCallback(() => {
-    setUsersLoading(true);
-    let url = `/api/waitlists/${waitlist.id}/users?page=${page - 1}`;
-    if (isPowerBadgeOnly) {
-      url += "&powerBadge=true";
-    }
-    fetch(url, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data.results);
-        setTotalPages(data.pages);
-        setCount(data.count._all);
-        setUsersLoading(false);
-      });
-  }, [waitlist.id, page, isPowerBadgeOnly, jwt]);
-  useEffect(() => {
-    if (jwt && isConnected) {
-      fetchUsers();
-    }
-  }, [jwt, isConnected, fetchUsers, page]);
   const copyWaitlistFrameLink = () => {
     navigator.clipboard.writeText(`${BASE_FRAME_URL}/${waitlist.slug}`);
     setIsCopied(true);
@@ -150,36 +116,13 @@ export const WaitlistDetail = ({
         color="primary"
         onSelectionChange={(value) => setSelected(value as string)}
       >
-        <Tab key="list" title={`Waitlisted Users · ${count || 0}`}>
-          {usersLoading ? (
-            <div className="flex flex-row justify-center items-center p-16">
-              <Spinner />
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              <div className="flex flex-row px-4">
-                <Checkbox
-                  isSelected={isPowerBadgeOnly}
-                  onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
-                />
-                Power Badge only ({count})
-              </div>
-              <UsersTable users={users} />
-              <div className="flex flex-row justify-center items-center mb-4">
-                <Pagination
-                  isCompact
-                  showControls
-                  total={totalPages}
-                  initialPage={1}
-                  page={page}
-                  onChange={setPage}
-                  classNames={{
-                    cursor: "text-black rounded-sm",
-                  }}
-                />
-              </div>
-            </div>
-          )}
+        <Tab
+          key="list"
+          title={`Waitlisted Users · ${
+            (waitlist as any)._count.waitlistedUsers || 0
+          }`}
+        >
+          <UsersTable waitlistId={waitlist.id} />
         </Tab>
         <Tab key="images" title="Images">
           <div className="flex flex-col gap-2 p-4">

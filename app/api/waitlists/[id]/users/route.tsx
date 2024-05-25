@@ -34,6 +34,15 @@ export const GET = async (
       }
     );
   }
+  console.log({
+    ...(orderBy === "referrals"
+      ? {
+          referrals: {
+            _count: orderDirection as "asc" | "desc",
+          },
+        }
+      : { [orderBy]: orderDirection }),
+  });
 
   const totalItems = await prisma.waitlistedUser.count({
     select: {
@@ -54,7 +63,21 @@ export const GET = async (
     take: parseInt(limit),
     skip: parseInt(page) * parseInt(limit),
     orderBy: {
-      [orderBy]: orderDirection,
+      ...(orderBy === "referrals"
+        ? {
+            referrals: {
+              _count: orderDirection as "asc" | "desc",
+            },
+          }
+        : { [orderBy]: orderDirection }),
+    },
+    include: {
+      referrals: true,
+      _count: {
+        select: {
+          referrals: true,
+        },
+      },
     },
   });
 

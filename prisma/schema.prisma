@@ -45,8 +45,8 @@ model WaitlistedUser {
   createdAt     DateTime   @db.Date @map("created_at")
   updatedAt     DateTime   @db.Date @map("updated_at")
   waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  referrer      WaitlistedUser? @relation("Referrer", fields: [waitlistId, fid], references: [waitlistId, fid])
-  referredBy    WaitlistedUser[] @relation("Referrer")
+  referrer      WaitlistedUser? @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
+  referrals    WaitlistedUser[] @relation("Referrals")
 
   @@index([waitlistId, fid], name: "waitlistId_fid")
   @@unique([waitlistId, fid], name: "waitlistId_fid")
