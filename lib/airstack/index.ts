@@ -1,4 +1,4 @@
-import { FarcasterChannelsQuery, FarcasterQuery } from "./types";
+import { FarcasterChannelsQuery, FarcasterQuery, IsFollowingQuery } from "./types";
 import { fetchQuery, init } from "@airstack/node";
 
 if (!process.env.AIRSTACK_API_KEY) {
@@ -98,4 +98,53 @@ export const fetchFarcasterChannels = async (
     return [];
   }
   return data.FarcasterChannelParticipants.FarcasterChannelParticipant;
+};
+
+const farcasterFollowQuery = /* GraphQL */ `
+  query isFollowing($fid: Identity!, $followedNames: [Identity!]) {
+    Wallet(input: { identity: $fid, blockchain: ethereum }) {
+      socialFollowers( 
+        input: {
+          filter: {
+            identity: { _in: $followedNames }
+            dappName: { _eq: farcaster }
+          }
+        }
+      ) {
+        Follower {
+          dappName
+          dappSlug
+          followingProfileId
+          followerProfileId
+        }
+      }
+    }
+  }
+`;
+
+interface FollowingQueryResponse {
+  data: IsFollowingQuery | null;
+  error: Error | null;
+}
+
+
+export const isUserFollowingUsers = async (
+  fid: string,
+  followedNames: string[]
+) => {
+  const { data, error }: FollowingQueryResponse = await fetchQuery(
+    farcasterFollowQuery,
+    { fid: `fc_fid:${fid}`, followedNames: followedNames.map((f) => `fc_fname:${f}`) }
+  );
+  if (
+    error ||
+    !data ||
+    !data.Wallet ||
+    !data.Wallet.socialFollowers ||
+    !data.Wallet.socialFollowers.Follower ||
+    data.Wallet.socialFollowers.Follower?.length === 0
+  ) {
+    return [];
+  }
+  return data.Wallet.socialFollowers.Follower;
 };

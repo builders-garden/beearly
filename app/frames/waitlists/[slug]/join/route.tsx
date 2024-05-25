@@ -5,6 +5,7 @@ import prisma from "../../../../../lib/prisma";
 import {
   fetchFarcasterChannels,
   fetchFarcasterProfile,
+  isUserFollowingUsers,
 } from "../../../../../lib/airstack";
 import { WaitlistRequirementType } from "@prisma/client";
 import {
@@ -19,7 +20,8 @@ const frameHandler = frames(async (ctx) => {
 
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
-  if (ref) {
+
+  if (ref && ref !== "1") {
     const isWaitlistUser = await prisma.waitlistedUser.findFirst({
       where: {
         fid: parseInt(ref),
@@ -73,6 +75,7 @@ const frameHandler = frames(async (ctx) => {
       fid: ctx.message.requesterFid,
     },
   });
+  const fid = ctx.message?.requesterFid;
   if (waitlistedUser) {
     return {
       image: waitlist.imageSuccess,
@@ -82,6 +85,20 @@ const frameHandler = frames(async (ctx) => {
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
+        </Button>,
+        <Button
+          action="link"
+          key="2"
+          target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+        >
+          Share with referral
+        </Button>,
+        <Button
+          action="link"
+          key="3"
+          target={"https://warpcast.com/beearlybot"}
+        >
+          Follow @beearlybot for updates
         </Button>,
       ],
     };
@@ -102,7 +119,6 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  const fid = ctx.message?.requesterFid;
   const farcasterProfile = await fetchFarcasterProfile(fid.toString());
   if (!farcasterProfile) {
     // TODO: show error frame
@@ -115,6 +131,9 @@ const frameHandler = frames(async (ctx) => {
     );
     const requiredChannels = waitlist.waitlistRequirements.filter(
       (r) => r.type === WaitlistRequirementType.CHANNEL_FOLLOW
+    );
+    const requiredUsersFollow = waitlist.waitlistRequirements.filter(
+      (r) => r.type === WaitlistRequirementType.USER_FOLLOW
     );
     if (powerBadgeRequirement?.value === "true") {
       if (!farcasterProfile?.isFarcasterPowerUser) {
@@ -164,8 +183,50 @@ const frameHandler = frames(async (ctx) => {
         };
       }
     }
+    if (requiredUsersFollow.length > 0) {
+      const isUserFollowingRequiredUsers = await isUserFollowingUsers(
+        fid.toString(),
+        requiredUsersFollow.map((r) => r.value)
+      );
+      if (isUserFollowingRequiredUsers.length < requiredUsersFollow.length) {
+        return {
+          image: waitlist.imageNotEligible,
+          imageOptions: {
+            aspectRatio: "1.91:1",
+          },
+          buttons: [
+            <Button
+              action="post"
+              key="1"
+              target={`/waitlists/${waitlist.slug}/join`}
+            >
+              Try again
+            </Button>,
+            <Button action="link" key="2" target={waitlist.externalUrl}>
+              Learn more
+            </Button>,
+          ],
+        };
+      }
+    }
   }
-
+  console.log({
+    waitlistId: waitlist.id,
+    fid,
+    address:
+      ctx.message.verifiedWalletAddress ||
+      ctx.message.connectedAddress ||
+      ctx.message.requesterVerifiedAddresses[0] ||
+      ctx.message.requesterCustodyAddress,
+    displayName: farcasterProfile.profileDisplayName!,
+    username: farcasterProfile.profileName!,
+    avatarUrl: farcasterProfile.profileImage!,
+    powerBadge: farcasterProfile.isFarcasterPowerUser,
+    referrerFid: ref ? parseInt(ref) : null,
+    waitlistedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   await prisma.waitlistedUser.create({
     data: {
       waitlistId: waitlist.id,
@@ -179,7 +240,7 @@ const frameHandler = frames(async (ctx) => {
       username: farcasterProfile.profileName!,
       avatarUrl: farcasterProfile.profileImage!,
       powerBadge: farcasterProfile.isFarcasterPowerUser,
-      referrerFid: ref ? parseInt(ref) : null,
+      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
       waitlistedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -200,6 +261,9 @@ const frameHandler = frames(async (ctx) => {
         target={createCastIntent(fid, waitlist.name, waitlist.slug)}
       >
         Share with referral
+      </Button>,
+      <Button action="link" key="3" target={"https://warpcast.com/beearlybot"}>
+        Follow @beearlybot for launch notifications
       </Button>,
     ],
   };

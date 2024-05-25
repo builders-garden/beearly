@@ -119,7 +119,7 @@ export const WaitlistDetail = ({
         <Tab
           key="list"
           title={`Waitlisted Users · ${
-            (waitlist as any)._count.waitlistedUsers || 0
+            (waitlist as any)._count?.waitlistedUsers || 0
           }`}
         >
           <UsersTable waitlistId={waitlist.id} />

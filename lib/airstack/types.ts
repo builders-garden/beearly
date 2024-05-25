@@ -2243,3 +2243,11 @@ export type FarcasterChannelsQueryVariables = Exact<{
 
 
 export type FarcasterChannelsQuery = { FarcasterChannelParticipants: { FarcasterChannelParticipant: Array<{ channelId: string }> | null } | null };
+
+export type IsFollowingQueryVariables = Exact<{
+  fid: Scalars['Identity']['input'];
+  followedFids: InputMaybe<Array<Scalars['Identity']['input']> | Scalars['Identity']['input']>;
+}>;
+
+
+export type IsFollowingQuery = { Wallet: { socialFollowers: { Follower: Array<{ dappName: string | null, dappSlug: string | null, followingProfileId: string | null, followerProfileId: string | null }> | null } | null } | null };
