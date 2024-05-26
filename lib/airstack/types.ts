@@ -2246,7 +2246,7 @@ export type FarcasterChannelsQuery = { FarcasterChannelParticipants: { Farcaster
 
 export type IsFollowingQueryVariables = Exact<{
   fid: Scalars['Identity']['input'];
-  followedFids: InputMaybe<Array<Scalars['Identity']['input']> | Scalars['Identity']['input']>;
+  followedNames: InputMaybe<Array<Scalars['Identity']['input']> | Scalars['Identity']['input']>;
 }>;
 
 

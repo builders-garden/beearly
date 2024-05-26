@@ -13,6 +13,7 @@ import {
 import {
   CheckCircleIcon,
   CopyIcon,
+  ExternalLink,
   Frame,
   ImageIcon,
   Info,
@@ -35,7 +36,7 @@ export const CreateWaitlistModal = ({
   onOpenChange: (open: boolean) => void;
   refetchWaitlists: () => void;
 }) => {
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(true);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
@@ -392,6 +393,20 @@ export const CreateWaitlistModal = ({
                       </div>
                     )}
                   </div>
+                  <div>Test it on the Warpcast Frame validator</div>
+                  <BeearlyButton
+                    isDisabled={name?.length > 0}
+                    text="Test your Waitlist frame"
+                    icon={<ExternalLink size={16} />}
+                    iconPosition="right"
+                    link={`https://warpcast.com/~/developers/frames?url=https%3A%2F%2Fbeearly.club/w/${slugify(
+                      name,
+                      {
+                        lower: true,
+                        replacement: "-",
+                      }
+                    )}`}
+                  />
                 </div>
               )}
             </ModalBody>
