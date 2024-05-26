@@ -55,9 +55,7 @@ export default function WaitlistTable({
             className="cursor-pointer border-bottom-2 border-gray-200"
             onClick={() => setSelectedWaitlist(waitlist)}
           >
-            <TableCell>
-              <Link href={`/waitlists/${waitlist.slug}`}>{waitlist.name}</Link>
-            </TableCell>
+            <TableCell>{waitlist.name}</TableCell>
             <TableCell>
               <div className="text-blue-500">
                 {(waitlist as any)?._count?.waitlistedUsers}
