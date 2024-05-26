@@ -25,6 +25,7 @@
     "@tanstack/react-query": "^5.35.5",
     "@vercel/kv": "^1.0.1",
     "@xmtp/frames-validator": "^0.5.0",
+    "bullmq": "^5.7.12",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.0",
@@ -43,6 +44,7 @@
     "strip-ansi": "^7.1.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^9.0.1",
     "viem": "^2.10.5",
     "wagmi": "^2.8.7"
   },
@@ -55,6 +57,7 @@
     "@types/node": "^18.17.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.0.1",
     "child_process": "^1.0.2",
     "concurrently": "^8.2.2",

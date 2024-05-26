@@ -19,6 +19,7 @@ import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
+import BroadcastDCModal from "./BroadcastDCModal";
 
 enum OrderByMode {
   WAITLISTED_AT = "waitlistedAt",
@@ -26,6 +27,8 @@ enum OrderByMode {
 }
 
 export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] =
+    useState<boolean>(false);
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
   const [orderBy, setOrderBy] = useState<string>("waitlistedAt");
   const [orderDirection, setOrderDirection] = useState<string>("desc");
@@ -75,12 +78,22 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   };
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row px-4">
-        <Checkbox
-          isSelected={isPowerBadgeOnly}
-          onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
-        />
-        Power Badge only ({totalCount})
+      <div className="flex flex-row px-4 justify-between">
+        <div>
+          <Checkbox
+            isSelected={isPowerBadgeOnly}
+            onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
+          />
+          Power Badge only ({totalCount})
+        </div>
+        <Button
+          color="primary"
+          className="text-primary"
+          variant="flat"
+          onPress={() => setIsBroadcastModalOpen(true)}
+        >
+          Send Broadcast DC
+        </Button>
       </div>
       <Table aria-label="Example static collection table" shadow="none">
         <TableHeader>
@@ -213,6 +226,11 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
           }}
         />
       </div>
+      <BroadcastDCModal
+        isOpen={isBroadcastModalOpen}
+        onOpenChange={setIsBroadcastModalOpen}
+        waitlistId={waitlistId}
+      />
     </div>
   );
 };
