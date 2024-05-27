@@ -35,14 +35,6 @@ export const POST = async (
     },
   });
 
-  console.log("lastMessageSent", lastMessageSent);
-  console.log(
-    new Date().getTime(),
-    lastMessageSent?.createdAt.getTime(),
-    new Date().getTime() - lastMessageSent?.createdAt.getTime()! <
-      MESSAGE_COOLDOWN
-  );
-
   // check if lastMessage was sent in the last 12 hours
   if (
     lastMessageSent &&

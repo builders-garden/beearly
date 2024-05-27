@@ -4328,13 +4328,6 @@
   dependencies:
     sha256-uint8array "^0.10.7"
 
-"@types/blob-stream@^0.1.33":
-  version "0.1.33"
-  resolved "https://registry.yarnpkg.com/@types/blob-stream/-/blob-stream-0.1.33.tgz#2107fc2e9ec11a70161dec982e62858e8937b4d3"
-  integrity sha512-HNHZ1S6W7F8PhxdyAastunpUC8cAZim78UIfqbL79gLzylp8EZep68yxAh11hTRoEvsqHAg/MECgmKF8+V0HzQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/connect@^3.4.33":
   version "3.4.38"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.38.tgz#5ba7f3bc4fbbdeaff8dded952e5ff2cc53f8d858"
@@ -5597,18 +5590,6 @@ bl@^4.0.3, bl@^4.1.0:
     buffer "^5.5.0"
     inherits "^2.0.4"
     readable-stream "^3.4.0"
-
-blob-to-buffer@^1.2.6:
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/blob-to-buffer/-/blob-to-buffer-1.2.9.tgz#a17fd6c1c564011408f8971e451544245daaa84a"
-  integrity sha512-BF033y5fN6OCofD3vgHmNtwZWRcq9NLyyxyILx9hfMy1sXYy4ojFl765hJ2lP0YaN2fuxPaLO2Vzzoxy0FLFFA==
-
-blob-to-stream@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/blob-to-stream/-/blob-to-stream-1.0.3.tgz#0bc46a433fb34581f2e2489a36cdf9248b36b9f5"
-  integrity sha512-nr109/wyKlE9cYm3tS5AW8/cQj46bQ/z6kt3tN46JjTUeqsaXLp1Il63nf54PA8nAj9xR29kiK+PxW6Lc3aHpg==
-  dependencies:
-    blob-to-buffer "^1.2.6"
 
 bn.js@^4.11.9:
   version "4.12.0"
