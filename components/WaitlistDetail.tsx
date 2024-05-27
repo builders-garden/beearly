@@ -164,7 +164,7 @@ export const WaitlistDetail = ({
               <div className="flex flex-col gap-1 p-2 bg-gray-100 rounded-md">
                 <div className="flex flex-row gap-2 items-center justify-center">
                   <ImageIcon size={16} className="text-gray-500" />
-                  <div className="text-gray-500 text-sm">Landing image</div>
+                  <div className="text-gray-500 text-sm">Not eligible image</div>
                 </div>
                 <Image
                   src={waitlist.imageNotEligible}
