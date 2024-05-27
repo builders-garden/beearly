@@ -15,7 +15,7 @@ import {
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
 import { count } from "console";
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -36,6 +36,21 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const jwt = getAuthToken();
   const { isConnected } = useAccount();
+  const exportUsers = useCallback(() => {
+    fetch(`/api/waitlists/${waitlistId}/users/export`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.csv";
+        a.click();
+      });
+  }, [waitlistId, jwt]);
   const fetchUsers = useCallback(() => {
     setUsersLoading(true);
     let url = `/api/waitlists/${waitlistId}/users?page=${
@@ -75,12 +90,18 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   };
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row px-4">
-        <Checkbox
-          isSelected={isPowerBadgeOnly}
-          onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
-        />
-        Power Badge only ({totalCount})
+      <div className="flex flex-row justify-between items-center px-4 ">
+        <div className="flex flex-row items-center">
+          <Checkbox
+            isSelected={isPowerBadgeOnly}
+            onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
+          />
+          Power Badge only ({totalCount})
+        </div>
+        <Button color="primary" variant="flat" onPress={exportUsers}>
+          <Download size={16} />
+          Export users
+        </Button>
       </div>
       <Table aria-label="Example static collection table" shadow="none">
         <TableHeader>
