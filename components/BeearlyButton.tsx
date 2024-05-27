@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 export const BeearlyButton = ({
   onPress,
   icon,
+  iconPosition,
   text,
   isLoading,
   isDisabled,
@@ -11,11 +12,13 @@ export const BeearlyButton = ({
 }: {
   onPress?: () => void;
   icon?: ReactNode;
+  iconPosition?: "left" | "right";
   text: string;
   isLoading?: boolean;
   isDisabled?: boolean;
   link?: string;
 }) => {
+  if (!iconPosition) iconPosition = "left";
   return (
     <Button
       color="primary"
@@ -26,14 +29,15 @@ export const BeearlyButton = ({
       isDisabled={isDisabled}
     >
       <div className="flex flex-row gap-1 items-center">
-        {icon}
+        {iconPosition === "left" && icon}
         {link ? (
-          <Link href={link}>
+          <Link href={link} target="_blank">
             <div className="font-semibold text-black">{text}</div>
           </Link>
         ) : (
           <div className="font-semibold">{text}</div>
         )}
+        {iconPosition === "right" && icon}
       </div>
     </Button>
   );

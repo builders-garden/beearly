@@ -58,7 +58,7 @@ export default function Home() {
           >
             <Image
               src="/stringz-waitlist.png"
-              className="h-96"
+              className="h-72"
               alt="example"
               radius="sm"
             />
@@ -66,7 +66,7 @@ export default function Home() {
           <Link href="https://warpcast.com/yar0x/0xfc9dc826" target="_blank">
             <Image
               src="/powerfeed-waitlist.png"
-              className="h-96"
+              className="h-72"
               alt="example"
               radius="sm"
             />
@@ -74,7 +74,15 @@ export default function Home() {
           <Link href="https://warpcast.com/lottopgf/0x2c619fc5" target="_blank">
             <Image
               src="/otto-waitlist.png"
-              className="h-96"
+              className="h-72"
+              alt="example"
+              radius="sm"
+            />
+          </Link>
+          <Link href="https://warpcast.com/husson.eth/0x0adcb141" target="_blank">
+            <Image
+              src="/builders-brunch-waitlist.png"
+              className="h-72"
               alt="example"
               radius="sm"
             />

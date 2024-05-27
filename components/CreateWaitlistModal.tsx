@@ -13,6 +13,7 @@ import {
 import {
   CheckCircleIcon,
   CopyIcon,
+  ExternalLink,
   Frame,
   ImageIcon,
   Info,
@@ -175,7 +176,6 @@ export const CreateWaitlistModal = ({
       setIsCopied(false);
     }, 5000);
   };
-
   return (
     <Modal
       size="2xl"
@@ -358,8 +358,24 @@ export const CreateWaitlistModal = ({
               ) : (
                 <div className="flex flex-col gap-4">
                   <div>
-                    Copy the URL on your favourite Farcaster client and start
-                    getting waitlist registrations!
+                    You can start testing it on the Warpcast frame validator
+                  </div>
+                  <BeearlyButton
+                    isDisabled={!name || name?.length === 0}
+                    text="Test your Waitlist frame"
+                    icon={<ExternalLink size={16} />}
+                    iconPosition="right"
+                    link={`https://warpcast.com/~/developers/frames?url=https%3A%2F%2Fbeearly.club/w/${slugify(
+                      name,
+                      {
+                        lower: true,
+                        replacement: "-",
+                      }
+                    )}`}
+                  />
+                  <div>
+                    Then, copy the URL on your favourite Farcaster client and
+                    start getting waitlist registrations!
                   </div>
                   <div className="flex flex-row gap-2 items-center">
                     <div className="w-[60%] p-2 rounded-lg border-2 border-gray-200 flex flex-row justify-between items-center">
