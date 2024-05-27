@@ -44,17 +44,11 @@ export const POST = async (
     fidsToNotify = fids.map((fid: string) => parseInt(fid));
   }
 
+  const enrichedMessage = `📢🐝\n\n"${message}"\n\nYou are receiveing this message because you joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
   try {
-    /*await Promise.all(
-      fidsToNotify.map((fid) => addToDCsQueue({ fid, text: message }))
-    );*/
-    console.log({
-      username: process.env.REDIS_USERNAME!,
-      password: process.env.REDIS_PASSWORD!,
-      host: process.env.REDIS_HOST!,
-      port: parseInt(process.env.REDIS_PORT!),
-      enableOfflineQueue: false,
-    });
+    await Promise.all(
+      fidsToNotify.map((fid) => addToDCsQueue({ fid, text: enrichedMessage }))
+    );
   } catch (e) {
     console.error("Failed to send broadcast", e);
     return NextResponse.json(

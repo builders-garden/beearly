@@ -11,7 +11,7 @@ export const sendDirectCast = async (recipient: number, text: string) => {
   }
 
   const res = await fetch("https://api.warpcast.com/v2/ext-send-direct-cast", {
-    method: "POST",
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${process.env.WARPCAST_API_KEY}`,
       "Content-Type": "application/json",
@@ -22,7 +22,6 @@ export const sendDirectCast = async (recipient: number, text: string) => {
       idempotencyKey: uuidv4(),
     }),
   });
-
   if (!res.ok) {
     console.error(`error sending direct cast to ${recipient}.`);
     return;

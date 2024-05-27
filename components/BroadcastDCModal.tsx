@@ -6,6 +6,7 @@ import {
   ModalFooter,
   Button,
   Textarea,
+  Checkbox,
 } from "@nextui-org/react";
 import { InfoIcon } from "lucide-react";
 import Link from "next/link";
@@ -24,9 +25,10 @@ export default function BroadcastDCModal({
 }) {
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
+  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const jwt = getAuthToken();
+  const canSend = text.length > 0;
   const sendMessage = async () => {
     // send message
     setIsLoading(true);
@@ -118,6 +120,12 @@ export default function BroadcastDCModal({
                     radius="sm"
                   />
                 </div>
+                <Checkbox
+                  isSelected={isPowerBadgeOnly}
+                  onValueChange={setIsPowerBadgeOnly}
+                >
+                  Send only to Power Badge users (recommended)
+                </Checkbox>
               </div>
             </ModalBody>
             <ModalFooter>
@@ -127,6 +135,7 @@ export default function BroadcastDCModal({
               <BeearlyButton
                 onPress={sendMessage}
                 text="Send broadcast"
+                isDisabled={!canSend}
                 isLoading={isLoading}
               />
             </ModalFooter>

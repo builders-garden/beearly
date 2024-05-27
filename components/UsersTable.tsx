@@ -15,7 +15,13 @@ import {
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
 import { count } from "console";
-import { ChevronDown, ChevronUp, Download, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  ExternalLink,
+  Send,
+} from "lucide-react";
 import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -95,26 +101,29 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
     <div className="flex flex-col">
       <div className="flex flex-row justify-between items-center px-4 justify-between ">
         <div className="flex flex-row items-center">
-        <div>
+          <div>
             <Checkbox
               isSelected={isPowerBadgeOnly}
               onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
             />
             Power Badge only ({totalCount})
+          </div>
         </div>
-        <Button
-          color="primary"
-          className="text-primary"
-          variant="flat"
-          onPress={() => setIsBroadcastModalOpen(true)}
-        >
-          Send Broadcast DC
-        </Button>
+        <div className="flex flex-row gap-2 items-center">
+          <Button
+            color="primary"
+            className="text-primary"
+            variant="flat"
+            onPress={() => setIsBroadcastModalOpen(true)}
+          >
+            <Send size={16} />
+            Broadcast
+          </Button>
+          <Button color="primary" variant="flat" onPress={exportUsers}>
+            <Download size={16} />
+            Export users
+          </Button>
         </div>
-        <Button color="primary" variant="flat" onPress={exportUsers}>
-          <Download size={16} />
-          Export users
-        </Button>
       </div>
       <Table aria-label="Example static collection table" shadow="none">
         <TableHeader>
@@ -156,9 +165,6 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
           <TableColumn>
             <div></div>
           </TableColumn>
-          <TableColumn>
-            <div></div>
-          </TableColumn>
         </TableHeader>
         <TableBody>
           {users.map((user) => (
@@ -196,38 +202,16 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
                 {new Date(user.waitlistedAt).toDateString()}
               </TableCell>
               <TableCell>
-                <Tooltip
-                  key={"tooltip-" + user.fid}
-                  className="cursor-none"
-                  radius="sm"
-                  content={
-                    <div className="flex flex-row items-center gap-2">
-                      <Image
-                        className="h-4 w-4"
-                        src="/warpcast-logo.svg"
-                        alt="warpcast-logo"
-                        radius="none"
-                      />
-                      <div>Soon Warpcast Direct Cast integration!</div>
-                    </div>
-                  }
-                >
-                  <div className="opacity-40">
-                    <Image
-                      className="h-4 w-4"
-                      src="/warpcast-logo.svg"
-                      alt="warpcast-logo"
-                      radius="none"
-                    />
-                  </div>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
                 <Link
                   href={`https://warpcast.com/${user.username}`}
                   target="_blank"
                 >
-                  <ExternalLink size={16} />
+                  <Image
+                    className="h-4 w-4"
+                    src="/warpcast-logo.svg"
+                    alt="warpcast-logo"
+                    radius="none"
+                  />
                 </Link>
               </TableCell>
             </TableRow>

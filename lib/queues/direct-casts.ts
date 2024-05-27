@@ -1,5 +1,6 @@
 import { Queue, Worker } from "bullmq";
 import { sendDirectCast } from "../farcaster";
+import { redisConnection } from "./connection";
 
 const DCS_QUEUE_NAME = "dcs";
 
@@ -19,22 +20,19 @@ export const processDC = async (job: { data: MessageWithFarcasterIdBody }) => {
 
   await sendDirectCast(fid, text);
 
-  console.log(`[dcs worker] [${Date.now()}] - dc sent successfully.`);
+  console.log(`[dcs worker] [${Date.now()}] - dc job processed.`);
 };
 
 if (process.env.REDIS_HOST) {
+  console.log(`[dcs worker] [${Date.now()}] - starting dcs worker.`);
   // @ts-ignore
-  const dcsWorker = new Worker(DCS_QUEUE_NAME, processDC);
+  const dcsWorker = new Worker(DCS_QUEUE_NAME, processDC, {
+    connection: redisConnection,
+  });
 }
 
 export const dcsQueue = process.env.REDIS_HOST
   ? new Queue(DCS_QUEUE_NAME, {
-      connection: {
-        username: process.env.REDIS_USERNAME!,
-        password: process.env.REDIS_PASSWORD!,
-        host: process.env.REDIS_HOST!,
-        port: parseInt(process.env.REDIS_PORT!),
-        enableOfflineQueue: false,
-      },
+      connection: redisConnection,
     })
   : null;
