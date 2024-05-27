@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
 import { addToDCsQueue } from "../../../../../../lib/queues";
+import { MESSAGE_COOLDOWN } from "../../../../../../lib/constants";
 
 export const POST = async (
   req: NextRequest,
@@ -21,6 +22,42 @@ export const POST = async (
       },
       {
         status: 404,
+      }
+    );
+  }
+
+  const lastMessageSent = await prisma.waitlistMessages.findFirst({
+    where: {
+      waitlistId: parseInt(id),
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  console.log("lastMessageSent", lastMessageSent);
+  console.log(
+    new Date().getTime(),
+    lastMessageSent?.createdAt.getTime(),
+    new Date().getTime() - lastMessageSent?.createdAt.getTime()! <
+      MESSAGE_COOLDOWN
+  );
+
+  // check if lastMessage was sent in the last 12 hours
+  if (
+    lastMessageSent &&
+    new Date().getTime() - lastMessageSent.createdAt.getTime() <
+      MESSAGE_COOLDOWN
+  ) {
+    const nextMessageTime = new Date(
+      lastMessageSent.createdAt.getTime() + MESSAGE_COOLDOWN
+    );
+    return NextResponse.json(
+      {
+        message: `Next message can be sent from ${nextMessageTime.toLocaleString()}.`,
+      },
+      {
+        status: 400,
       }
     );
   }
@@ -60,6 +97,15 @@ export const POST = async (
         status: 500,
       }
     );
+  } finally {
+    await prisma.waitlistMessages.create({
+      data: {
+        waitlistId: parseInt(id),
+        message: enrichedMessage,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
   }
 
   return NextResponse.json({ success: true });

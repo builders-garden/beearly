@@ -10,8 +10,8 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   address       String
-  created_at    DateTime? @db.Date
-  updated_at    DateTime? @db.Date
+  created_at    DateTime? 
+  updated_at    DateTime? 
 }
 
 model Waitlist {
@@ -19,16 +19,17 @@ model Waitlist {
   name            String           @db.VarChar
   slug            String            @unique
   externalUrl     String            @map("external_url")  
-  endDate         DateTime          @db.Date @map("end_date")
+  endDate         DateTime          @map("end_date")
   imageLanding    String            @map("image_landing")
   imageSuccess    String            @map("image_success")
   imageNotEligible String          @map("image_not_eligible")
   imageError      String            @map("image_error")
   userAddress     String            @map("user_address")
-  createdAt       DateTime          @db.Date @map("created_at")
-  updatedAt       DateTime          @db.Date @map("updated_at")
+  createdAt       DateTime          @map("created_at")
+  updatedAt       DateTime          @map("updated_at")
   waitlistedUsers WaitlistedUser[]
   waitlistRequirements WaitlistRequirement[]
+  waitlistMessages WaitlistMessages[]
 }
 
 model WaitlistedUser {
@@ -41,9 +42,9 @@ model WaitlistedUser {
   avatarUrl     String?    @map("avatar_url")
   powerBadge    Boolean?   @default(false) @map("power_badge")
   referrerFid   Int?       @map("referrer_fid")
-  waitlistedAt  DateTime   @db.Date
-  createdAt     DateTime   @db.Date @map("created_at")
-  updatedAt     DateTime   @db.Date @map("updated_at")
+  waitlistedAt  DateTime   
+  createdAt     DateTime   @map("created_at")
+  updatedAt     DateTime   @map("updated_at")
   waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   referrer      WaitlistedUser? @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
   referrals    WaitlistedUser[] @relation("Referrals")
@@ -62,7 +63,16 @@ model WaitlistRequirement {
   waitlistId    Int        @map("waitlist_id")
   value         String 
   type   WaitlistRequirementType     
-  createdAt     DateTime   @db.Date @map("created_at")
-  updatedAt     DateTime   @db.Date @map("updated_at")
+  createdAt     DateTime   @map("created_at")
+  updatedAt     DateTime   @map("updated_at")
+  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model WaitlistMessages {
+  id            Int        @default(autoincrement()) @unique
+  waitlistId    Int        @map("waitlist_id")
+  message       String
+  createdAt     DateTime   @map("created_at")
+  updatedAt     DateTime   @map("updated_at")
   waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

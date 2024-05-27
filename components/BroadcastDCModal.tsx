@@ -24,7 +24,7 @@ export default function BroadcastDCModal({
   waitlistId: number;
 }) {
   const [text, setText] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>();
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const jwt = getAuthToken();
@@ -49,8 +49,10 @@ export default function BroadcastDCModal({
       onOpenChange(false);
     } else {
       console.error("Failed to send broadcast", res);
+      const data = await res.json();
       setError(
-        "An error occurred while sending the broadcast. Please try again later."
+        data.message ||
+          "An error occurred while sending the broadcast.Please try again later."
       );
     }
     setIsLoading(false);
@@ -96,9 +98,12 @@ export default function BroadcastDCModal({
                       account.
                     </p>
                     <p className="undeline text-primary">
-                      Avoid <span className="font-bold">spamming</span> or
-                      sending irrelevant messages to your users.
+                      You can send a message{" "}
+                      <span className="font-bold">every 12 hours</span>. Avoid{" "}
+                      <span className="font-bold">spamming</span> or sending
+                      irrelevant messages to your users.
                     </p>
+                    <p className="undeline text-primary"></p>
                     <p className="undeline text-primary">
                       Intro yourself and your project,{" "}
                       <span className="font-bold">
@@ -129,15 +134,20 @@ export default function BroadcastDCModal({
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" variant="light" onPress={onClose}>
-                Close
-              </Button>
-              <BeearlyButton
-                onPress={sendMessage}
-                text="Send broadcast"
-                isDisabled={!canSend}
-                isLoading={isLoading}
-              />
+              <div className="flex flex-col justify-end text-right gap-2">
+                {error && <div className="text-red-500 text-sm">{error}</div>}
+                <div className="flex flex-row gap-2 items-center justify-end">
+                  <Button color="primary" variant="light" onPress={onClose}>
+                    Close
+                  </Button>
+                  <BeearlyButton
+                    onPress={sendMessage}
+                    text="Send broadcast"
+                    isDisabled={!canSend}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </div>
             </ModalFooter>
           </>
         )}
