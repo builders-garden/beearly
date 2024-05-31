@@ -64,6 +64,12 @@ export const WaitlistDetail = ({
     ?.filter((r) => r.type === WaitlistRequirementType.CHANNEL_FOLLOW)
     ?.map((r) => r.value)
     ?.join(",");
+  const requiredUsersFollow =
+    waitlist.waitlistRequirements
+      ?.filter((r) => r.type === WaitlistRequirementType.USER_FOLLOW)
+      ?.map((r) => r.value)
+      ?.join(",") || "";
+
   const isPowerBadgeRequired =
     waitlist.waitlistRequirements?.find(
       (r) => r.type === WaitlistRequirementType.POWER_BADGE
@@ -164,7 +170,9 @@ export const WaitlistDetail = ({
               <div className="flex flex-col gap-1 p-2 bg-gray-100 rounded-md">
                 <div className="flex flex-row gap-2 items-center justify-center">
                   <ImageIcon size={16} className="text-gray-500" />
-                  <div className="text-gray-500 text-sm">Not eligible image</div>
+                  <div className="text-gray-500 text-sm">
+                    Not eligible image
+                  </div>
                 </div>
                 <Image
                   src={waitlist.imageNotEligible}
@@ -215,6 +223,21 @@ export const WaitlistDetail = ({
                   to be eligible
                 </div>
               </div>
+              <div className="flex flex-col gap-1 w-[50%]">
+                <div className="text-sm text-gray-500">Follow Users</div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={requiredUsersFollow}
+                  isDisabled
+                />
+                <div className="text-xs text-gray-500">
+                  Comma separated list of usernames that the users must follow
+                  to be eligible
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row gap-4 w-full">
               <div className="flex flex-col gap-1 w-[50%]">
                 <div className="text-sm text-gray-500">Power Badge</div>
                 <Checkbox

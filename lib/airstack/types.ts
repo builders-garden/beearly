@@ -1702,6 +1702,7 @@ export enum TokenBlockchain {
   Degen = 'degen',
   Ethereum = 'ethereum',
   Gold = 'gold',
+  Ham = 'ham',
   Zora = 'zora'
 }
 
