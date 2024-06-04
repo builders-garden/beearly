@@ -1,14 +1,10 @@
 "use client";
 import {
   Button,
-  Card,
-  CardBody,
   Checkbox,
   Image,
   Input,
   Link,
-  Pagination,
-  Spinner,
   Tab,
   Tabs,
   Tooltip,
@@ -20,8 +16,6 @@ import {
   Edit,
   ExternalLink,
   ImageIcon,
-  LinkIcon,
-  Users,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -31,8 +25,6 @@ import {
   WaitlistedUser,
 } from "@prisma/client";
 import { BASE_FRAME_URL, BASE_URL } from "../lib/constants";
-import { getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { useAccount } from "wagmi";
 import { UsersTable } from "./UsersTable";
 import { EditWaitlistModal } from "./EditWaitlistModal";
 

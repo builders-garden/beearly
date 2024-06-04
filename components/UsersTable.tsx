@@ -42,6 +42,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   const [users, setUsers] = useState<WaitlistedUser[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
+  const [powerBadgeUsersCount, setPowerBadgeUsersCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const jwt = getAuthToken();
   const { isConnected } = useAccount();
@@ -77,7 +78,8 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
       .then((data) => {
         setUsers(data.results);
         setTotalPages(data.pages);
-        setTotalCount(data.count._all);
+        setTotalCount(data.count);
+        setPowerBadgeUsersCount(data.powerBadgeUsersCount);
         setUsersLoading(false);
       });
   }, [waitlistId, page, orderBy, orderDirection, isPowerBadgeOnly, jwt]);
@@ -106,7 +108,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
               isSelected={isPowerBadgeOnly}
               onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
             />
-            Power Badge only ({totalCount})
+            Power Badge only ({powerBadgeUsersCount})
           </div>
         </div>
         <div className="flex flex-row gap-2 items-center">

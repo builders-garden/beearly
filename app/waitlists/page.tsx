@@ -7,12 +7,10 @@ import {
 } from "../../components/WaitlistDetail";
 import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { Waitlist } from "@prisma/client";
 import { useAccount } from "wagmi";
 import { CreateWaitlistModal } from "../../components/CreateWaitlistModal";
 import { BeearlyButton } from "../../components/BeearlyButton";
 import { ExternalLink, PlusSquare } from "lucide-react";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const Waitlists = () => {
