@@ -210,6 +210,11 @@ const frameHandler = frames(async (ctx) => {
       }
     }
   }
+  console.log({
+    ref,
+    parsedIntRef: parseInt(ref as any),
+    referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+  });
   await prisma.waitlistedUser.create({
     data: {
       waitlistId: waitlist.id,
