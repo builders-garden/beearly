@@ -18,6 +18,21 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid message");
   }
 
+  const urlSplit = ctx.url.pathname.split("/");
+  const slug = urlSplit[urlSplit.length - 2];
+  const waitlist = await prisma.waitlist.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      waitlistRequirements: true,
+    },
+  });
+  if (!waitlist) {
+    // TODO: show error frame
+    throw new Error("Invalid waitlist");
+  }
+
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
 
@@ -33,25 +48,9 @@ const frameHandler = frames(async (ctx) => {
       if (!farcasterProfile) {
         ref = "";
       } else {
-        console.log({
-          waitlistId: 1,
-          fid: parseInt(ref),
-          address:
-            farcasterProfile.connectedAddresses?.length! > 0
-              ? farcasterProfile.connectedAddresses![0]!.address
-              : farcasterProfile.userAddress,
-          displayName: farcasterProfile.profileDisplayName!,
-          username: farcasterProfile.profileName!,
-          avatarUrl: farcasterProfile.profileImage!,
-          powerBadge: farcasterProfile.isFarcasterPowerUser,
-          referrerFid: null,
-          waitlistedAt: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
         await prisma.waitlistedUser.create({
           data: {
-            waitlistId: 1,
+            waitlistId: waitlist.id,
             fid: parseInt(ref),
             address:
               farcasterProfile.connectedAddresses?.length! > 0
@@ -69,20 +68,6 @@ const frameHandler = frames(async (ctx) => {
         });
       }
     }
-  }
-  const urlSplit = ctx.url.pathname.split("/");
-  const slug = urlSplit[urlSplit.length - 2];
-  const waitlist = await prisma.waitlist.findUnique({
-    where: {
-      slug,
-    },
-    include: {
-      waitlistRequirements: true,
-    },
-  });
-  if (!waitlist) {
-    // TODO: show error frame
-    throw new Error("Invalid waitlist");
   }
 
   // ALREADY WAITLISTED
@@ -227,11 +212,6 @@ const frameHandler = frames(async (ctx) => {
       }
     }
   }
-  console.log({
-    ref,
-    parsedIntRef: parseInt(ref as any),
-    referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
-  });
   await prisma.waitlistedUser.create({
     data: {
       waitlistId: waitlist.id,
