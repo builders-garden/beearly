@@ -37,3 +37,14 @@ export const createCastIntent = (
   const urlFriendlyText = encodeURIComponent(text);
   return `https://warpcast.com/~/compose?text=${urlFriendlyText}&embeds[]=${waitlistFrameUrl}`;
 };
+
+export const createReferralCastIntent = (
+  waitlistName: string,
+  waitlistSlug: string
+) => {
+  //const waitlistFrameUrl = `${BASE_FRAME_URL}/${waitlistSlug}?ref=${fid}`;
+  const waitlistFrameUrl = `https://beearly.club/w/${waitlistSlug}`;
+  const text = `Join ${waitlistName} waitlist through the frame below and help me climb up the leaderboard!\n\nPowered by /beearly 🐝`;
+  const urlFriendlyText = encodeURIComponent(text);
+  return `https://warpcast.com/~/compose?text=${urlFriendlyText}&embeds[]=${waitlistFrameUrl}`;
+};

@@ -5,6 +5,9 @@ import { Waitlist } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { LeaderboardUser } from "../app/api/public/waitlists/[idOrSlug]/leaderboard/route";
 import { ReferrersTable } from "./ReferrersTable";
+import { BeearlyButton } from "./BeearlyButton";
+import { ExternalLink } from "lucide-react";
+import { createReferralCastIntent } from "../lib/warpcast";
 
 export default function Leaderboard({
   waitlistSlug,
@@ -59,6 +62,12 @@ export default function Leaderboard({
       {!topReferrers?.length! && (
         <div className="mt-16">No referrals activated so far.</div>
       )}
+      <BeearlyButton
+        text="Share and climb the leaderboard"
+        icon={<ExternalLink size={16} />}
+        iconPosition="right"
+        link={createReferralCastIntent(waitlist!.name, waitlist!.slug)}
+      />
     </div>
   );
 }
