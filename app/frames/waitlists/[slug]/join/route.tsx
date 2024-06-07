@@ -22,6 +22,7 @@ const frameHandler = frames(async (ctx) => {
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
 
   if (ref && ref !== "1") {
+    console.log("ref", ref);
     const isWaitlistUser = await prisma.waitlistedUser.findFirst({
       where: {
         fid: parseInt(ref),
