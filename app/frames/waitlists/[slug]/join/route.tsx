@@ -33,6 +33,22 @@ const frameHandler = frames(async (ctx) => {
       if (!farcasterProfile) {
         ref = "";
       } else {
+        console.log({
+          waitlistId: 1,
+          fid: parseInt(ref),
+          address:
+            farcasterProfile.connectedAddresses?.length! > 0
+              ? farcasterProfile.connectedAddresses![0]!.address
+              : farcasterProfile.userAddress,
+          displayName: farcasterProfile.profileDisplayName!,
+          username: farcasterProfile.profileName!,
+          avatarUrl: farcasterProfile.profileImage!,
+          powerBadge: farcasterProfile.isFarcasterPowerUser,
+          referrerFid: null,
+          waitlistedAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
         await prisma.waitlistedUser.create({
           data: {
             waitlistId: 1,
