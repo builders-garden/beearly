@@ -29,6 +29,6 @@ export const createWaitlistRequirement = async (payload: { data: any }) => {
  * })
  *
  **/
-export const createManyWaitlistRequirements = async (payload: { data: any }) => {
+export const createWaitlistRequirements = async (payload: { data: any }) => {
   return await prisma.waitlistRequirement.createMany(payload);
 };
