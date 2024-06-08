@@ -14,7 +14,9 @@ import prisma from "../prisma";
  * })
  *
  **/
-export const createWaitlistRequirement = async (payload: { data: Omit<WaitlistRequirement, "id"> }) => {
+export const createWaitlistRequirement = async (payload: {
+  data: Omit<WaitlistRequirement, "id">;
+}) => {
   return await prisma.waitlistRequirement.create(payload);
 };
 
@@ -30,6 +32,8 @@ export const createWaitlistRequirement = async (payload: { data: Omit<WaitlistRe
  * })
  *
  **/
-export const createWaitlistRequirements = async (payload: { data: Omit<WaitlistRequirement, "id">[] }) => {
+export const createWaitlistRequirements = async (payload: {
+  data: Omit<WaitlistRequirement, "id">[];
+}) => {
   return await prisma.waitlistRequirement.createMany(payload);
 };

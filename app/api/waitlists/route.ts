@@ -2,8 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
 import { WaitlistRequirementType } from "@prisma/client";
-import { getUserWaitlists, getWaitlistBySlug, createWaitlist, getUserWaitlistsCount } from "../../../lib/db/waitlist";
-import { createWaitlistRequirements, createWaitlistRequirement } from "../../../lib/db/waitlistRequirements";
+import {
+  getUserWaitlists,
+  getWaitlistBySlug,
+  createWaitlist,
+  getUserWaitlistsCount,
+} from "../../../lib/db/waitlist";
+import {
+  createWaitlistRequirements,
+  createWaitlistRequirement,
+} from "../../../lib/db/waitlistRequirements";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
@@ -32,11 +40,26 @@ export const POST = async (req: NextRequest) => {
   const waitlistsCount = await getUserWaitlistsCount(address!);
 
   if (waitlistsCount >= 1) {
-    return NextResponse.json({ message: "You can only create one waitlist" }, { status: 400 });
+    return NextResponse.json(
+      { message: "You can only create one waitlist" },
+      { status: 400 }
+    );
   }
 
-  if (!name || !endDate || !externalUrl || !address || !landingImage || !successImage || !notEligibleImage || !errorImage) {
-    return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+  if (
+    !name ||
+    !endDate ||
+    !externalUrl ||
+    !address ||
+    !landingImage ||
+    !successImage ||
+    !notEligibleImage ||
+    !errorImage
+  ) {
+    return NextResponse.json(
+      { success: false, message: "Missing required fields" },
+      { status: 400 }
+    );
   }
 
   const slugName = slugify(name as string, {
@@ -48,7 +71,10 @@ export const POST = async (req: NextRequest) => {
   const existingWaitlist = await getWaitlistBySlug(slugName);
 
   if (existingWaitlist) {
-    return NextResponse.json({ message: "Waitlist with that name already exists" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Waitlist with that name already exists" },
+      { status: 400 }
+    );
   }
 
   const landingBytes = await landingImage!.arrayBuffer();
