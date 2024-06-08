@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
 import { WaitlistRequirementType } from "@prisma/client";
-import { getUserWaitlists, findFirstWaitlist, createWaitlist } from "../../../lib/db/waitlist";
-import { createManyWaitlistRequirements, createWaitlistRequirement } from "../../../lib/db/waitlistRequirements";
+import { getUserWaitlists, getWaitlistBySlug, createWaitlist, getUserWaitlistsCount } from "../../../lib/db/waitlist";
+import { createWaitlistRequirements, createWaitlistRequirement } from "../../../lib/db/waitlistRequirements";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
@@ -29,9 +29,9 @@ export const POST = async (req: NextRequest) => {
   const errorImage: File | null = body.get("files[3]") as unknown as File;
 
   // Prisma call to check if the user has more than 1 waitlist
-  const waitlists = await getUserWaitlists(address!);
+  const waitlistsCount = await getUserWaitlistsCount(address!);
 
-  if (waitlists.length >= 1) {
+  if (waitlistsCount >= 1) {
     return NextResponse.json({ message: "You can only create one waitlist" }, { status: 400 });
   }
 
@@ -45,7 +45,7 @@ export const POST = async (req: NextRequest) => {
     replacement: "-",
   });
 
-  const existingWaitlist = await findFirstWaitlist(slugName);
+  const existingWaitlist = await getWaitlistBySlug(slugName);
 
   if (existingWaitlist) {
     return NextResponse.json({ message: "Waitlist with that name already exists" }, { status: 400 });
@@ -99,7 +99,7 @@ export const POST = async (req: NextRequest) => {
       ?.toString()
       .split(",")
       .map((c) => c?.trim()?.toLowerCase());
-    await createManyWaitlistRequirements({
+    await createWaitlistRequirements({
       data: channels!.map((channel) => ({
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.CHANNEL_FOLLOW,
@@ -115,7 +115,7 @@ export const POST = async (req: NextRequest) => {
       ?.toString()
       .split(",")
       .map((u) => u?.trim()?.toLowerCase());
-    await createManyWaitlistRequirements({
+    await createWaitlistRequirements({
       data: users!.map((user) => ({
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.USER_FOLLOW,

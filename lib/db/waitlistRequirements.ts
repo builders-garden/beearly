@@ -1,4 +1,5 @@
 // This is a library with functions to interact with the waitlistRequirements table in the database.
+import { WaitlistRequirement } from "@prisma/client";
 import prisma from "../prisma";
 
 /**
@@ -13,7 +14,7 @@ import prisma from "../prisma";
  * })
  *
  **/
-export const createWaitlistRequirement = async (payload: { data: any }) => {
+export const createWaitlistRequirement = async (payload: { data: Omit<WaitlistRequirement, "id"> }) => {
   return await prisma.waitlistRequirement.create(payload);
 };
 
@@ -29,6 +30,6 @@ export const createWaitlistRequirement = async (payload: { data: any }) => {
  * })
  *
  **/
-export const createWaitlistRequirements = async (payload: { data: any }) => {
+export const createWaitlistRequirements = async (payload: { data: Omit<WaitlistRequirement, "id">[] }) => {
   return await prisma.waitlistRequirement.createMany(payload);
 };
