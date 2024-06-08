@@ -23,7 +23,7 @@ export const getUserWaitlists = async (address: string) => {
  * @param slugName - The slug name of the waitlist.
  * @returns the first found waitlist with the given slug name.
  */
-export const findFirstWaitlist = async (slugName: string) => {
+export const getWaitlistBySlug = async (slug: string) => {
   return await prisma.waitlist.findFirst({
     where: {
       slug: slugName,
