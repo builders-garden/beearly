@@ -38,20 +38,25 @@ export const POST = async (req: NextRequest) => {
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
 
-  if (
-    !name ||
-    !endDate ||
-    !externalUrl ||
-    !address ||
-    !landingImage ||
-    !successImage ||
-    !notEligibleImage ||
-    !errorImage
-  ) {
-    return NextResponse.json(
-      { success: false, message: "Missing required fields" },
-      { status: 400 }
-    );
+  // Prisma call to check if the user has more than 1 waitlist
+  const waitlists = await prisma.waitlist.findMany({
+    where: {
+      userAddress: address!,
+    },
+    include: {
+      _count: {
+        select: { waitlistedUsers: true },
+      },
+      waitlistRequirements: true,
+    },
+  });
+
+  if (waitlists.length >= 1) {
+    return NextResponse.json({ message: "You can only create one waitlist" }, { status: 400 });
+  }
+
+  if (!name || !endDate || !externalUrl || !address || !landingImage || !successImage || !notEligibleImage || !errorImage) {
+    return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
   }
 
   const slugName = slugify(name as string, {
@@ -67,10 +72,7 @@ export const POST = async (req: NextRequest) => {
   });
 
   if (existingWaitlist) {
-    return NextResponse.json(
-      { message: "Waitlist with that name already exists" },
-      { status: 400 }
-    );
+    return NextResponse.json({ message: "Waitlist with that name already exists" }, { status: 400 });
   }
 
   const landingBytes = await landingImage!.arrayBuffer();
@@ -104,7 +106,6 @@ export const POST = async (req: NextRequest) => {
     },
   });
 
-
   if (isPowerBadgeRequired) {
     await prisma.waitlistRequirement.create({
       data: {
@@ -132,6 +133,7 @@ export const POST = async (req: NextRequest) => {
       })),
     });
   }
+
   if (requiredUsersFollow?.toString()?.length! > 0) {
     const users = requiredUsersFollow
       ?.toString()
