@@ -66,7 +66,7 @@ const Waitlists = () => {
               setIsOpen(true);
             }}
             showTooltip={waitlists.length >= 1}
-            tooltipText="We allow only one waitlist per person for now :("
+            tooltipText="There's currently a limit of 1 waitlist per user"
             tooltipPlacement="bottom"
             icon={
               <div className="rounded-2xl">
