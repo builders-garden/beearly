@@ -143,7 +143,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
               isSelected={isPowerBadgeOnly}
               onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
             />
-            Power Badge only ({powerBadgeUsersCount})
+            Power Badge only ({powerBadgeUsersCount}/{totalCount})
           </div>
         </div>
         <div className="flex flex-row gap-2 items-center">

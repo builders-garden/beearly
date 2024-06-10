@@ -52,10 +52,11 @@ export default function WaitlistTable({
         {waitlists.map((waitlist) => (
           <TableRow
             key={waitlist.id}
-            className="cursor-pointer border-bottom-2 border-gray-200"
-            onClick={() => setSelectedWaitlist(waitlist)}
+            className="border-bottom-2 border-gray-200"
           >
-            <TableCell>{waitlist.name}</TableCell>
+            <TableCell className="cursor-pointer">
+              <Link href={`/waitlists/${waitlist.id}`}>{waitlist.name}</Link>
+            </TableCell>
             <TableCell>
               <div className="text-blue-500">
                 {(waitlist as any)?._count?.waitlistedUsers}
@@ -71,8 +72,10 @@ export default function WaitlistTable({
                 {waitlist.externalUrl.replace("https://", "")}
               </a>
             </TableCell>
-            <TableCell>
-              <ChevronRight size={16} />
+            <TableCell className="cursor-pointer ">
+              <Link href={`/waitlists/${waitlist.id}`}>
+                <ChevronRight size={16} />
+              </Link>
             </TableCell>
           </TableRow>
         ))}
