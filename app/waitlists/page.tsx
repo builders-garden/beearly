@@ -1,7 +1,10 @@
 "use client";
 import { Button, Image, Spinner, Tooltip } from "@nextui-org/react";
 import WaitlistTable from "../../components/WaitlistTable";
-import { WaitlistDetail, WaitlistWithRequirements } from "../../components/WaitlistDetail";
+import {
+  WaitlistDetail,
+  WaitlistWithRequirements,
+} from "../../components/WaitlistDetail";
 import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
@@ -12,7 +15,8 @@ import Link from "next/link";
 
 const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
-  const [selectedWaitlist, setSelectedWaitlist] = useState<WaitlistWithRequirements | null>();
+  const [selectedWaitlist, setSelectedWaitlist] =
+    useState<WaitlistWithRequirements | null>();
   const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
   const [waitlistsLoading, setWaitlistsLoading] = useState(true);
@@ -41,7 +45,9 @@ const Waitlists = () => {
       <div className="flex flex-col gap-8">
         <div className="text-3xl font-bold">Waitlists</div>
         <div className="flex flex-col p-24 items-center justify-center gap-4">
-          <DynamicWidget innerButtonComponent={<Button>Login to view your waitlists</Button>} />
+          <DynamicWidget
+            innerButtonComponent={<Button>Login to view your waitlists</Button>}
+          />
         </div>
       </div>
     );
@@ -70,7 +76,12 @@ const Waitlists = () => {
             tooltipPlacement="bottom"
             icon={
               <div className="rounded-2xl">
-                <PlusSquare radius={"lg"} fill="black" className="text-primary rounded-xl" size={24} />
+                <PlusSquare
+                  radius={"lg"}
+                  fill="black"
+                  className="text-primary rounded-xl"
+                  size={24}
+                />
               </div>
             }
             text="New waitlist"
@@ -90,11 +101,18 @@ const Waitlists = () => {
               // if there are no waitlists, show a message
               waitlists.length === 0 ? (
                 <div className="flex flex-col mx-auto my-auto justify-center items-center gap-4 mt-24">
-                  <Image src="/empty-waitlists.png" alt="empty-state" width={200} />
+                  <Image
+                    src="/empty-waitlists.png"
+                    alt="empty-state"
+                    width={200}
+                  />
                   <div className="flex flex-col gap-2 justify-center text-center">
-                    <div className="text-2xl font-semibold text-center">You don&apos;t have any waitlist</div>
+                    <div className="text-2xl font-semibold text-center">
+                      You don&apos;t have any waitlist
+                    </div>
                     <div className="text-lg text-gray-400">
-                      Create your first waitlist and publish it, we all need to Beearly!
+                      Create your first waitlist and publish it, we all need to
+                      Beearly!
                     </div>
                   </div>
                   <BeearlyButton
@@ -103,7 +121,12 @@ const Waitlists = () => {
                     }}
                     icon={
                       <div className="rounded-2xl">
-                        <PlusSquare radius={"lg"} fill="black" className="text-primary rounded-xl" size={24} />
+                        <PlusSquare
+                          radius={"lg"}
+                          fill="black"
+                          className="text-primary rounded-xl"
+                          size={24}
+                        />
                       </div>
                     }
                     text="New waitlist"
@@ -111,7 +134,12 @@ const Waitlists = () => {
                 </div>
               ) : (
                 <div className="w-[50%] border-2 border-gray-200 rounded-xl">
-                  {!waitlistsLoading && <WaitlistTable waitlists={waitlists} setSelectedWaitlist={setSelectedWaitlist} />}
+                  {!waitlistsLoading && (
+                    <WaitlistTable
+                      waitlists={waitlists}
+                      setSelectedWaitlist={setSelectedWaitlist}
+                    />
+                  )}
                 </div>
               )
             }
@@ -129,7 +157,11 @@ const Waitlists = () => {
         )
       }
 
-      <CreateWaitlistModal isOpen={isOpen} onOpenChange={setIsOpen} refetchWaitlists={fetchWaitlists} />
+      <CreateWaitlistModal
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        refetchWaitlists={fetchWaitlists}
+      />
     </div>
   );
 };

@@ -10,9 +10,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
-import {
-  ExternalLink,
-} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { LeaderboardUser } from "../app/api/public/waitlists/[idOrSlug]/leaderboard/route";
 

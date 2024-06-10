@@ -25,9 +25,7 @@ import { parseAbsoluteToLocal } from "@internationalized/date";
 import { FrameImage } from "./FrameImage";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { BASE_FRAME_URL } from "../lib/constants";
-import {
-  WaitlistRequirementType,
-} from "@prisma/client";
+import { WaitlistRequirementType } from "@prisma/client";
 import { BeearlyButton } from "./BeearlyButton";
 import { WaitlistWithRequirements } from "./WaitlistDetail";
 
