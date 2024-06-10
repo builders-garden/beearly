@@ -67,7 +67,7 @@ const Waitlists = () => {
           </Link>
 
           <BeearlyButton
-            isDisabled={waitlists.length >= 1}
+            isDisabled={waitlistsLoading || waitlists.length >= 1}
             onPress={() => {
               setIsOpen(true);
             }}
