@@ -2,8 +2,8 @@
 
 This repository contains the source code for the **Beearly** waitlist creation web app.
 
-![test](./beearly-logo.svg)
-<img src="./beearly-logo.svg">
+![test](./public/beearly-logo.svg)
+<img src="./public/beearly-logo.svg">
 
 ## 📋 Features
 
