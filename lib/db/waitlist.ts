@@ -24,22 +24,12 @@ export const getUserWaitlists = async (address: string) => {
  * @param address - The user's address.
  * @returns the number of waitlists the user has created.
  */
-export const getUserWaitlistsCount = async (
-  address: string
-): Promise<number> => {
-  return (
-    await prisma.waitlist.findMany({
-      where: {
-        userAddress: address!,
-      },
-      include: {
-        _count: {
-          select: { waitlistedUsers: true },
-        },
-        waitlistRequirements: true,
-      },
-    })
-  ).length;
+export const getUserWaitlistsCount = async (address: string): Promise<number> => {
+  return await prisma.waitlist.count({
+    where: {
+      userAddress: address!,
+    },
+  });
 };
 
 /**
@@ -66,8 +56,6 @@ export const getWaitlistBySlug = async (slug: string) => {
  * })
  *
  **/
-export const createWaitlist = async (payload: {
-  data: Omit<Waitlist, "id">;
-}) => {
+export const createWaitlist = async (payload: { data: Omit<Waitlist, "id"> }) => {
   return await prisma.waitlist.create(payload);
 };
