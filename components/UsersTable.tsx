@@ -12,6 +12,10 @@ import {
   Spinner,
   Checkbox,
   Pagination,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
 import { count } from "console";
@@ -23,7 +27,7 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import BroadcastDCModal from "./BroadcastDCModal";
 
@@ -36,6 +40,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] =
     useState<boolean>(false);
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
+  const [limit, setLimit] = useState(new Set(["10"]));
   const [orderBy, setOrderBy] = useState<string>("waitlistedAt");
   const [orderDirection, setOrderDirection] = useState<string>("desc");
   const [usersLoading, setUsersLoading] = useState<boolean>(false);
@@ -61,9 +66,13 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
         a.click();
       });
   }, [waitlistId, jwt]);
+  const selectedlimit = useMemo(
+    () => Array.from(limit).join(", ").replaceAll("_", " "),
+    [limit]
+  );
   const fetchUsers = useCallback(() => {
     setUsersLoading(true);
-    let url = `/api/waitlists/${waitlistId}/users?page=${page - 1}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+    let url = `/api/waitlists/${waitlistId}/users?page=${page - 1}&orderBy=${orderBy}&orderDirection=${orderDirection}&limit=${selectedlimit}`;
     if (isPowerBadgeOnly) {
       url += "&powerBadge=true";
     }
@@ -80,12 +89,21 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
         setPowerBadgeUsersCount(data.powerBadgeUsersCount);
         setUsersLoading(false);
       });
-  }, [waitlistId, page, orderBy, orderDirection, isPowerBadgeOnly, jwt]);
+  }, [
+    waitlistId,
+    page,
+    orderBy,
+    orderDirection,
+    selectedlimit,
+    isPowerBadgeOnly,
+    jwt,
+  ]);
   useEffect(() => {
     if (jwt && isConnected) {
       fetchUsers();
     }
   }, [jwt, isConnected, fetchUsers, page]);
+
   if (usersLoading && !users.length) {
     return (
       <div className="flex flex-row justify-center items-center p-16">
@@ -93,6 +111,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
       </div>
     );
   }
+
   const toggleOrderBy = (mode: OrderByMode) => {
     setOrderBy(mode);
     setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
@@ -100,7 +119,25 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between items-center px-4 ">
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center gap-4">
+          <Dropdown>
+            <DropdownTrigger>
+              <Button variant="bordered" className="capitalize">
+                {selectedlimit} <ChevronDown size={16} />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="limit selector"
+              disallowEmptySelection
+              selectionMode="single"
+              selectedKeys={limit}
+              onSelectionChange={setLimit as any}
+            >
+              <DropdownItem key="10">10</DropdownItem>
+              <DropdownItem key="25">25</DropdownItem>
+              <DropdownItem key="50">50</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
           <div>
             <Checkbox
               isSelected={isPowerBadgeOnly}
