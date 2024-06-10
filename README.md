@@ -48,6 +48,6 @@ pnpm build && pnpm start # using pnpm
 
 The app should be running in the chosen port (`3000` by default).
 
-## 📝 license
+## 📝 License
 
-this project is licensed under the **MIT License**. check the [LICENSE.md](/LICENSE.md) file for more information.
+This project is licensed under the **MIT License**. check the [LICENSE.md](/LICENSE.md) file for more information.
