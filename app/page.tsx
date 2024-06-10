@@ -79,7 +79,10 @@ export default function Home() {
               radius="sm"
             />
           </Link>
-          <Link href="https://warpcast.com/husson.eth/0x0adcb141" target="_blank">
+          <Link
+            href="https://warpcast.com/husson.eth/0x0adcb141"
+            target="_blank"
+          >
             <Image
               src="/builders-brunch-waitlist.png"
               className="h-72"

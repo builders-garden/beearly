@@ -64,8 +64,11 @@
     "dotenv": "^16.4.5",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.1.0",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8",
+    "prettier": "^3.3.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.3.3"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

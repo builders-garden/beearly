@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../lib/prisma";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
 import { WaitlistRequirementType } from "@prisma/client";
+import {
+  getUserWaitlists,
+  getWaitlistBySlug,
+  createWaitlist,
+  getUserWaitlistsCount,
+} from "../../../lib/db/waitlist";
+import {
+  createWaitlistRequirements,
+  createWaitlistRequirement,
+} from "../../../lib/db/waitlistRequirements";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
-
-  const waitlists = await prisma.waitlist.findMany({
-    where: {
-      userAddress: address!,
-    },
-    include: {
-      _count: {
-        select: { waitlistedUsers: true },
-      },
-      waitlistRequirements: true,
-    },
-  });
+  const waitlists = await getUserWaitlists(address!);
 
   return NextResponse.json(waitlists);
 };
@@ -37,6 +35,16 @@ export const POST = async (req: NextRequest) => {
   const successImage: File | null = body.get("files[1]") as unknown as File;
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
+
+  // Prisma call to check if the user has more than 1 waitlist
+  const waitlistsCount = await getUserWaitlistsCount(address!);
+
+  if (waitlistsCount >= 1) {
+    return NextResponse.json(
+      { message: "You can only create one waitlist" },
+      { status: 400 }
+    );
+  }
 
   if (
     !name ||
@@ -60,11 +68,7 @@ export const POST = async (req: NextRequest) => {
     replacement: "-",
   });
 
-  const existingWaitlist = await prisma.waitlist.findFirst({
-    where: {
-      slug: slugName,
-    },
-  });
+  const existingWaitlist = await getWaitlistBySlug(slugName);
 
   if (existingWaitlist) {
     return NextResponse.json(
@@ -88,7 +92,7 @@ export const POST = async (req: NextRequest) => {
     uploadImage(errorBuffer, `${name}-error.png`),
   ]);
 
-  const waitlist = await prisma.waitlist.create({
+  const waitlist = await createWaitlist({
     data: {
       name: name as string,
       slug: slugName,
@@ -104,9 +108,8 @@ export const POST = async (req: NextRequest) => {
     },
   });
 
-
   if (isPowerBadgeRequired) {
-    await prisma.waitlistRequirement.create({
+    await createWaitlistRequirement({
       data: {
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.POWER_BADGE,
@@ -122,7 +125,7 @@ export const POST = async (req: NextRequest) => {
       ?.toString()
       .split(",")
       .map((c) => c?.trim()?.toLowerCase());
-    await prisma.waitlistRequirement.createMany({
+    await createWaitlistRequirements({
       data: channels!.map((channel) => ({
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.CHANNEL_FOLLOW,
@@ -132,12 +135,13 @@ export const POST = async (req: NextRequest) => {
       })),
     });
   }
+
   if (requiredUsersFollow?.toString()?.length! > 0) {
     const users = requiredUsersFollow
       ?.toString()
       .split(",")
       .map((u) => u?.trim()?.toLowerCase());
-    await prisma.waitlistRequirement.createMany({
+    await createWaitlistRequirements({
       data: users!.map((user) => ({
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.USER_FOLLOW,
