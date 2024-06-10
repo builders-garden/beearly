@@ -15,7 +15,13 @@ import {
 } from "@nextui-org/react";
 import { WaitlistedUser } from "@prisma/client";
 import { count } from "console";
-import { ChevronDown, ChevronUp, Download, ExternalLink, Send } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  ExternalLink,
+  Send,
+} from "lucide-react";
 import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -27,7 +33,8 @@ enum OrderByMode {
 }
 
 export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
-  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState<boolean>(false);
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] =
+    useState<boolean>(false);
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
   const [orderBy, setOrderBy] = useState<string>("waitlistedAt");
   const [orderDirection, setOrderDirection] = useState<string>("desc");
@@ -95,12 +102,20 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
       <div className="flex flex-row justify-between items-center px-4 ">
         <div className="flex flex-row items-center">
           <div>
-            <Checkbox isSelected={isPowerBadgeOnly} onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)} />
+            <Checkbox
+              isSelected={isPowerBadgeOnly}
+              onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
+            />
             Power Badge only ({powerBadgeUsersCount})
           </div>
         </div>
         <div className="flex flex-row gap-2 items-center">
-          <Button color="primary" className="text-primary" variant="flat" onPress={() => setIsBroadcastModalOpen(true)}>
+          <Button
+            color="primary"
+            className="text-primary"
+            variant="flat"
+            onPress={() => setIsBroadcastModalOpen(true)}
+          >
             <Send size={16} />
             Broadcast
           </Button>
@@ -156,21 +171,47 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
             <TableRow key={user.fid} className="cursor-pointer">
               <TableCell>
                 <div className="flex flex-row gap-2 items-center">
-                  <Image radius="full" src={user.avatarUrl!} alt="user-image" className="h-8 w-8" />
+                  <Image
+                    radius="full"
+                    src={user.avatarUrl!}
+                    alt="user-image"
+                    className="h-8 w-8"
+                  />
                   <div className="flex flex-row items-center gap-2">
                     <div className="text-sm">
-                      {user.displayName.length > 20 ? `${user.displayName.substring(0, 20)}...` : `${user.displayName}`}
+                      {user.displayName.length > 20
+                        ? `${user.displayName.substring(0, 20)}...`
+                        : `${user.displayName}`}
                     </div>
-                    {user.powerBadge && <Image src="/power-badge.png" className="h-4 w-4" radius="full" alt="power-badge" />}
-                    <div className="text-sm text-gray-500">@{user.username}</div>
+                    {user.powerBadge && (
+                      <Image
+                        src="/power-badge.png"
+                        className="h-4 w-4"
+                        radius="full"
+                        alt="power-badge"
+                      />
+                    )}
+                    <div className="text-sm text-gray-500">
+                      @{user.username}
+                    </div>
                   </div>
                 </div>
               </TableCell>
               <TableCell>{(user as any)?._count?.referrals}</TableCell>
-              <TableCell>{new Date(user.waitlistedAt).toDateString()}</TableCell>
               <TableCell>
-                <Link href={`https://warpcast.com/${user.username}`} target="_blank">
-                  <Image className="h-4 w-4" src="/warpcast-logo.svg" alt="warpcast-logo" radius="none" />
+                {new Date(user.waitlistedAt).toDateString()}
+              </TableCell>
+              <TableCell>
+                <Link
+                  href={`https://warpcast.com/${user.username}`}
+                  target="_blank"
+                >
+                  <Image
+                    className="h-4 w-4"
+                    src="/warpcast-logo.svg"
+                    alt="warpcast-logo"
+                    radius="none"
+                  />
                 </Link>
               </TableCell>
             </TableRow>
@@ -190,7 +231,11 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
           }}
         />
       </div>
-      <BroadcastDCModal isOpen={isBroadcastModalOpen} onOpenChange={setIsBroadcastModalOpen} waitlistId={waitlistId} />
+      <BroadcastDCModal
+        isOpen={isBroadcastModalOpen}
+        onOpenChange={setIsBroadcastModalOpen}
+        waitlistId={waitlistId}
+      />
     </div>
   );
 };

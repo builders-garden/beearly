@@ -20,7 +20,7 @@ export const GET = async (
       },
     });
   }
-  
+
   if (!waitlist) {
     return NextResponse.json(
       {

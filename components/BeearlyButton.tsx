@@ -27,7 +27,12 @@ export const BeearlyButton = ({
   if (!iconPosition) iconPosition = "left";
   if (!tooltipPlacement) tooltipPlacement = "top";
   return (
-    <Tooltip isDisabled={!showTooltip} showArrow={true} placement={tooltipPlacement} content={tooltipText}>
+    <Tooltip
+      isDisabled={!showTooltip}
+      showArrow={true}
+      placement={tooltipPlacement}
+      content={tooltipText}
+    >
       {/* This div is needed to make the Tooltip work on disabled buttons */}
       <div>
         <Button
