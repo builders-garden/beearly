@@ -55,7 +55,12 @@ export default function WaitlistTable({
             className="border-bottom-2 border-gray-200"
           >
             <TableCell className="cursor-pointer">
-              <Link href={`/waitlists/${waitlist.id}`}>{waitlist.name}</Link>
+              <Link
+                href={`/waitlists/${waitlist.id}`}
+                className="hover:text-primary"
+              >
+                {waitlist.name}
+              </Link>
             </TableCell>
             <TableCell>
               <div className="text-blue-500">
@@ -72,9 +77,9 @@ export default function WaitlistTable({
                 {waitlist.externalUrl.replace("https://", "")}
               </a>
             </TableCell>
-            <TableCell className="cursor-pointer ">
+            <TableCell className="cursor-pointer">
               <Link href={`/waitlists/${waitlist.id}`}>
-                <ChevronRight size={16} />
+                <ChevronRight size={16} className="hover:text-primary" />
               </Link>
             </TableCell>
           </TableRow>
