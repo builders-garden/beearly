@@ -15,6 +15,7 @@ export const GET = async (
       id: parseInt(id),
     },
     include: {
+      waitlistRequirements: true,
       _count: {
         select: { waitlistedUsers: true },
       },
