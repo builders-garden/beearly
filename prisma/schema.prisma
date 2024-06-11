@@ -58,6 +58,7 @@ enum WaitlistRequirementType {
   USER_FOLLOW
   POWER_BADGE
 }
+
 model WaitlistRequirement {
   id            Int        @default(autoincrement()) @unique
   waitlistId    Int        @map("waitlist_id")

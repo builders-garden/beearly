@@ -1,7 +1,8 @@
 import {
   FarcasterChannelsQuery,
-  FarcasterQuery,
+  ProfileQuery,
   IsFollowingQuery,
+  ProfilesQuery,
 } from "./types";
 import { fetchQuery, init } from "@airstack/node";
 
@@ -10,8 +11,9 @@ if (!process.env.AIRSTACK_API_KEY) {
 }
 
 init(process.env.AIRSTACK_API_KEY!);
-const query = /* GraphQL */ `
-  query Farcaster($fid: String!) {
+
+const profileQuery = /* GraphQL */ `
+  query Profile($fid: String!) {
     Socials(
       input: {
         filter: { dappName: { _eq: farcaster }, userId: { _eq: $fid } }
@@ -33,8 +35,8 @@ const query = /* GraphQL */ `
   }
 `;
 
-interface QueryResponse {
-  data: FarcasterQuery | null;
+interface ProfileQueryResponse {
+  data: ProfileQuery | null;
   error: Error | null;
 }
 
@@ -43,7 +45,9 @@ interface Error {
 }
 
 export const fetchFarcasterProfile = async (fid: string) => {
-  const { data, error }: QueryResponse = await fetchQuery(query, { fid });
+  const { data, error }: ProfileQueryResponse = await fetchQuery(profileQuery, {
+    fid,
+  });
   if (
     error ||
     !data ||
@@ -78,10 +82,6 @@ const channelsQuery = /* GraphQL */ `
 interface ChannelsQueryResponse {
   data: FarcasterChannelsQuery | null;
   error: Error | null;
-}
-
-interface Error {
-  message: string;
 }
 
 export const fetchFarcasterChannels = async (
@@ -153,4 +153,61 @@ export const isUserFollowingUsers = async (
     return [];
   }
   return data.Wallet.socialFollowers.Follower;
+};
+
+const profilesQuery = /* GraphQL */ `
+  query Profiles($fids: [String!], $pointer: String) {
+    Socials(
+      input: {
+        filter: { dappName: { _eq: farcaster }, userId: { _in: $fids } }
+        blockchain: ethereum
+        cursor: $pointer
+      }
+    ) {
+      Social {
+        userId
+        profileName
+        profileDisplayName
+        profileImage
+        isFarcasterPowerUser
+        userAddress
+        connectedAddresses {
+          address
+        }
+      }
+      pageInfo {
+        hasNextPage
+        nextCursor
+      }
+    }
+  }
+`;
+
+interface ProfilesQueryResponse {
+  data: ProfilesQuery | null;
+  error: Error | null;
+}
+
+export const fetchFarcasterProfiles = async (
+  fids: string[],
+  pointer: string
+) => {
+  const { data, error }: ProfilesQueryResponse = await fetchQuery(
+    profilesQuery,
+    {
+      fids,
+      pointer,
+    }
+  );
+  if (
+    error ||
+    !data ||
+    !data.Socials ||
+    !data.Socials.Social ||
+    !data.Socials.pageInfo ||
+    data.Socials.Social?.length === 0
+  ) {
+    return false;
+  }
+  return { profiles: data.Socials.Social, pageInfo: data.Socials.pageInfo };
 };

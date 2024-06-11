@@ -2230,12 +2230,12 @@ export type XmtPsOutput = {
   pageInfo: Maybe<PageInfo>;
 };
 
-export type FarcasterQueryVariables = Exact<{
+export type ProfileQueryVariables = Exact<{
   fid: Scalars['String']['input'];
 }>;
 
 
-export type FarcasterQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, connectedAddresses: Array<{ address: any | null }> | null }> | null } | null };
+export type ProfileQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, connectedAddresses: Array<{ address: any | null }> | null }> | null } | null };
 
 export type FarcasterChannelsQueryVariables = Exact<{
   fid: Scalars['Identity']['input'];
@@ -2252,3 +2252,11 @@ export type IsFollowingQueryVariables = Exact<{
 
 
 export type IsFollowingQuery = { Wallet: { socialFollowers: { Follower: Array<{ dappName: string | null, dappSlug: string | null, followingProfileId: string | null, followerProfileId: string | null }> | null } | null } | null };
+
+export type ProfilesQueryVariables = Exact<{
+  fids: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  pointer: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ProfilesQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, connectedAddresses: Array<{ address: any | null }> | null }> | null, pageInfo: { hasNextPage: boolean, nextCursor: string } | null } | null };
