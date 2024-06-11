@@ -10,19 +10,7 @@ export const GET = async (
     params: { id: string };
   }
 ) => {
-  const address = req.headers.get("x-address");
-
-  // If the address is not present, return a 401 (authentication error)
-  if (!address) {
-    return NextResponse.json(
-      {
-        message: "Unauthenticated call",
-      },
-      {
-        status: 401,
-      }
-    );
-  }
+  const address = req.headers.get("x-address")!;
 
   const { searchParams } = new URL(req.url);
   const limit = searchParams.get("limit") || "10";
@@ -110,21 +98,9 @@ export const POST = async (
 ) => {
   try {
     // Get the address from the request headers
-    const address = req.headers.get("x-address");
+    const address = req.headers.get("x-address")!;
 
-    // If the address is not present, return a 401 (authentication error)
-    if (!address) {
-      return NextResponse.json(
-        {
-          message: "Unauthenticated call",
-        },
-        {
-          status: 401,
-        }
-      );
-    }
-
-    // Find the waitlist associated with the id
+    // Find the waitlist associated with the id and the address
     const waitlist = await prisma.waitlist.findUnique({
       where: {
         id: parseInt(id),
