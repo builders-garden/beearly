@@ -11,13 +11,7 @@ import {
   Checkbox,
 } from "@nextui-org/react";
 import {
-  AlertCircle,
-  CopyIcon,
-  Frame,
-  ImageIcon,
   Info,
-  MessageCircleWarning,
-  PlusSquare,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import slugify from "slugify";

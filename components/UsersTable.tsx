@@ -24,12 +24,14 @@ import {
   ChevronUp,
   Download,
   ExternalLink,
+  PlusCircle,
   Send,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import BroadcastDCModal from "./BroadcastDCModal";
+import { AddWaitlistedUsersModal } from "./AddWaitlistedUsersModal";
 
 enum OrderByMode {
   WAITLISTED_AT = "waitlistedAt",
@@ -38,6 +40,8 @@ enum OrderByMode {
 
 export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] =
+    useState<boolean>(false);
+  const [isAddUsersModalOpen, setIsAddUsersModalOpen] =
     useState<boolean>(false);
   const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
   const [limit, setLimit] = useState(new Set(["10"]));
@@ -156,6 +160,14 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
             <Send size={16} />
             Broadcast
           </Button>
+          <Button
+            color="primary"
+            variant="flat"
+            onPress={() => setIsAddUsersModalOpen(true)}
+          >
+            <PlusCircle size={16} />
+            Add users
+          </Button>
           <Button color="primary" variant="flat" onPress={exportUsers}>
             <Download size={16} />
             Export users
@@ -271,6 +283,11 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
       <BroadcastDCModal
         isOpen={isBroadcastModalOpen}
         onOpenChange={setIsBroadcastModalOpen}
+        waitlistId={waitlistId}
+      />
+      <AddWaitlistedUsersModal
+        onOpenChange={setIsAddUsersModalOpen}
+        isOpen={isAddUsersModalOpen}
         waitlistId={waitlistId}
       />
     </div>
