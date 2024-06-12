@@ -289,6 +289,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
         onOpenChange={setIsAddUsersModalOpen}
         isOpen={isAddUsersModalOpen}
         waitlistId={waitlistId}
+        refetchUsers={fetchUsers}
       />
     </div>
   );
