@@ -3,16 +3,21 @@ import { loadQstash } from "../../../../../lib/qstash";
 
 export const GET = async (req: NextRequest) => {
   const authHeader = req.headers.get("authorization");
+
+  // Check if the request is authorized to run the cron job
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse("Unauthorized", {
       status: 401,
     });
   }
+
   // Send the first payload to QStash to start sync users
   const { response } = await loadQstash(
-    `${process.env.BASE_URL}/api/workers/sync-users`,
+    `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
     0
   );
+
+  // Check if the payload was sent successfully
   if (response === "ko") {
     return NextResponse.json(
       {
