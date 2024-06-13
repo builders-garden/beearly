@@ -12,72 +12,83 @@ import {
 async function handler(request: NextRequest) {
   // Get the payload from the request and extract the offset
   const body: UsersSyncPayload = await request.json();
-  console.log(JSON.stringify(body));
   const { offset } = body;
 
+  // Declaring the batch size
+  const batchSize = 400;
+
   try {
-    // Read users from the WaitlistedUser Model in the database, grouped by fid with [offset]
+    // Read users from the WaitlistedUser Model in the database, grouped by fid with and taken with an offset
     const usersBatch = await prisma.waitlistedUser.findMany({
       distinct: ["fid"],
       skip: offset,
-      take: 400,
+      take: batchSize,
       orderBy: { fid: "asc" },
     });
 
-    // Transforming the fids number array to a string array to satisfy the Airstack query
-    const fidsString = usersBatch.map((fid) => fid.toString());
+    if (usersBatch.length > 0) {
+      // Transforming the fids number array to a string array to satisfy the Airstack query
+      const fidsString = usersBatch.map((fid) => fid.toString());
 
-    // Call Airstack to fetch all useful information about the users in the batch
-    const usersToUpdate: UserProfile[] = [];
-    let pointer = "";
+      // Call Airstack to fetch all useful information about the users in the batch
+      const usersToUpdate: UserProfile[] = [];
+      let pointer = "";
 
-    do {
-      const res = await fetchFarcasterProfiles(fidsString, pointer);
-      if (res) {
-        const { profiles, pageInfo } = res;
-        usersToUpdate.push(...profiles);
-        pointer = pageInfo.nextCursor;
+      do {
+        const res = await fetchFarcasterProfiles(fidsString, pointer);
+        if (res) {
+          const { profiles, pageInfo } = res;
+          usersToUpdate.push(...profiles);
+          pointer = pageInfo.nextCursor;
+        }
+      } while (pointer);
+
+      // Update the users in the database with the new information
+      // Maybe there's a better way to do this to avoid doing N queries to the DB
+      for (const user of usersToUpdate) {
+        await prisma.waitlistedUser.updateMany({
+          where: {
+            fid: parseInt(user.userId!),
+          },
+          data: {
+            address: user.userAddress,
+            displayName: user.profileDisplayName ?? "",
+            username: user.profileName ?? "",
+            avatarUrl: user.profileImage ?? "",
+            powerBadge: user.isFarcasterPowerUser,
+            updatedAt: new Date(),
+          },
+        });
       }
-    } while (pointer);
-
-    // Update the users in the database with the new information
-    for (const user of usersToUpdate) {
-      await prisma.waitlistedUser.updateMany({
-        where: {
-          fid: parseInt(user.userId!),
-        },
-        data: {
-          address: user.userAddress,
-          displayName: user.profileDisplayName ?? "",
-          username: user.profileName ?? "",
-          avatarUrl: user.profileImage ?? "",
-          powerBadge: user.isFarcasterPowerUser,
-          updatedAt: new Date(),
-        },
-      });
     }
 
-    // exit if there are no more users to sync
-    if (usersBatch.length < 400) {
+    // Exit if there are no more users to sync
+    if (usersBatch.length < batchSize) {
       return new NextResponse("No more users to sync", { status: 200 });
     }
   } catch (error) {
-    return new NextResponse("Error while syncing a batch of users", {
-      status: 500,
-    });
+    return new NextResponse(
+      `Error while syncing batch #${((offset % batchSize) + 1).toString()}`,
+      {
+        status: 500,
+      }
+    );
   } finally {
     // Send the next payload to QStash to continue syncing users, whatever the outcome
     const { response } = await loadQstash(
       `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
-      offset + 400
+      offset + batchSize
     );
     if (response === "ko") {
       throw new Error("Error while publishing json to QStash");
     }
 
-    return new NextResponse("Successfully sent another batch to update", {
-      status: 200,
-    });
+    return new NextResponse(
+      `Successfully sent batch #${((offset % batchSize) + 2).toString()} to QStash`,
+      {
+        status: 200,
+      }
+    );
   }
 }
 
