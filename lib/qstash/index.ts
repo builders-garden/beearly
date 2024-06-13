@@ -6,7 +6,7 @@ export async function loadQstash(
 ): Promise<{ response: string }> {
   // Get the Qstash client
   const qstashClient = new Client({
-    token: process.env.QSTASH_TOKEN!, // Add this to .env file
+    token: process.env.QSTASH_TOKEN!,
   });
 
   // Send payload to the Qstash API
