@@ -43,7 +43,7 @@ export const GET = async (req: NextRequest) => {
         message: "Error while publishing json to QStash",
       },
       {
-        status: 500,
+        status: 400,
       }
     );
   } else {
