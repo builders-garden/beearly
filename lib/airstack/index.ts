@@ -162,6 +162,7 @@ const profilesQuery = /* GraphQL */ `
         filter: { dappName: { _eq: farcaster }, userId: { _in: $fids } }
         blockchain: ethereum
         cursor: $pointer
+        limit: 200
       }
     ) {
       Social {
@@ -186,6 +187,20 @@ const profilesQuery = /* GraphQL */ `
 interface ProfilesQueryResponse {
   data: ProfilesQuery | null;
   error: Error | null;
+}
+
+export interface UserProfile {
+  userId: string | null;
+  profileName: string | null;
+  profileDisplayName: string | null;
+  profileImage: string | null;
+  isFarcasterPowerUser: boolean | null;
+  userAddress: any | null;
+  connectedAddresses:
+    | {
+        address: any | null;
+      }[]
+    | null;
 }
 
 export const fetchFarcasterProfiles = async (
