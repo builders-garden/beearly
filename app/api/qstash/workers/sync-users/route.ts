@@ -57,6 +57,15 @@ async function handler(request: NextRequest) {
             avatarUrl: user.profileImage ?? "",
             powerBadge: user.isFarcasterPowerUser,
             updatedAt: new Date(),
+
+            // We may add...
+
+            // follower count
+            // following count
+            // location
+            // profile Bio
+            // Social Capital Rank
+            // Social Capital Score
           },
         });
       }
