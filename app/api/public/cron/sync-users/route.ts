@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loadQstash } from "../../../../../lib/qstash";
+import { publishToQstash } from "../../../../../lib/qstash";
 
 export const GET = async (req: NextRequest) => {
   const authHeader = req.headers.get("authorization");
@@ -12,7 +12,7 @@ export const GET = async (req: NextRequest) => {
   }
 
   // Send the first payload to QStash to start sync users
-  const { response } = await loadQstash(
+  const { response } = await publishToQstash(
     `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
     0
   );

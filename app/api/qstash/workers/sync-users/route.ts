@@ -1,7 +1,7 @@
 // This is a public API endpoint that will be invoked by QStash.
 import { verifySignatureAppRouter } from "@upstash/qstash/dist/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { loadQstash } from "../../../../../lib/qstash";
+import { publishToQstash } from "../../../../../lib/qstash";
 import { UsersSyncPayload } from "../../../../../lib/qstash/types";
 import prisma from "../../../../../lib/prisma";
 import {
@@ -84,7 +84,7 @@ async function handler(request: NextRequest) {
     );
   } finally {
     // Send the next payload to QStash to continue syncing users, whatever the outcome
-    const { response } = await loadQstash(
+    const { response } = await publishToQstash(
       `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
       offset + batchSize
     );
