@@ -26,6 +26,7 @@ async function handler(request: NextRequest) {
       orderBy: { fid: "asc" },
     });
 
+    // Do the syncing work if there is at least one user in the batch (nobody is left behind!)
     if (usersBatch.length > 0) {
       // Transforming the fids number array to a string array to satisfy the Airstack query
       const fidsString = usersBatch.map((fid) => fid.toString());
