@@ -1,6 +1,6 @@
 import { Client } from "@upstash/qstash";
 
-export async function loadQstash(
+export async function publishToQstash(
   endpoint: string,
   offset: number
 ): Promise<{ response: string }> {
