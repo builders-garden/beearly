@@ -2,11 +2,7 @@
   "crons": [
     {
       "path": "/api/public/cron/sync-users",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/public/cron/sync-users",
-      "schedule": "0 0 * * *"
+      "schedule": "0 0,12 * * *"
     }
   ]
 }
