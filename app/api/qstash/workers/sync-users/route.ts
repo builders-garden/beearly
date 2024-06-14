@@ -19,8 +19,8 @@ async function handler(request: NextRequest) {
 
   try {
     // Read users from the WaitlistedUser Model in the database, grouped by fid with and taken with an offset
-    const usersBatch = await prisma.waitlistedUser.findMany({
-      distinct: ["fid"],
+    const usersBatch = await prisma.waitlistedUser.groupBy({
+      by: ["fid"],
       skip: offset,
       take: batchSize,
       orderBy: { fid: "asc" },
@@ -43,32 +43,46 @@ async function handler(request: NextRequest) {
         }
       } while (pointer);
 
-      // Update the users in the database with the new information
-      // Maybe there's a better way to do this to avoid doing N queries to the DB
-      for (const user of usersToUpdate) {
-        await prisma.waitlistedUser.updateMany({
-          where: {
-            fid: parseInt(user.userId!),
-          },
-          data: {
-            address: user.userAddress,
-            displayName: user.profileDisplayName ?? "",
-            username: user.profileName ?? "",
-            avatarUrl: user.profileImage ?? "",
-            powerBadge: user.isFarcasterPowerUser,
-            updatedAt: new Date(),
+      // Creating chunks of users to update in the database in a parallel way
+      const usersToUpdateChunks: UserProfile[][] = [];
+      const chunkSize = 200;
 
-            // We may add...
-
-            // follower count
-            // following count
-            // location
-            // profile Bio
-            // Social Capital Rank
-            // Social Capital Score
-          },
-        });
+      for (let i = 0; i < usersToUpdate.length; i += chunkSize) {
+        usersToUpdateChunks.push(usersToUpdate.slice(i, i + chunkSize));
       }
+
+      // Update the users in the database with the new information, in parallel
+      await Promise.all(
+        usersToUpdateChunks.map(async (chunk) => {
+          // For each chunk, update users in parallel
+          await Promise.all(
+            chunk.map(async (user) => {
+              return prisma.waitlistedUser.updateMany({
+                where: {
+                  fid: parseInt(user.userId!),
+                },
+                data: {
+                  address: user.userAddress,
+                  displayName: user.profileDisplayName ?? "",
+                  username: user.profileName ?? "",
+                  avatarUrl: user.profileImage ?? "",
+                  powerBadge: user.isFarcasterPowerUser,
+                  updatedAt: new Date(),
+
+                  // We may add...
+
+                  // follower count
+                  // following count
+                  // location
+                  // profile Bio
+                  // Social Capital Rank
+                  // Social Capital Score
+                },
+              });
+            })
+          );
+        })
+      );
     }
 
     // Exit if there are no more users to sync
