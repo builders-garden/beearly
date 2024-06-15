@@ -226,3 +226,42 @@ export const fetchFarcasterProfiles = async (
   }
   return { profiles: data.Socials.Social, pageInfo: data.Socials.pageInfo };
 };
+
+const query = `
+query FarcasterUsersQuery($profileName: String, $limit: Int) {
+  Socials(
+    input: {
+      filter: {
+        profileName: {_regex: $profileName},
+        dappName: {_eq: farcaster}
+      },
+      blockchain: ethereum,
+      limit: $limit,
+      order: {socialCapitalRank: ASC}
+    }
+  ) {
+    Social {
+      userId
+      profileName
+      profileDisplayName
+      profileImage
+      isFarcasterPowerUser
+      userAddress
+      connectedAddresses {
+        address
+      }
+    }
+  }
+}
+`;
+
+export const searchFarcasterUsers = async (profileName: string, limit = 10) => {
+  const { data, error }: ProfilesQueryResponse = await fetchQuery(query, {
+    profileName,
+    limit,
+  });
+  if (error || !data || !data.Socials || !data.Socials.Social) {
+    return [];
+  }
+  return data.Socials.Social;
+};

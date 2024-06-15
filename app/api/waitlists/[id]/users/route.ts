@@ -136,14 +136,16 @@ export const POST = async (
         }
       );
     }
-    const { fids }: { fids: number[] } = body;
+    const { fids }: { fids: string[] } = body;
+    const parsedFids = fids.map((fid) => parseInt(fid));
 
     // Query the database for existing WaitlistedUser entries with the provided fids
     const existingUsers = await prisma.waitlistedUser.findMany({
       where: {
         fid: {
-          in: fids,
+          in: parsedFids,
         },
+        waitlistId: parseInt(id),
       },
       select: {
         fid: true,
@@ -154,7 +156,9 @@ export const POST = async (
     const existingFids = new Set(existingUsers.map((user) => user.fid));
 
     // Filter out the fids that are already in the database
-    const fidsNotInDatabase = fids.filter((fid) => !existingFids.has(fid));
+    const fidsNotInDatabase = parsedFids.filter(
+      (fid) => !existingFids.has(fid)
+    );
 
     // Transforming the fids not in db array to a string array to satisfy the Airstack query
     const fidsString = fidsNotInDatabase.map((fid) => fid.toString());
