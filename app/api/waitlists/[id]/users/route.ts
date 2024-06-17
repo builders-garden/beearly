@@ -173,6 +173,8 @@ export const POST = async (
         const { profiles, pageInfo } = res;
         newUsers.push(...profiles);
         pointer = pageInfo.nextCursor;
+      } else {
+        pointer = "";
       }
     } while (pointer);
 
