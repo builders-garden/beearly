@@ -30,6 +30,14 @@ const profileQuery = /* GraphQL */ `
         connectedAddresses {
           address
         }
+        socialCapital {
+          socialCapitalRank
+          socialCapitalScore
+        }
+        followerCount
+        followingCount
+        location
+        profileBio
       }
     }
   }
@@ -175,6 +183,14 @@ const profilesQuery = /* GraphQL */ `
         connectedAddresses {
           address
         }
+        socialCapital {
+          socialCapitalRank
+          socialCapitalScore
+        }
+        followerCount
+        followingCount
+        location
+        profileBio
       }
       pageInfo {
         hasNextPage
@@ -201,6 +217,14 @@ export interface UserProfile {
         address: any | null;
       }[]
     | null;
+  socialCapital: {
+    socialCapitalRank: number | null;
+    socialCapitalScore: number | null;
+  } | null;
+  followerCount: number | null;
+  followingCount: number | null;
+  location: string | null;
+  profileBio: string | null;
 }
 
 export const fetchFarcasterProfiles = async (
@@ -227,8 +251,8 @@ export const fetchFarcasterProfiles = async (
   return { profiles: data.Socials.Social, pageInfo: data.Socials.pageInfo };
 };
 
-const query = `
-query FarcasterUsersQuery($profileName: String, $limit: Int) {
+const farcasterUsersQuery = `
+query FarcasterUsers($profileName: String, $limit: Int) {
   Socials(
     input: {
       filter: {
@@ -250,16 +274,27 @@ query FarcasterUsersQuery($profileName: String, $limit: Int) {
       connectedAddresses {
         address
       }
+      socialCapital {
+        socialCapitalRank
+        socialCapitalScore
+      }
+      location
+      profileBio
+      followerCount
+      followingCount
     }
   }
 }
 `;
 
 export const searchFarcasterUsers = async (profileName: string, limit = 10) => {
-  const { data, error }: ProfilesQueryResponse = await fetchQuery(query, {
-    profileName,
-    limit,
-  });
+  const { data, error }: ProfilesQueryResponse = await fetchQuery(
+    farcasterUsersQuery,
+    {
+      profileName,
+      limit,
+    }
+  );
   if (error || !data || !data.Socials || !data.Socials.Social) {
     return [];
   }
