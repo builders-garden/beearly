@@ -60,6 +60,14 @@ const frameHandler = frames(async (ctx) => {
             avatarUrl: farcasterProfile.profileImage!,
             powerBadge: farcasterProfile.isFarcasterPowerUser,
             referrerFid: null,
+            socialCapitalRank:
+              farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
+            socialCapitalScore:
+              farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
+            followerCount: farcasterProfile.followerCount ?? 0,
+            followingCount: farcasterProfile.followingCount ?? 0,
+            location: farcasterProfile.location ?? "",
+            profileBio: farcasterProfile.profileBio ?? "",
             waitlistedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -225,6 +233,13 @@ const frameHandler = frames(async (ctx) => {
       avatarUrl: farcasterProfile.profileImage!,
       powerBadge: farcasterProfile.isFarcasterPowerUser,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      socialCapitalRank: farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
+      socialCapitalScore:
+        farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
+      followerCount: farcasterProfile.followerCount ?? 0,
+      followingCount: farcasterProfile.followingCount ?? 0,
+      location: farcasterProfile.location ?? "",
+      profileBio: farcasterProfile.profileBio ?? "",
       waitlistedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
