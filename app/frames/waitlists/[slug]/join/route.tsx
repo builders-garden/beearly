@@ -64,7 +64,7 @@ const frameHandler = frames(async (ctx) => {
               farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
             socialCapitalScore:
               farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
-            followersCount: farcasterProfile.followerCount ?? 0,
+            followerCount: farcasterProfile.followerCount ?? 0,
             followingCount: farcasterProfile.followingCount ?? 0,
             location: farcasterProfile.location ?? "",
             profileBio: farcasterProfile.profileBio ?? "",
@@ -236,7 +236,7 @@ const frameHandler = frames(async (ctx) => {
       socialCapitalRank: farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
       socialCapitalScore:
         farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
-      followersCount: farcasterProfile.followerCount ?? 0,
+      followerCount: farcasterProfile.followerCount ?? 0,
       followingCount: farcasterProfile.followingCount ?? 0,
       location: farcasterProfile.location ?? "",
       profileBio: farcasterProfile.profileBio ?? "",

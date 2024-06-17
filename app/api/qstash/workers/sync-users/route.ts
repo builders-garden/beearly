@@ -74,7 +74,7 @@ async function handler(request: NextRequest) {
                 updatedAt: new Date(),
                 socialCapitalRank: user.socialCapital?.socialCapitalRank ?? 0,
                 socialCapitalScore: user.socialCapital?.socialCapitalScore ?? 0,
-                followersCount: user.followerCount ?? 0,
+                followerCount: user.followerCount ?? 0,
                 followingCount: user.followingCount ?? 0,
                 location: user.location ?? "",
                 profileBio: user.profileBio ?? "",
