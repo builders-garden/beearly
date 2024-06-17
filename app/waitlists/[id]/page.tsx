@@ -123,7 +123,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium">
-                Referrrals Leaderboard URL
+                Referrals Leaderboard URL
               </div>
               <Link
                 href={`${BASE_URL}/leaderboards/${waitlist.slug}`}
