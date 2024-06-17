@@ -21,17 +21,16 @@ export async function middleware(req: NextRequest) {
     });
 
     const signature = req.headers.get("Upstash-Signature")!;
-    const body = await req.json();
+    const body = await req.text();
 
-    const isValid = receiver.verify({
-      body,
-      signature,
-      url: process.env.BASE_URL,
-    });
-
-    if (!isValid) {
+    try {
+      await receiver.verify({
+        body,
+        signature,
+      });
+    } catch (error) {
       return NextResponse.json(
-        { success: false, message: "Invalid signature" },
+        { success: false, message: `Invalid signature: ${error}` },
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
