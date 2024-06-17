@@ -278,10 +278,10 @@ query FarcasterUsers($profileName: String, $limit: Int) {
         socialCapitalRank
         socialCapitalScore
       }
-      location
-      profileBio
       followerCount
       followingCount
+      location
+      profileBio
     }
   }
 }
