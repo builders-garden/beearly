@@ -41,6 +41,12 @@ model WaitlistedUser {
   username      String     @db.VarChar
   avatarUrl     String?    @map("avatar_url")
   powerBadge    Boolean?   @default(false) @map("power_badge")
+  socialCapitalRank Int  @map("social_capital_rank")
+  socialCapitalScore Float @map("social_capital_score")
+  followersCount Int       @map("followers_count")
+  followingCount Int      @map("following_count")
+  location      String?
+  profileBio    String?   @map("profile_bio")
   referrerFid   Int?       @map("referrer_fid")
   waitlistedAt  DateTime   
   createdAt     DateTime   @map("created_at")
