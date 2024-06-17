@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { jwtVerify, importSPKI } from "jose";
-
+import { Receiver } from "@upstash/qstash";
 import type { NextRequest } from "next/server";
 
 export const config = {
@@ -10,6 +10,34 @@ export const config = {
 export async function middleware(req: NextRequest) {
   if (req.url.includes("/api/public/")) {
     // If the request is for a public endpoint, continue processing the request
+    return NextResponse.next();
+  }
+
+  if (req.url.includes("/api/qstash/")) {
+    // If the request is for a QStash endpoint, check the signature
+    const receiver = new Receiver({
+      currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
+      nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+    });
+
+    const signature = req.headers.get("Upstash-Signature")!;
+    const body = await req.json();
+
+    const isValid = receiver.verify({
+      body,
+      signature,
+      url: process.env.BASE_URL,
+    });
+
+    if (!isValid) {
+      return NextResponse.json(
+        { success: false, message: "Invalid signature" },
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
     return NextResponse.next();
   }
 

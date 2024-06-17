@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchFarcasterProfiles } from "../../../../../lib/airstack";
+import {
+  fetchFarcasterProfiles,
+  UserProfile,
+} from "../../../../../lib/airstack";
 import prisma from "../../../../../lib/prisma";
 
 export const GET = async (
@@ -157,11 +160,11 @@ export const POST = async (
       (fid) => !existingFids.has(fid)
     );
 
-    // Transforming the fids not in db array to a string array to satisfies the Airstack query
+    // Transforming the fids not in db array to a string array to satisfy the Airstack query
     const fidsString = fidsNotInDatabase.map((fid) => fid.toString());
 
     // Calling Airstack API many times to get all users' profiles
-    const newUsers = [];
+    const newUsers: UserProfile[] = [];
     let pointer = "";
 
     do {
@@ -177,7 +180,7 @@ export const POST = async (
     const result = await prisma.waitlistedUser.createMany({
       data: newUsers.map((user) => ({
         waitlistId: parseInt(id),
-        fid: parseInt(user.userId!), // Not sure if this is safe
+        fid: parseInt(user.userId!),
         address: user.userAddress,
         displayName: user.profileDisplayName ?? "",
         username: user.profileName ?? "",
