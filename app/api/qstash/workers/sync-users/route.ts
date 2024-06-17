@@ -17,6 +17,9 @@ async function handler(request: NextRequest) {
   // Declaring the batch size
   const batchSize = 400;
 
+  // Creating a job state
+  let jobState: "running" | "finished" = "running";
+
   try {
     // Read users from the WaitlistedUser Model in the database, grouped by fid with and taken with an offset
     const usersBatch = await prisma.waitlistedUser.groupBy({
@@ -26,10 +29,10 @@ async function handler(request: NextRequest) {
       orderBy: { fid: "asc" },
     });
 
-    // Do the syncing work if there is at least one user in the batch (nobody is left behind!)
+    // Do the syncing if there is at least one user in the batch (nobody is left behind!)
     if (usersBatch.length > 0) {
       // Transforming the fids number array to a string array to satisfy the Airstack query
-      const fidsString = usersBatch.map((fid) => fid.toString());
+      const fidsString = usersBatch.map((user) => user.fid.toString());
 
       // Call Airstack to fetch all useful information about the users in the batch
       const usersToUpdate: UserProfile[] = [];
@@ -41,6 +44,8 @@ async function handler(request: NextRequest) {
           const { profiles, pageInfo } = res;
           usersToUpdate.push(...profiles);
           pointer = pageInfo.nextCursor;
+        } else {
+          pointer = "";
         }
       } while (pointer);
 
@@ -83,19 +88,26 @@ async function handler(request: NextRequest) {
       }
     }
 
-    // Exit if there are no more users to sync
+    // Set the state to finished if there are no more users to sync
     if (usersBatch.length < batchSize) {
-      return new NextResponse("No more users to sync", { status: 200 });
+      jobState = "finished";
     }
   } catch (error) {
     return new NextResponse(
-      `Error while syncing batch #${((offset % batchSize) + 1).toString()}`,
+      `Error while syncing batch #${(offset / batchSize + 1).toString()}`,
       {
-        status: 500,
+        status: 400,
       }
     );
   } finally {
-    // Send the next payload to QStash to continue syncing users, whatever the outcome
+    // If the cron job is finished, return a success message
+    if (jobState === "finished") {
+      return new NextResponse("Successfully synced all users", {
+        status: 200,
+      });
+    }
+
+    // Else send the next payload to QStash to continue syncing users, whatever the outcome
     const { response } = await publishToQstash(
       `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
       offset + batchSize
@@ -105,7 +117,7 @@ async function handler(request: NextRequest) {
     }
 
     return new NextResponse(
-      `Successfully sent batch #${((offset % batchSize) + 2).toString()} to QStash`,
+      `Successfully sent batch #${(offset / batchSize + 2).toString()} to QStash`,
       {
         status: 200,
       }
