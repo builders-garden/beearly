@@ -170,12 +170,10 @@ export const POST = async (
     do {
       const res = await fetchFarcasterProfiles(fidsString, pointer);
       if (res) {
-        const { profiles, pageInfo } = res;
+        const { profiles } = res;
         newUsers.push(...profiles);
-        pointer = pageInfo.nextCursor;
-      } else {
-        pointer = "";
       }
+      pointer = res ? res.pageInfo.nextCursor : "";
     } while (pointer);
 
     // Bulk insert new users
