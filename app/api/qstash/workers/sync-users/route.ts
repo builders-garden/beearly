@@ -17,6 +17,9 @@ async function handler(request: NextRequest) {
   // Declaring the batch size
   const batchSize = 400;
 
+  // Declaring the QStash delay time
+  const delay = 10;
+
   // Creating a job state
   let jobState: "running" | "finished" = "running";
 
@@ -108,7 +111,8 @@ async function handler(request: NextRequest) {
     // Else send the next payload to QStash to continue syncing users, whatever the outcome
     const { response } = await publishToQstash(
       `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
-      offset + batchSize
+      offset + batchSize,
+      delay
     );
     if (response === "ko") {
       throw new Error("Error while publishing json to QStash");
