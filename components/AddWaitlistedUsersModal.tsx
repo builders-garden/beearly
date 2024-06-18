@@ -53,6 +53,7 @@ export const AddWaitlistedUsersModal = ({
         }),
       });
       onOpenChange(false);
+      setSelectedUsers([]);
       refetchUsers();
     } catch (e) {
       setError("Failed to add users to waitlist");
