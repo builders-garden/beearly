@@ -41,12 +41,13 @@ async function handler(request: NextRequest) {
       do {
         const res = await fetchFarcasterProfiles(fidsString, pointer);
         if (res) {
-          const { profiles, pageInfo } = res;
+          const { profiles } = res;
           usersToUpdate.push(...profiles);
-          pointer = pageInfo.nextCursor;
-        } else {
-          pointer = "";
         }
+        pointer =
+          res && usersToUpdate.length < batchSize
+            ? res.pageInfo.nextCursor
+            : "";
       } while (pointer);
 
       // Creating chunks of users to update in the database in a concurrent way
