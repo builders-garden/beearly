@@ -24,6 +24,7 @@ import {
   ChevronUp,
   Download,
   ExternalLink,
+  InfoIcon,
   PlusCircle,
   Send,
 } from "lucide-react";
@@ -36,6 +37,10 @@ import { AddWaitlistedUsersModal } from "./AddWaitlistedUsersModal";
 enum OrderByMode {
   WAITLISTED_AT = "waitlistedAt",
   REFERRALS = "referrals",
+  FOLLOWERS = "followerCount",
+  FOLLOWING = "followingCount",
+  SOCIAL_CAPITAL_SCORE = "socialCapitalScore",
+  SOCIAL_CAPITAL_RANK = "socialCapitalRank",
 }
 
 export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
@@ -197,6 +202,122 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
           <TableColumn>
             <div
               className="flex flex-row gap-1 items-center cursor-pointer"
+              onClick={() => toggleOrderBy(OrderByMode.FOLLOWERS)}
+            >
+              <div>FOLLOWERS</div>
+              {orderBy === OrderByMode.FOLLOWERS ? (
+                orderDirection === "asc" ? (
+                  <ChevronUp size={12} />
+                ) : (
+                  <ChevronDown size={12} />
+                )
+              ) : (
+                <div></div>
+              )}
+            </div>
+          </TableColumn>
+          <TableColumn>
+            <div
+              className="flex flex-row gap-1 items-center cursor-pointer"
+              onClick={() => toggleOrderBy(OrderByMode.FOLLOWING)}
+            >
+              <div>FOLLOWING</div>
+              {orderBy === OrderByMode.FOLLOWING ? (
+                orderDirection === "asc" ? (
+                  <ChevronUp size={12} />
+                ) : (
+                  <ChevronDown size={12} />
+                )
+              ) : (
+                <div></div>
+              )}
+            </div>
+          </TableColumn>
+          <TableColumn>
+            <div className="cursor-pointer flex flex-row gap-1 items-center">
+              <div
+                className="flex flex-row gap-1 items-center cursor-pointer"
+                onClick={() => toggleOrderBy(OrderByMode.SOCIAL_CAPITAL_SCORE)}
+              >
+                <div>AIRSTACK SOCIAL SCORE</div>
+                {orderBy === OrderByMode.SOCIAL_CAPITAL_SCORE ? (
+                  orderDirection === "asc" ? (
+                    <ChevronUp size={12} />
+                  ) : (
+                    <ChevronDown size={12} />
+                  )
+                ) : (
+                  <div></div>
+                )}
+              </div>
+              <Tooltip
+                radius="sm"
+                size="sm"
+                content={
+                  <div>
+                    Social Capital Scores (SCS) area measure of each Farcaster{" "}
+                    <br></br>user&apos;s influence in the network.{" "}
+                    <Link
+                      href={
+                        "https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital"
+                      }
+                      target="_blank"
+                    >
+                      <span className="font-bold">
+                        Click here to learn more.
+                      </span>
+                    </Link>
+                  </div>
+                }
+              >
+                <InfoIcon size={14} />
+              </Tooltip>
+            </div>
+          </TableColumn>
+          <TableColumn>
+            <div className="cursor-pointer flex flex-row gap-1 items-center">
+              <div
+                className="flex flex-row gap-1 items-center cursor-pointer"
+                onClick={() => toggleOrderBy(OrderByMode.SOCIAL_CAPITAL_RANK)}
+              >
+                <div>AIRSTACK SOCIAL RANK</div>
+                {orderBy === OrderByMode.SOCIAL_CAPITAL_RANK ? (
+                  orderDirection === "asc" ? (
+                    <ChevronUp size={12} />
+                  ) : (
+                    <ChevronDown size={12} />
+                  )
+                ) : (
+                  <div></div>
+                )}
+              </div>
+              <Tooltip
+                radius="sm"
+                size="sm"
+                content={
+                  <div>
+                    Social Capital Scores (SCS) area measure of each Farcaster{" "}
+                    <br></br>user&apos;s influence in the network.{" "}
+                    <Link
+                      href={
+                        "https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital"
+                      }
+                      target="_blank"
+                    >
+                      <span className="font-bold">
+                        Click here to learn more.
+                      </span>
+                    </Link>
+                  </div>
+                }
+              >
+                <InfoIcon size={14} />
+              </Tooltip>
+            </div>
+          </TableColumn>
+          <TableColumn>
+            <div
+              className="flex flex-row gap-1 items-center cursor-pointer"
               onClick={() => toggleOrderBy(OrderByMode.WAITLISTED_AT)}
             >
               <div>DATE</div>
@@ -219,34 +340,41 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
           {users.map((user) => (
             <TableRow key={user.fid} className="cursor-pointer">
               <TableCell>
-                <div className="flex flex-row gap-2 items-center">
-                  <Image
-                    radius="full"
-                    src={user.avatarUrl!}
-                    alt="user-image"
-                    className="h-8 w-8"
-                  />
-                  <div className="flex flex-row items-center gap-2">
-                    <div className="text-sm">
-                      {user.displayName.length > 20
-                        ? `${user.displayName.substring(0, 20)}...`
-                        : `${user.displayName}`}
-                    </div>
-                    {user.powerBadge && (
-                      <Image
-                        src="/power-badge.png"
-                        className="h-4 w-4"
-                        radius="full"
-                        alt="power-badge"
-                      />
-                    )}
-                    <div className="text-sm text-gray-500">
-                      @{user.username}
+                <Link
+                  href={`https://warpcast.com/${user.username}`}
+                  target="_blank"
+                >
+                  <div className="flex flex-row gap-2 items-center cursor-pointer">
+                    <Image
+                      radius="full"
+                      src={user.avatarUrl!}
+                      alt="user-image"
+                      className="h-8 w-8"
+                    />
+                    <div className="flex flex-col">
+                      <div className="flex flex-row items-center gap-1">
+                        <div>{user.displayName}</div>
+                        {user.powerBadge && (
+                          <Image
+                            src="/power-badge.png"
+                            className="h-3 w-3"
+                            radius="full"
+                            alt="power-badge"
+                          />
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        @{user.username} • #{user.fid}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </TableCell>
               <TableCell>{(user as any)?._count?.referrals}</TableCell>
+              <TableCell>{user.followerCount}</TableCell>
+              <TableCell>{user.followingCount}</TableCell>
+              <TableCell>{user.socialCapitalScore}</TableCell>
+              <TableCell>{user.socialCapitalRank}</TableCell>
               <TableCell>
                 {new Date(user.waitlistedAt).toDateString()}
               </TableCell>
