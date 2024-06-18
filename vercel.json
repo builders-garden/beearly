@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/public/cron/sync-users",
-      "schedule": "0 0,12 * * *"
+      "schedule": "0 0 */3 * *"
     }
   ]
 }
