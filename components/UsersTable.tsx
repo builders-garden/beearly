@@ -352,12 +352,12 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
                       className="h-8 w-8"
                     />
                     <div className="flex flex-col">
-                      <div className="flex flex-row items-center gap-2">
-                        <div className="text-sm">{user.displayName}</div>
+                      <div className="flex flex-row items-center gap-1">
+                        <div>{user.displayName}</div>
                         {user.powerBadge && (
                           <Image
                             src="/power-badge.png"
-                            className="h-4 w-4"
+                            className="h-3 w-3"
                             radius="full"
                             alt="power-badge"
                           />
