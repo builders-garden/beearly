@@ -143,8 +143,8 @@ const frameHandler = frames(async (ctx) => {
       throw new Error("Invalid farcaster profile");
     }
     userToAdd = {
-      waitlistId: waitlist.id,
       ...convertAirstackUserData(farcasterProfile),
+      waitlistId: waitlist.id,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
       waitlistedAt: new Date(),
       createdAt: new Date(),
