@@ -4,7 +4,7 @@ import {
   UserProfile,
 } from "../../../../../lib/airstack";
 import prisma from "../../../../../lib/prisma";
-import { convertAirstackUserData } from "../../../../../lib/db/waitlistedUser";
+import { convertAirstackUserData } from "../../../../../lib/airstack/utils";
 
 export const GET = async (
   req: NextRequest,

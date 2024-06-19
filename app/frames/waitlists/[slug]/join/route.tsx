@@ -13,7 +13,7 @@ import {
   createCastIntent,
   isUserFollowingChannels,
 } from "../../../../../lib/warpcast";
-import { convertAirstackUserData } from "../../../../../lib/db/waitlistedUser";
+import { convertAirstackUserData } from "../../../../../lib/airstack/utils";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
