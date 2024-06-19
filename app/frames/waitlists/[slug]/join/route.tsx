@@ -53,25 +53,10 @@ const frameHandler = frames(async (ctx) => {
       } else {
         await prisma.waitlistedUser.create({
           data: {
+            ...convertAirstackUserData(farcasterProfile),
             waitlistId: waitlist.id,
             fid: parseInt(ref),
-            address:
-              farcasterProfile.connectedAddresses?.length! > 0
-                ? farcasterProfile.connectedAddresses![0]!.address
-                : farcasterProfile.userAddress,
-            displayName: farcasterProfile.profileDisplayName!,
-            username: farcasterProfile.profileName!,
-            avatarUrl: farcasterProfile.profileImage!,
-            powerBadge: farcasterProfile.isFarcasterPowerUser,
             referrerFid: null,
-            socialCapitalRank:
-              farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
-            socialCapitalScore:
-              farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
-            followerCount: farcasterProfile.followerCount ?? 0,
-            followingCount: farcasterProfile.followingCount ?? 0,
-            location: farcasterProfile.location ?? "",
-            profileBio: farcasterProfile.profileBio ?? "",
             waitlistedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date(),
