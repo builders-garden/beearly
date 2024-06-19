@@ -14,12 +14,19 @@ model User {
   updated_at    DateTime? 
 }
 
+enum WaitlistTier {
+  FREE
+  HONEY
+  QUEEN
+}
+
 model Waitlist {
   id              Int              @default(autoincrement()) @unique
   name            String           @db.VarChar
   slug            String            @unique
   externalUrl     String            @map("external_url")  
   endDate         DateTime          @map("end_date")
+  tier            WaitlistTier      @default(FREE)      
   imageLanding    String            @map("image_landing")
   imageSuccess    String            @map("image_success")
   imageNotEligible String          @map("image_not_eligible")
