@@ -6,12 +6,20 @@ import { useState } from "react";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import slugify from "slugify";
 import { FrameImage } from "../../../components/FrameImage";
-import { BASE_FRAME_URL } from "../../../lib/constants";
+import {
+  BASE_FRAME_URL,
+  BASE_USDC_ADDRESS,
+  BEEARLY_WALLET_ADDRESS,
+} from "../../../lib/constants";
 import { Waitlist, WaitlistTier } from "@prisma/client";
 import { Image } from "@nextui-org/react";
 import { title } from "process";
 import PremiumRequired from "../../../components/PremiumRequired";
 import { BeearlyButton } from "../../../components/BeearlyButton";
+import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
+import { parseUnits } from "viem";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
 
 export const tiers = [
   {
@@ -34,7 +42,37 @@ export const tiers = [
   },
 ];
 
+enum PaymentStatus {
+  NOT_STARTED = "NOT_STARTED",
+  SUCCESS = "SUCCESS",
+  PENDING = "PENDING",
+  ERROR = "ERROR",
+}
+
 export default function NewWaitlist() {
+  const router = useRouter();
+  const { address, isConnected, isConnecting } = useAccount();
+  const [buttonLoadingMessage, setButtonLoadingMessage] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
+    PaymentStatus.NOT_STARTED
+  );
+  const {
+    mutate: createAndPayRequest,
+    isPending: isCreateAndPayPending,
+    isSuccess: isCreateAndPaySuccess,
+  } = useCreateAndPayRequest({
+    async onSuccess() {
+      console.log("Successfully paid.");
+      setPaymentStatus(PaymentStatus.SUCCESS);
+      setButtonLoadingMessage("Creating waitlist");
+      await createWaitlist();
+    },
+    onError(error: any) {
+      console.error(error);
+      setButtonLoadingMessage("");
+      setPaymentStatus(PaymentStatus.ERROR);
+    },
+  });
   const [selectedTier, setSelectedTier] = useState<WaitlistTier>(
     WaitlistTier.FREE
   );
@@ -114,8 +152,32 @@ export default function NewWaitlist() {
     !selectedFileClosed;
 
   const [error, setError] = useState<string>("");
+  const confirmWaitlistCreation = async () => {
+    if (selectedTier === WaitlistTier.FREE) {
+      await createWaitlist();
+      return;
+    } else {
+      const amount = selectedTier === WaitlistTier.HONEY ? 25 : 30;
+      const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
+      await createAndPayRequest({
+        setButtonLoadingMessage,
+        amount: selectedTier === WaitlistTier.HONEY ? 25 : 30,
+        payerAddress: address!,
+        requestParams: {
+          payerIdentity: address!,
+          payeeIdentity: BEEARLY_WALLET_ADDRESS,
+          signerIdentity: address!,
+          paymentAddress: BEEARLY_WALLET_ADDRESS,
+          expectedAmount: Number(parseUnits(amount.toString(), 6)),
+          currencyAddress: BASE_USDC_ADDRESS,
+          reason: description,
+        },
+      });
+    }
+  };
   const createWaitlist = async () => {
     setLoading(true);
+    setButtonLoadingMessage("Creating waitlist");
     if (
       !name ||
       !endDate ||
@@ -127,12 +189,14 @@ export default function NewWaitlist() {
     ) {
       setError("Please fill all the fields");
       setLoading(false);
+      setButtonLoadingMessage("");
       return;
     }
     const formData = new FormData();
     formData.append("name", name);
     formData.append("endDate", endDate.toAbsoluteString());
     formData.append("externalUrl", externalUrl);
+    formData.append("tier", selectedTier);
     formData.append("files[0]", selectedFileLanding);
     formData.append("files[1]", selectedFileSuccess);
     formData.append("files[2]", selectedFileNotEligible);
@@ -156,8 +220,8 @@ export default function NewWaitlist() {
       });
       if (res.ok) {
         const data = await res.json();
-
         setIsSuccess(true);
+        router.push(`/waitlists/${data.slug}`);
       } else {
         const data = await res.json();
         setError(data.message);
@@ -166,6 +230,7 @@ export default function NewWaitlist() {
       setError("An error occurred");
     } finally {
       setLoading(false);
+      setButtonLoadingMessage("");
     }
   };
 
@@ -409,7 +474,19 @@ export default function NewWaitlist() {
                 Cancel
               </Button>
             </Link>
-            <BeearlyButton text="Create waitlist" onPress={createWaitlist} />
+            <BeearlyButton
+              text={
+                buttonLoadingMessage ? buttonLoadingMessage : "Create waitlist"
+              }
+              onPress={confirmWaitlistCreation}
+              isLoading={isCreateAndPayPending}
+              isDisabled={
+                isCreateAndPayPending ||
+                isConnecting ||
+                !isConnected ||
+                isDisabled
+              }
+            />
           </div>
         </div>
       </div>

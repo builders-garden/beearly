@@ -19,6 +19,7 @@ interface UseCreateAndPayRequestParams {
   payerAddress: string;
   amount: number;
   requestParams: CreateRequestParams;
+  setButtonLoadingMessage: (message: string) => void;
 }
 
 export function useCreateAndPayRequest(
@@ -38,7 +39,9 @@ export function useCreateAndPayRequest(
       payerAddress,
       amount,
       requestParams,
+      setButtonLoadingMessage,
     }: UseCreateAndPayRequestParams) => {
+      setButtonLoadingMessage("Preparing checkout");
       const signer = new Web3SignatureProvider(walletClient);
       if (!address || !signer) throw new Error("Account not initialized");
       if (!walletClient) throw new Error("Wallet client not initialized");
@@ -66,6 +69,7 @@ export function useCreateAndPayRequest(
 
       console.log("Request data", requestData);
       console.log("Processing payment...");
+      setButtonLoadingMessage("Preparing payment");
       const { success, message } = await processPayment(
         requestData,
         address,
@@ -77,16 +81,11 @@ export function useCreateAndPayRequest(
         throw new Error(message);
       }
 
+      setButtonLoadingMessage("Sending payment");
       // Send payment transaction
       await sendPaymentTransaction(requestData, ethersSigner!);
 
       console.log("Payment sent");
-      console.log("updating checkout", {
-        //...checkout,
-        requestId: requestData.requestId,
-        payerAddress,
-        amount,
-      });
       /* await setCheckout(checkout.id, {
         ...checkout,
         requestId: requestData.requestId,
