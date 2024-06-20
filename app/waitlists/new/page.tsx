@@ -27,18 +27,27 @@ export const tiers = [
     price: "Free",
     image: "/bumble.svg",
     type: WaitlistTier.FREE,
+    waitlistSize: "100",
+    broadcastMessage: "1 every 24 hours",
+    exportUsers: "No",
   },
   {
     title: "Honey Bee",
     price: "25$",
     image: "/honey.svg",
     type: WaitlistTier.HONEY,
+    waitlistSize: "500",
+    broadcastMessage: "1 every 12 hours",
+    exportUsers: "Yes",
   },
   {
     title: "Queen Bee",
     price: "30$",
     image: "/queen.svg",
     type: WaitlistTier.QUEEN,
+    waitlistSize: "Unlimited ∞",
+    broadcastMessage: "1 every 10 minutes",
+    exportUsers: "Yes",
   },
 ];
 
@@ -161,8 +170,6 @@ export default function NewWaitlist() {
       const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
       await createAndPayRequest({
         setButtonLoadingMessage,
-        amount: selectedTier === WaitlistTier.HONEY ? 25 : 30,
-        payerAddress: address!,
         requestParams: {
           payerIdentity: address!,
           payeeIdentity: BEEARLY_WALLET_ADDRESS,
@@ -221,7 +228,7 @@ export default function NewWaitlist() {
       if (res.ok) {
         const data = await res.json();
         setIsSuccess(true);
-        router.push(`/waitlists/${data.slug}`);
+        router.push(`/waitlists/${data.id}`);
       } else {
         const data = await res.json();
         setError(data.message);
@@ -243,6 +250,7 @@ export default function NewWaitlist() {
       setIsCopied(false);
     }, 5000);
   };
+  const selectedTierDetails = tiers.find((tier) => tier.type === selectedTier);
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -255,13 +263,40 @@ export default function NewWaitlist() {
               <div className="font-semibold text-lg">Tier</div>
               <ExternalLink size={16} />
             </div>
-            <div className="flex flex-row gap-4">
-              {tiers.map((tier) => {
-                if (selectedTier === tier.type) {
+            <div className="flex flex-row gap-8">
+              <div className="flex flex-row gap-4">
+                {tiers.map((tier) => {
+                  if (selectedTier === tier.type) {
+                    return (
+                      <div
+                        key={tier.type}
+                        className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border-3 border-primary bg-primary/10 gap-1"
+                      >
+                        <Image
+                          src={tier.image}
+                          className="w-10 h-10"
+                          alt={tier.title}
+                        />
+                        <div className="flex flex-col items-center text-center justify-center">
+                          <div className="text-lg font-semibold text-center">
+                            {tier.title}
+                          </div>
+                          <div className="text-sm">{tier.price}</div>
+                        </div>
+                      </div>
+                    );
+                  }
                   return (
                     <div
                       key={tier.type}
-                      className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border-3 border-primary bg-primary/10 gap-1"
+                      className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border border-gray-300 opacity-50 gap-1"
+                      onClick={() => {
+                        if (tier.type === WaitlistTier.FREE) {
+                          setIsPowerBadgeRequired(false);
+                          setRequiredUsersFollow("");
+                        }
+                        setSelectedTier(tier.type);
+                      }}
                     >
                       <Image
                         src={tier.image}
@@ -276,33 +311,30 @@ export default function NewWaitlist() {
                       </div>
                     </div>
                   );
-                }
-                return (
-                  <div
-                    key={tier.type}
-                    className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border border-gray-300 opacity-50 gap-1"
-                    onClick={() => {
-                      if (tier.type === WaitlistTier.FREE) {
-                        setIsPowerBadgeRequired(false);
-                        setRequiredUsersFollow("");
-                      }
-                      setSelectedTier(tier.type);
-                    }}
-                  >
-                    <Image
-                      src={tier.image}
-                      className="w-10 h-10"
-                      alt={tier.title}
-                    />
-                    <div className="flex flex-col items-center text-center justify-center">
-                      <div className="text-lg font-semibold text-center">
-                        {tier.title}
-                      </div>
-                      <div className="text-sm">{tier.price}</div>
-                    </div>
+                })}
+              </div>
+              <div className="flex flex-row gap-2 items-center">
+                <div className="flex flex-col justify-center">
+                  <div className="flex flex-row gap-1">
+                    <p>Waitlist size:</p>
+                    <p className="font-semibold">
+                      {selectedTierDetails?.waitlistSize}
+                    </p>
                   </div>
-                );
-              })}
+                  <div className="flex flex-row gap-1">
+                    <p>Broadcast messages:</p>
+                    <p className="font-semibold">
+                      {selectedTierDetails?.broadcastMessage}
+                    </p>
+                  </div>
+                  <div className="flex flex-row gap-1">
+                    <p>Export users:</p>
+                    <p className="font-semibold">
+                      {selectedTierDetails?.exportUsers}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -387,8 +419,6 @@ export default function NewWaitlist() {
                     label="Success"
                   />
                 </div>
-              </div>
-              <div className="flex flex-row gap-1">
                 <div className="w-[50%]">
                   <FrameImage
                     selectedFile={selectedFileNotEligible!}
@@ -407,63 +437,59 @@ export default function NewWaitlist() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="font-semibold text-lg">
-                Eligibility Requirements (optional)
-              </div>
-              <div className="flex flex-row gap-2 w-full">
-                <div className="flex flex-col gap-1">
-                  <div className="text-sm text-gray-500">
-                    Follow Channel IDs
-                  </div>
-                  <Input
-                    type="text"
-                    variant={"bordered"}
-                    value={requiredChannels}
-                    onValueChange={setRequiredChannels}
-                    placeholder="build,base,farcaster"
-                  />
-                  <div className="text-xs text-gray-500">
-                    Comma separated list of channel IDs that the users must
-                    follow to be eligible
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex flex-row gap-1 items-center">
-                    <div className="text-sm text-gray-500">Follow users</div>
-                    <PremiumRequired />
-                  </div>
-                  <Input
-                    type="text"
-                    variant={"bordered"}
-                    value={requiredUsersFollow}
-                    onValueChange={setRequiredUsersFollow}
-                    placeholder="dwr.eth,v,horsefacts"
-                    isDisabled={selectedTier === WaitlistTier.FREE}
-                  />
-                  <div className="text-xs text-gray-500">
-                    Comma separated list of usernames that the users must follow
-                    to be eligible
-                  </div>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="font-semibold text-lg">
+              Eligibility Requirements (optional)
+            </div>
+            <div className="flex flex-row gap-8 w-full">
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-gray-500">Follow Channel IDs</div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={requiredChannels}
+                  onValueChange={setRequiredChannels}
+                  placeholder="build,base,farcaster"
+                />
+                <div className="text-xs text-gray-500">
+                  Comma separated list of channel IDs that the users must follow
+                  to be eligible
                 </div>
               </div>
-              <div className="flex flex-row gap-4 w-full">
-                <div className="flex flex-col gap-1 w-[50%]">
-                  <div className="flex flex-row gap-1 items-center">
-                    <div className="text-sm text-gray-500">Power Badge</div>
-                    <PremiumRequired />
-                  </div>
-                  <Checkbox
-                    isSelected={isPowerBadgeRequired}
-                    onValueChange={setIsPowerBadgeRequired}
-                    isDisabled={selectedTier === WaitlistTier.FREE}
-                  >
-                    Power Badge required
-                  </Checkbox>
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">Follow users</div>
+                  <PremiumRequired />
+                </div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={requiredUsersFollow}
+                  onValueChange={setRequiredUsersFollow}
+                  placeholder="dwr.eth,v,horsefacts"
+                  isDisabled={selectedTier === WaitlistTier.FREE}
+                />
+                <div className="text-xs text-gray-500">
+                  Comma separated list of usernames that the users must follow
+                  to be eligible
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 w-[50%]">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">Power Badge</div>
+                  <PremiumRequired />
+                </div>
+                <Checkbox
+                  isSelected={isPowerBadgeRequired}
+                  onValueChange={setIsPowerBadgeRequired}
+                  isDisabled={selectedTier === WaitlistTier.FREE}
+                >
+                  Power Badge required
+                </Checkbox>
 
-                  <div className="text-xs text-gray-500">
-                    Users must have a Warpcast power badge to be eligible
-                  </div>
+                <div className="text-xs text-gray-500">
+                  Users must have a Warpcast power badge to be eligible
                 </div>
               </div>
             </div>

@@ -37,6 +37,7 @@ model Waitlist {
   waitlistedUsers WaitlistedUser[]
   waitlistRequirements WaitlistRequirement[]
   waitlistMessages WaitlistMessages[]
+  waitlistCheckouts Checkout[]
 }
 
 model WaitlistedUser {
@@ -89,4 +90,24 @@ model WaitlistMessages {
   createdAt     DateTime   @map("created_at")
   updatedAt     DateTime   @map("updated_at")
   waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum CheckoutStatus {
+  PENDING
+  SUCCESS
+  ERROR
+}
+model Checkout {
+  id            Int        @default(autoincrement()) @unique
+  waitlistId    Int?        @map("waitlist_id")
+  address       String
+  tier          WaitlistTier
+  amount        Float
+  status        CheckoutStatus
+  requestId     String     @map("request_id") @unique
+  createdAt     DateTime   @map("created_at")
+  updatedAt     DateTime   @map("updated_at")
+  waitlist      Waitlist?  @relation(fields: [waitlistId], references: [id])
+
+  @@unique([address, requestId])
 }

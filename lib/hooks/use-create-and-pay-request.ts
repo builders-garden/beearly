@@ -16,8 +16,6 @@ import { useEthersV5Signer } from "./use-ethers-v5-signer";
 import { base } from "viem/chains";
 
 interface UseCreateAndPayRequestParams {
-  payerAddress: string;
-  amount: number;
   requestParams: CreateRequestParams;
   setButtonLoadingMessage: (message: string) => void;
 }
@@ -35,9 +33,6 @@ export function useCreateAndPayRequest(
 
   return useMutation({
     mutationFn: async ({
-      // checkout,
-      payerAddress,
-      amount,
       requestParams,
       setButtonLoadingMessage,
     }: UseCreateAndPayRequestParams) => {
@@ -86,13 +81,6 @@ export function useCreateAndPayRequest(
       await sendPaymentTransaction(requestData, ethersSigner!);
 
       console.log("Payment sent");
-      /* await setCheckout(checkout.id, {
-        ...checkout,
-        requestId: requestData.requestId,
-        payerAddress,
-        amount,
-      });
-      console.log("Checkout updated", checkout.id);*/
       return createdRequest.requestId;
     },
     ...options,
