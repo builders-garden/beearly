@@ -41,8 +41,8 @@ export const formatAirstackUserData = (user: UserProfile) => {
   > = {
     fid: parseInt(user.userId!),
     address: userAddress,
-    displayName: user.profileDisplayName ?? "",
-    username: user.profileName ?? "",
+    displayName: user.profileDisplayName?.trim().replace(/\r?\n|\r/g, "") || "",
+    username: user.profileName?.trim().replace(/\r?\n|\r/g, "") || "",
     avatarUrl: user.profileImage ?? "",
     powerBadge: user.isFarcasterPowerUser,
     socialCapitalRank: user.socialCapital?.socialCapitalRank ?? 0,
