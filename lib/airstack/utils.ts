@@ -3,6 +3,21 @@ import { UserProfile } from ".";
 
 /**
  * @param user - The user with data coming from Airstack.
+ * @returns The first ethereum address from the connectedAddresses array or the userAddress if there are no connectedAddresses
+ **/
+export const findFirstEthereumAddress = (user: UserProfile) => {
+  if (user.connectedAddresses?.length! > 0) {
+    for (const address of user.connectedAddresses!) {
+      if (address.blockchain === "ethereum") {
+        return address.address!;
+      }
+    }
+  }
+  return user.userAddress!;
+};
+
+/**
+ * @param user - The user with data coming from Airstack.
  * @returns The data ready to be written in the prisma database without the fields:
     | "id"
     | "waitlistId"
@@ -12,6 +27,9 @@ import { UserProfile } from ".";
     | "updatedAt"
  **/
 export const formatAirstackUserData = (user: UserProfile) => {
+  // Taking the first ethereum address from the connectedAddresses array or the userAddress if there are no connectedAddresses
+  const userAddress = findFirstEthereumAddress(user);
+
   const databaseUserData: Omit<
     WaitlistedUser,
     | "id"
@@ -22,10 +40,7 @@ export const formatAirstackUserData = (user: UserProfile) => {
     | "updatedAt"
   > = {
     fid: parseInt(user.userId!),
-    address:
-      user.connectedAddresses?.length! > 0
-        ? user.connectedAddresses![0]!.address
-        : user.userAddress,
+    address: userAddress,
     displayName: user.profileDisplayName ?? "",
     username: user.profileName ?? "",
     avatarUrl: user.profileImage ?? "",
