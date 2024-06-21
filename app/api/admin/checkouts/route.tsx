@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../lib/prisma";
+import prisma from "../../../../lib/prisma";
 import { CheckoutStatus } from "@prisma/client";
 
 export const POST = async (req: NextRequest) => {
-  const address = req.headers.get("x-address")!;
-
   const body = await req.json();
-  const { requestId, tier, amount } = body;
+  const { requestId, tier, amount, address } = body;
 
   const checkout = await prisma.checkout.create({
     data: {
