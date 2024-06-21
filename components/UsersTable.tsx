@@ -17,7 +17,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import { WaitlistedUser } from "@prisma/client";
+import { WaitlistTier, WaitlistedUser } from "@prisma/client";
 import { count } from "console";
 import {
   ChevronDown,
@@ -33,6 +33,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import BroadcastDCModal from "./BroadcastDCModal";
 import { AddWaitlistedUsersModal } from "./AddWaitlistedUsersModal";
+import { TIERS } from "../lib/constants";
 
 enum OrderByMode {
   WAITLISTED_AT = "waitlistedAt",
@@ -43,7 +44,13 @@ enum OrderByMode {
   SOCIAL_CAPITAL_RANK = "socialCapitalRank",
 }
 
-export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
+export const UsersTable = ({
+  waitlistId,
+  waitlistTier,
+}: {
+  waitlistId: number;
+  waitlistTier: WaitlistTier;
+}) => {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] =
     useState<boolean>(false);
   const [isAddUsersModalOpen, setIsAddUsersModalOpen] =
@@ -173,10 +180,25 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
             <PlusCircle size={16} />
             Add users
           </Button>
-          <Button color="primary" variant="flat" onPress={exportUsers}>
-            <Download size={16} />
-            Export users
-          </Button>
+          <Tooltip
+            isDisabled={TIERS[waitlistTier].allowExportUsers}
+            content="This feature is only available for Honey tier and above."
+          >
+            <Button
+              color="primary"
+              variant="flat"
+              onPress={() => {
+                if (!TIERS[waitlistTier].allowExportUsers) {
+                  return;
+                }
+                exportUsers();
+              }}
+              // isDisabled={waitlistTier === WaitlistTier.FREE}
+            >
+              <Download size={16} />
+              Export users
+            </Button>
+          </Tooltip>
         </div>
       </div>
       <Table aria-label="Example static collection table" shadow="none">
@@ -412,6 +434,7 @@ export const UsersTable = ({ waitlistId }: { waitlistId: number }) => {
         isOpen={isBroadcastModalOpen}
         onOpenChange={setIsBroadcastModalOpen}
         waitlistId={waitlistId}
+        waitlistTier={waitlistTier}
       />
       <AddWaitlistedUsersModal
         onOpenChange={setIsAddUsersModalOpen}

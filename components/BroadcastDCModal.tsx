@@ -13,15 +13,19 @@ import Link from "next/link";
 import { useState } from "react";
 import { BeearlyButton } from "./BeearlyButton";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
+import { WaitlistTier } from "@prisma/client";
+import { TIERS } from "../lib/constants";
 
 export default function BroadcastDCModal({
   isOpen,
   onOpenChange,
   waitlistId,
+  waitlistTier,
 }: {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   waitlistId: number;
+  waitlistTier: WaitlistTier;
 }) {
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string | null>();
@@ -99,9 +103,17 @@ export default function BroadcastDCModal({
                     </p>
                     <p className="undeline text-primary">
                       You can send a message{" "}
-                      <span className="font-bold">every 12 hours</span>. Avoid{" "}
-                      <span className="font-bold">spamming</span> or sending
-                      irrelevant messages to your users.
+                      <span className="font-bold">
+                        every {TIERS[waitlistTier].broadcastDCCooldownText}
+                      </span>
+                      .{" "}
+                      {waitlistTier !== WaitlistTier.QUEEN
+                        ? "Upgrade your waitlist's tier to increase this frequency."
+                        : ""}
+                    </p>
+                    <p className="text-primary">
+                      Avoid <span className="font-bold">spamming</span> or
+                      sending irrelevant messages to your users.
                     </p>
                     <p className="undeline text-primary"></p>
                     <p className="undeline text-primary">

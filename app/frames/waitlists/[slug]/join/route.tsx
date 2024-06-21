@@ -7,11 +7,12 @@ import {
   fetchFarcasterProfile,
   isUserFollowingUsers,
 } from "../../../../../lib/airstack";
-import { WaitlistRequirementType } from "@prisma/client";
+import { WaitlistRequirementType, WaitlistTier } from "@prisma/client";
 import {
   createCastIntent,
   isUserFollowingChannels,
 } from "../../../../../lib/warpcast";
+import { TIERS } from "../../../../../lib/constants";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
@@ -26,11 +27,30 @@ const frameHandler = frames(async (ctx) => {
     },
     include: {
       waitlistRequirements: true,
+      _count: {
+        select: { waitlistedUsers: true },
+      },
     },
   });
   if (!waitlist) {
     // TODO: show error frame
     throw new Error("Invalid waitlist");
+  }
+
+  if (waitlist.tier !== WaitlistTier.QUEEN) {
+    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+      return {
+        image: waitlist.imageError,
+        imageOptions: {
+          aspectRatio: "1.91:1",
+        },
+        buttons: [
+          <Button action="link" key="1" target={waitlist.externalUrl}>
+            Learn more
+          </Button>,
+        ],
+      };
+    }
   }
 
   let ref =

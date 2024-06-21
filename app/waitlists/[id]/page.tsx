@@ -140,7 +140,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
             </div>
           </div>
           {waitlist && !isWaitlistLoading && (
-            <UsersTable waitlistId={waitlist.id} />
+            <UsersTable waitlistId={waitlist.id} waitlistTier={waitlist.tier} />
           )}
           <EditWaitlistModal
             isOpen={isEditModalOpen}
