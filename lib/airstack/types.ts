@@ -2236,7 +2236,7 @@ export type ProfileQueryVariables = Exact<{
 }>;
 
 
-export type ProfileQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, followerCount: number | null, followingCount: number | null, location: string | null, profileBio: string | null, connectedAddresses: Array<{ address: any | null }> | null, socialCapital: { socialCapitalRank: number | null, socialCapitalScore: number | null } | null }> | null } | null };
+export type ProfileQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, followerCount: number | null, followingCount: number | null, location: string | null, profileBio: string | null, connectedAddresses: Array<{ address: any | null, blockchain: string | null }> | null, socialCapital: { socialCapitalRank: number | null, socialCapitalScore: number | null } | null }> | null } | null };
 
 export type FarcasterChannelsQueryVariables = Exact<{
   fid: Scalars['Identity']['input'];
@@ -2260,4 +2260,4 @@ export type ProfilesQueryVariables = Exact<{
 }>;
 
 
-export type ProfilesQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, followerCount: number | null, followingCount: number | null, location: string | null, profileBio: string | null, connectedAddresses: Array<{ address: any | null }> | null, socialCapital: { socialCapitalRank: number | null, socialCapitalScore: number | null } | null }> | null, pageInfo: { hasNextPage: boolean, nextCursor: string } | null } | null };
+export type ProfilesQuery = { Socials: { Social: Array<{ userId: string | null, profileName: string | null, profileDisplayName: string | null, profileImage: string | null, isFarcasterPowerUser: boolean | null, userAddress: any | null, followerCount: number | null, followingCount: number | null, location: string | null, profileBio: string | null, connectedAddresses: Array<{ address: any | null, blockchain: string | null }> | null, socialCapital: { socialCapitalRank: number | null, socialCapitalScore: number | null } | null }> | null, pageInfo: { hasNextPage: boolean, nextCursor: string } | null } | null };

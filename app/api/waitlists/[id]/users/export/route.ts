@@ -38,8 +38,8 @@ export const GET = async (
       users.map((user) => {
         return [
           user.fid,
-          user.username,
-          user.displayName,
+          user.username.trim().replace(/\r?\n|\r/g, ""),
+          user.displayName.trim().replace(/\r?\n|\r/g, ""),
           user.address,
           user.powerBadge,
         ].join(",");

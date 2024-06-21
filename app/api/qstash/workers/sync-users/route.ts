@@ -8,6 +8,7 @@ import {
   fetchFarcasterProfiles,
   UserProfile,
 } from "../../../../../lib/airstack";
+import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 
 async function handler(request: NextRequest) {
   // Get the payload from the request and extract the offset
@@ -70,18 +71,8 @@ async function handler(request: NextRequest) {
                 fid: parseInt(user.userId!),
               },
               data: {
-                address: user.userAddress,
-                displayName: user.profileDisplayName ?? "",
-                username: user.profileName ?? "",
-                avatarUrl: user.profileImage ?? "",
-                powerBadge: user.isFarcasterPowerUser,
+                ...formatAirstackUserData(user),
                 updatedAt: new Date(),
-                socialCapitalRank: user.socialCapital?.socialCapitalRank ?? 0,
-                socialCapitalScore: user.socialCapital?.socialCapitalScore ?? 0,
-                followerCount: user.followerCount ?? 0,
-                followingCount: user.followingCount ?? 0,
-                location: user.location ?? "",
-                profileBio: user.profileBio ?? "",
               },
             });
           })
