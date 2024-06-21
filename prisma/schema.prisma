@@ -14,12 +14,19 @@ model User {
   updated_at DateTime?
 }
 
+enum WaitlistTier {
+  FREE
+  HONEY
+  QUEEN
+}
+
 model Waitlist {
   id                   Int                   @unique @default(autoincrement())
   name                 String                @db.VarChar
   slug                 String                @unique
   externalUrl          String                @map("external_url")
   endDate              DateTime              @map("end_date")
+  tier                 WaitlistTier          @default(FREE)
   imageLanding         String                @map("image_landing")
   imageSuccess         String                @map("image_success")
   imageNotEligible     String                @map("image_not_eligible")
@@ -30,6 +37,7 @@ model Waitlist {
   waitlistedUsers      WaitlistedUser[]
   waitlistRequirements WaitlistRequirement[]
   waitlistMessages     WaitlistMessages[]
+  waitlistCheckouts    Checkout[]
 }
 
 model WaitlistedUser {
@@ -85,4 +93,25 @@ model WaitlistMessages {
   createdAt  DateTime @map("created_at")
   updatedAt  DateTime @map("updated_at")
   waitlist   Waitlist @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum CheckoutStatus {
+  PENDING
+  SUCCESS
+  ERROR
+}
+
+model Checkout {
+  id         Int            @unique @default(autoincrement())
+  waitlistId Int?           @map("waitlist_id")
+  address    String
+  tier       WaitlistTier
+  amount     Float
+  status     CheckoutStatus
+  requestId  String         @unique @map("request_id")
+  createdAt  DateTime       @map("created_at")
+  updatedAt  DateTime       @map("updated_at")
+  waitlist   Waitlist?      @relation(fields: [waitlistId], references: [id])
+
+  @@unique([address, requestId])
 }

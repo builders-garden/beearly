@@ -12,6 +12,7 @@ export const BeearlyButton = ({
   isLoading,
   isDisabled,
   link,
+  linkTarget,
 }: {
   onPress?: () => void;
   icon?: ReactNode;
@@ -23,6 +24,7 @@ export const BeearlyButton = ({
   isLoading?: boolean;
   isDisabled?: boolean;
   link?: string;
+  linkTarget?: "_blank" | "_self" | "_parent" | "_top";
 }) => {
   if (!iconPosition) iconPosition = "left";
   if (!tooltipPlacement) tooltipPlacement = "top";
@@ -46,7 +48,7 @@ export const BeearlyButton = ({
           <div className="flex flex-row gap-1 items-center">
             {iconPosition === "left" && icon}
             {link ? (
-              <Link href={link} target="_blank">
+              <Link href={link} target={linkTarget}>
                 <div className="font-semibold text-black">{text}</div>
               </Link>
             ) : (

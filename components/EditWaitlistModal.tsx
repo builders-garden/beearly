@@ -10,9 +10,7 @@ import {
   Image,
   Checkbox,
 } from "@nextui-org/react";
-import {
-  Info,
-} from "lucide-react";
+import { Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import slugify from "slugify";
 import { parseAbsoluteToLocal } from "@internationalized/date";
@@ -22,19 +20,18 @@ import { BASE_FRAME_URL } from "../lib/constants";
 import { WaitlistRequirementType } from "@prisma/client";
 import { BeearlyButton } from "./BeearlyButton";
 import { WaitlistWithRequirements } from "./WaitlistDetail";
+import PremiumRequired from "./PremiumRequired";
 
 export const EditWaitlistModal = ({
   waitlist,
-  setSelectedWaitlist,
-  refetchWaitlists,
+  refetchWaitlist,
   isOpen,
   onOpenChange,
 }: {
   waitlist: WaitlistWithRequirements;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  setSelectedWaitlist: (waitlist: WaitlistWithRequirements) => void;
-  refetchWaitlists: () => void;
+  refetchWaitlist: () => void;
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>(waitlist.name);
@@ -174,8 +171,7 @@ export const EditWaitlistModal = ({
     });
     if (res.ok) {
       const data = await res.json();
-      setSelectedWaitlist(data);
-      refetchWaitlists();
+      refetchWaitlist();
       onOpenChange(false);
     } else {
       const data = await res.json();
@@ -335,13 +331,19 @@ export const EditWaitlistModal = ({
                       </div>
                     </div>
                     <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="text-sm text-gray-500">Follow Users</div>
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Follow users
+                        </div>
+                        <PremiumRequired />
+                      </div>
                       <Input
                         type="text"
                         variant={"bordered"}
                         value={requiredUsersFollow}
                         onValueChange={setRequiredUsersFollow}
                         placeholder="dwr.eth,v,horsefacts"
+                        isDisabled={waitlist.tier === "FREE"}
                       />
                       <div className="text-xs text-gray-500">
                         Comma separated list of usernames that the users must
@@ -351,10 +353,14 @@ export const EditWaitlistModal = ({
                   </div>
                   <div className="flex flex-row gap-2 w-full">
                     <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="text-sm text-gray-500">Power Badge</div>
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">Power Badge</div>
+                        <PremiumRequired />
+                      </div>
                       <Checkbox
                         isSelected={isPowerBadgeRequired}
                         onValueChange={setIsPowerBadgeRequired}
+                        isDisabled={waitlist.tier === "FREE"}
                       >
                         Power Badge required
                       </Checkbox>

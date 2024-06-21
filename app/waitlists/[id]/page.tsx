@@ -25,7 +25,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
   const [isFrameUrlCopied, setIsFrameUrlCopied] = useState(false);
   const { isConnected } = useAccount();
   const jwt = getAuthToken();
-  const fetchWaitlists = useCallback(() => {
+  const fetchWaitlist = useCallback(() => {
     setWaitlistLoading(true);
     fetch(`/api/waitlists/${id}`, {
       headers: {
@@ -43,9 +43,9 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
 
   useEffect(() => {
     if (jwt && isConnected) {
-      fetchWaitlists();
+      fetchWaitlist();
     }
-  }, [jwt, isConnected, fetchWaitlists]);
+  }, [jwt, isConnected, fetchWaitlist]);
 
   if (!isConnected) {
     return (
@@ -150,8 +150,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
               }
             }
             onOpenChange={setIsEditModalOpen}
-            setSelectedWaitlist={waitlist as any}
-            refetchWaitlists={() => {}}
+            refetchWaitlist={fetchWaitlist}
           />
         </div>
       )}
