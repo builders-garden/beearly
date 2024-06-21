@@ -249,8 +249,6 @@ export const fetchFarcasterProfiles = async (
     !data.Socials.pageInfo ||
     data.Socials.Social?.length === 0
   ) {
-    if (!data) console.log("--- Data is null");
-    if (error) console.log("--- Error: ", error);
     return false;
   }
   return { profiles: data.Socials.Social, pageInfo: data.Socials.pageInfo };
