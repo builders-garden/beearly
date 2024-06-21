@@ -6,12 +6,14 @@ import {
   fetchFarcasterChannels,
   fetchFarcasterProfile,
   isUserFollowingUsers,
+  UserProfile,
 } from "../../../../../lib/airstack";
 import { WaitlistRequirementType } from "@prisma/client";
 import {
   createCastIntent,
   isUserFollowingChannels,
 } from "../../../../../lib/warpcast";
+import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
@@ -33,6 +35,7 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  // In this case you are a referrer and you should be in the waitlist
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
 
@@ -42,6 +45,7 @@ const frameHandler = frames(async (ctx) => {
         fid: parseInt(ref),
       },
     });
+    // If the referrer is not in the waitlist, we need to fetch the profile
     if (!isWaitlistUser) {
       const farcasterProfile = await fetchFarcasterProfile(ref);
       if (!farcasterProfile) {
@@ -49,25 +53,10 @@ const frameHandler = frames(async (ctx) => {
       } else {
         await prisma.waitlistedUser.create({
           data: {
+            ...formatAirstackUserData(farcasterProfile),
             waitlistId: waitlist.id,
             fid: parseInt(ref),
-            address:
-              farcasterProfile.connectedAddresses?.length! > 0
-                ? farcasterProfile.connectedAddresses![0]!.address
-                : farcasterProfile.userAddress,
-            displayName: farcasterProfile.profileDisplayName!,
-            username: farcasterProfile.profileName!,
-            avatarUrl: farcasterProfile.profileImage!,
-            powerBadge: farcasterProfile.isFarcasterPowerUser,
             referrerFid: null,
-            socialCapitalRank:
-              farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
-            socialCapitalScore:
-              farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
-            followerCount: farcasterProfile.followerCount ?? 0,
-            followingCount: farcasterProfile.followingCount ?? 0,
-            location: farcasterProfile.location ?? "",
-            profileBio: farcasterProfile.profileBio ?? "",
             waitlistedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -78,13 +67,13 @@ const frameHandler = frames(async (ctx) => {
   }
 
   // ALREADY WAITLISTED
+  const fid = ctx.message.requesterFid;
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
       waitlistId: waitlist.id,
-      fid: ctx.message.requesterFid,
+      fid: fid,
     },
   });
-  const fid = ctx.message?.requesterFid;
   if (waitlistedUser) {
     return {
       image: waitlist.imageSuccess,
@@ -128,17 +117,40 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  const farcasterProfile = await fetchFarcasterProfile(fid.toString());
+  // Check if the user is already in the database
+  const existingWaitlistedUser = await prisma.waitlistedUser.findFirst({
+    where: { fid: fid },
+  });
 
-  if (!farcasterProfile) {
-    // TODO: show error frame
-    throw new Error("Invalid farcaster profile");
+  let userToAdd;
+
+  // User was found in database
+  if (existingWaitlistedUser) {
+    userToAdd = {
+      ...existingWaitlistedUser,
+      id: undefined,
+      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      waitlistId: waitlist.id,
+      waitlistedAt: new Date(),
+    };
   }
-
-  const userAddress =
-    farcasterProfile.connectedAddresses![0]?.address ||
-    farcasterProfile.userAddress ||
-    farcasterProfile.userAssociatedAddresses![0];
+  // Fetch from Airstack if user was not found in database
+  else {
+    const farcasterProfile: UserProfile | boolean | undefined =
+      await fetchFarcasterProfile(fid.toString());
+    if (!farcasterProfile) {
+      // TODO: show error frame
+      throw new Error("Invalid farcaster profile");
+    }
+    userToAdd = {
+      ...formatAirstackUserData(farcasterProfile),
+      waitlistId: waitlist.id,
+      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      waitlistedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
 
   if (waitlist.waitlistRequirements.length > 0) {
     const powerBadgeRequirement = waitlist.waitlistRequirements.find(
@@ -151,7 +163,7 @@ const frameHandler = frames(async (ctx) => {
       (r) => r.type === WaitlistRequirementType.USER_FOLLOW
     );
     if (powerBadgeRequirement?.value === "true") {
-      if (!farcasterProfile?.isFarcasterPowerUser) {
+      if (!userToAdd?.powerBadge) {
         return {
           image: waitlist.imageNotEligible,
           imageOptions: {
@@ -226,31 +238,7 @@ const frameHandler = frames(async (ctx) => {
     }
   }
   await prisma.waitlistedUser.create({
-    data: {
-      waitlistId: waitlist.id,
-      fid,
-      address:
-        userAddress ||
-        ctx.message.verifiedWalletAddress ||
-        ctx.message.connectedAddress ||
-        ctx.message.requesterVerifiedAddresses[0] ||
-        ctx.message.requesterCustodyAddress,
-      displayName: farcasterProfile.profileDisplayName!,
-      username: farcasterProfile.profileName!,
-      avatarUrl: farcasterProfile.profileImage!,
-      powerBadge: farcasterProfile.isFarcasterPowerUser,
-      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
-      socialCapitalRank: farcasterProfile.socialCapital?.socialCapitalRank ?? 0,
-      socialCapitalScore:
-        farcasterProfile.socialCapital?.socialCapitalScore ?? 0,
-      followerCount: farcasterProfile.followerCount ?? 0,
-      followingCount: farcasterProfile.followingCount ?? 0,
-      location: farcasterProfile.location ?? "",
-      profileBio: farcasterProfile.profileBio ?? "",
-      waitlistedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
+    data: userToAdd,
   });
   return {
     image: waitlist.imageSuccess,

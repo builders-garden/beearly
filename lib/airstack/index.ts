@@ -29,8 +29,8 @@ const profileQuery = /* GraphQL */ `
         userAddress
         connectedAddresses {
           address
+          blockchain
         }
-        userAssociatedAddresses
         socialCapital {
           socialCapitalRank
           socialCapitalScore
@@ -183,6 +183,7 @@ const profilesQuery = /* GraphQL */ `
         userAddress
         connectedAddresses {
           address
+          blockchain
         }
         socialCapital {
           socialCapitalRank
@@ -216,6 +217,7 @@ export interface UserProfile {
   connectedAddresses:
     | {
         address: any | null;
+        blockchain: any | null;
       }[]
     | null;
   socialCapital: {
@@ -274,6 +276,7 @@ query FarcasterUsers($profileName: String, $limit: Int) {
       userAddress
       connectedAddresses {
         address
+        blockchain
       }
       socialCapital {
         socialCapitalRank
