@@ -26,6 +26,7 @@ const profileQuery = /* GraphQL */ `
         profileDisplayName
         profileImage
         isFarcasterPowerUser
+        userAddress
         connectedAddresses {
           address
           blockchain
@@ -212,11 +213,11 @@ export interface UserProfile {
   profileDisplayName: string | null;
   profileImage: string | null;
   isFarcasterPowerUser: boolean | null;
-  userAddress: string | null;
+  userAddress: any | null;
   connectedAddresses:
     | {
-        address: string | null;
-        blockchain: string | null;
+        address: any | null;
+        blockchain: any | null;
       }[]
     | null;
   socialCapital: {
