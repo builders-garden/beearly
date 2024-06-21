@@ -129,10 +129,16 @@ const frameHandler = frames(async (ctx) => {
   }
 
   const farcasterProfile = await fetchFarcasterProfile(fid.toString());
+
   if (!farcasterProfile) {
     // TODO: show error frame
     throw new Error("Invalid farcaster profile");
   }
+
+  const userAddress =
+    farcasterProfile.connectedAddresses![0]?.address ||
+    farcasterProfile.userAddress ||
+    farcasterProfile.userAssociatedAddresses![0];
 
   if (waitlist.waitlistRequirements.length > 0) {
     const powerBadgeRequirement = waitlist.waitlistRequirements.find(
@@ -224,6 +230,7 @@ const frameHandler = frames(async (ctx) => {
       waitlistId: waitlist.id,
       fid,
       address:
+        userAddress ||
         ctx.message.verifiedWalletAddress ||
         ctx.message.connectedAddress ||
         ctx.message.requesterVerifiedAddresses[0] ||

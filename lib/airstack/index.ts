@@ -30,6 +30,7 @@ const profileQuery = /* GraphQL */ `
         connectedAddresses {
           address
         }
+        userAssociatedAddresses
         socialCapital {
           socialCapitalRank
           socialCapitalScore
