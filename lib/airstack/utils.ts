@@ -11,7 +11,7 @@ import { UserProfile } from ".";
     | "waitlistedAt"
     | "updatedAt"
  **/
-export const convertAirstackUserData = (user: UserProfile) => {
+export const formatAirstackUserData = (user: UserProfile) => {
   const databaseUserData: Omit<
     WaitlistedUser,
     | "id"

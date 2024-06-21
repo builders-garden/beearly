@@ -4,7 +4,7 @@ import {
   UserProfile,
 } from "../../../../../lib/airstack";
 import prisma from "../../../../../lib/prisma";
-import { convertAirstackUserData } from "../../../../../lib/airstack/utils";
+import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 
 export const GET = async (
   req: NextRequest,
@@ -198,7 +198,7 @@ export const POST = async (
     // Concat the users we already have in the database with the users found through Airstack
     const allUsersToAdd = [
       ...usersFound.map((user) => ({
-        ...convertAirstackUserData(user),
+        ...formatAirstackUserData(user),
         waitlistId: parseInt(id),
         waitlistedAt: new Date(),
         createdAt: new Date(),

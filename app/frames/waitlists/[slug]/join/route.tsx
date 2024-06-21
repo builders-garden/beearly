@@ -13,7 +13,7 @@ import {
   createCastIntent,
   isUserFollowingChannels,
 } from "../../../../../lib/warpcast";
-import { convertAirstackUserData } from "../../../../../lib/airstack/utils";
+import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 
 const frameHandler = frames(async (ctx) => {
   if (!ctx?.message?.isValid) {
@@ -53,7 +53,7 @@ const frameHandler = frames(async (ctx) => {
       } else {
         await prisma.waitlistedUser.create({
           data: {
-            ...convertAirstackUserData(farcasterProfile),
+            ...formatAirstackUserData(farcasterProfile),
             waitlistId: waitlist.id,
             fid: parseInt(ref),
             referrerFid: null,
@@ -143,7 +143,7 @@ const frameHandler = frames(async (ctx) => {
       throw new Error("Invalid farcaster profile");
     }
     userToAdd = {
-      ...convertAirstackUserData(farcasterProfile),
+      ...formatAirstackUserData(farcasterProfile),
       waitlistId: waitlist.id,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
       waitlistedAt: new Date(),
