@@ -26,9 +26,9 @@ const profileQuery = /* GraphQL */ `
         profileDisplayName
         profileImage
         isFarcasterPowerUser
-        userAddress
         connectedAddresses {
           address
+          blockchain
         }
         socialCapital {
           socialCapitalRank
@@ -182,6 +182,7 @@ const profilesQuery = /* GraphQL */ `
         userAddress
         connectedAddresses {
           address
+          blockchain
         }
         socialCapital {
           socialCapitalRank
@@ -211,10 +212,11 @@ export interface UserProfile {
   profileDisplayName: string | null;
   profileImage: string | null;
   isFarcasterPowerUser: boolean | null;
-  userAddress: any | null;
+  userAddress: string | null;
   connectedAddresses:
     | {
-        address: any | null;
+        address: string | null;
+        blockchain: string | null;
       }[]
     | null;
   socialCapital: {
@@ -246,6 +248,8 @@ export const fetchFarcasterProfiles = async (
     !data.Socials.pageInfo ||
     data.Socials.Social?.length === 0
   ) {
+    if (!data) console.log("--- Data is null");
+    if (error) console.log("--- Error: ", error);
     return false;
   }
   return { profiles: data.Socials.Social, pageInfo: data.Socials.pageInfo };
@@ -273,6 +277,7 @@ query FarcasterUsers($profileName: String, $limit: Int) {
       userAddress
       connectedAddresses {
         address
+        blockchain
       }
       socialCapital {
         socialCapitalRank
