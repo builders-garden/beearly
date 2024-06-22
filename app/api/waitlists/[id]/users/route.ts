@@ -4,6 +4,7 @@ import {
   UserProfile,
 } from "../../../../../lib/airstack";
 import prisma from "../../../../../lib/prisma";
+import { TIERS } from "../../../../../lib/constants";
 
 export const GET = async (
   req: NextRequest,
@@ -109,6 +110,13 @@ export const POST = async (
         id: parseInt(id),
         userAddress: address,
       },
+      include: {
+        _count: {
+          select: {
+            waitlistedUsers: true,
+          },
+        },
+      },
     });
 
     // If the waitlist doesn't exist, return a 404
@@ -138,6 +146,17 @@ export const POST = async (
     }
     const { fids }: { fids: string[] } = body;
     const parsedFids = fids.map((fid) => parseInt(fid));
+
+    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+      return NextResponse.json(
+        {
+          message: "Waitlist is full, upgrade tier to add more users",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
     // Query the database for existing WaitlistedUser entries with the provided fids
     const existingUsers = await prisma.waitlistedUser.findMany({

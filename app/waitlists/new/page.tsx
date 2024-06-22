@@ -48,7 +48,7 @@ export const tiers = [
     price: "Free",
     image: "/bumble.svg",
     type: WaitlistTier.FREE,
-    waitlistSize: "100",
+    waitlistSize: "100 users",
     broadcastMessage: "1 every 24 hours",
     exportUsers: "No",
   },
@@ -57,7 +57,7 @@ export const tiers = [
     price: "25$",
     image: "/honey.svg",
     type: WaitlistTier.HONEY,
-    waitlistSize: "500",
+    waitlistSize: "500 users",
     broadcastMessage: "1 every 12 hours",
     exportUsers: "Yes",
   },
@@ -279,10 +279,12 @@ export default function NewWaitlist() {
       <div className="mt-4">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2 items-center">
-              <div className="font-semibold text-lg">Tier</div>
-              <ExternalLink size={16} />
-            </div>
+            <Link href={"/pricing"} target="_blank" className="text-black">
+              <div className="flex flex-row gap-2 items-center">
+                <div className="font-semibold text-lg">Tier</div>
+                <ExternalLink size={16} />
+              </div>
+            </Link>
             <div className="flex flex-row gap-8">
               <div className="flex flex-row gap-4">
                 {tiers.map((tier) => {
@@ -337,8 +339,13 @@ export default function NewWaitlist() {
                 <div className="flex flex-col text-sm">
                   <div className="flex flex-row gap-1">
                     <p>Waitlist size:</p>
-                    <p className="font-semibold">
-                      {selectedTierDetails?.waitlistSize}
+                    <p>
+                      <span className="font-semibold">
+                        {selectedTierDetails?.waitlistSize}
+                      </span>{" "}
+                      {selectedTier !== WaitlistTier.QUEEN
+                        ? "- we stop accepting new users after it"
+                        : ""}
                     </p>
                   </div>
                   <div className="flex flex-row gap-1">
@@ -485,7 +492,7 @@ export default function NewWaitlist() {
                       setUploadedClosedImage,
                       setSelectedFileClosed
                     )}
-                    label="Closed"
+                    label="Closed (deadline or size limit)"
                   />
                 </div>
               </div>
@@ -569,7 +576,7 @@ export default function NewWaitlist() {
                 <div className="flex flex-row gap-2 items-center">
                   <AlertCircle size={16} className="text-red-600" />
                   <div className="text-sm">
-                    To create an {selectedTier} waitlist, you need to unlock it
+                    To create a {selectedTier} waitlist, you need to unlock it
                     first
                   </div>
                 </div>
@@ -588,7 +595,7 @@ export default function NewWaitlist() {
                     : "Create waitlist"
                 }
                 onPress={createWaitlist}
-                isLoading={isCreateAndPayPending}
+                isLoading={loading}
                 isDisabled={isConnecting || !isConnected || isDisabled}
               />
             </div>
