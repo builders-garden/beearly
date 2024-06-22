@@ -120,7 +120,7 @@ export const WaitlistDetail = ({
             (waitlist as any)._count?.waitlistedUsers || 0
           }`}
         >
-          <UsersTable waitlistId={waitlist.id} />
+          <UsersTable waitlistTier={waitlist.tier} waitlistId={waitlist.id} />
         </Tab>
         <Tab key="images" title="Images">
           <div className="flex flex-col gap-2 p-4">
@@ -247,15 +247,6 @@ export const WaitlistDetail = ({
           </div>
         </Tab>
       </Tabs>
-      <EditWaitlistModal
-        isOpen={isEditModalOpen}
-        waitlist={
-          waitlist as Waitlist & { waitlistRequirements: WaitlistRequirement[] }
-        }
-        onOpenChange={setIsEditModalOpen}
-        setSelectedWaitlist={setSelectedWaitlist}
-        refetchWaitlists={refetchWaitlists}
-      />
     </div>
   );
 };
