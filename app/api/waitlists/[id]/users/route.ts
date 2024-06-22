@@ -4,6 +4,7 @@ import {
   UserProfile,
 } from "../../../../../lib/airstack";
 import prisma from "../../../../../lib/prisma";
+import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
 
 export const GET = async (
@@ -158,8 +159,8 @@ export const POST = async (
       );
     }
 
-    // Query the database for existing WaitlistedUser entries with the provided fids
-    const existingUsers = await prisma.waitlistedUser.findMany({
+    // Query the database for existing WaitlistedUser entries with the provided fids inside the waitlist
+    const usersInWaitlist = await prisma.waitlistedUser.findMany({
       where: {
         fid: {
           in: parsedFids,
@@ -171,50 +172,67 @@ export const POST = async (
       },
     });
 
-    // Extracting the fids of existing users
-    const existingFids = new Set(existingUsers.map((user) => user.fid));
+    // Create a Set of fids already in the waitlist
+    const fidsInWaitlistSet = new Set(usersInWaitlist.map((user) => user.fid));
 
-    // Filter out the fids that are already in the database
-    const fidsNotInDatabase = parsedFids.filter(
-      (fid) => !existingFids.has(fid)
+    // Filter out the fids that are already in the waitlist
+    const fidsNotInWaitlist = parsedFids.filter(
+      (fid) => !fidsInWaitlistSet.has(fid)
     );
 
-    // Transforming the fids not in db array to a string array to satisfy the Airstack query
-    const fidsString = fidsNotInDatabase.map((fid) => fid.toString());
+    // Query the Database to get the already existing users' profiles
+    const usersInDatabase = await prisma.waitlistedUser.findMany({
+      distinct: ["fid"],
+      where: {
+        fid: {
+          in: fidsNotInWaitlist,
+        },
+      },
+    });
+
+    // Create a Set of fids already in the database
+    const fidsInDatabaseSet = new Set(usersInDatabase.map((user) => user.fid));
+
+    // Filter out the fids we already have in the database
+    const fidsToFind = fidsNotInWaitlist.filter(
+      (fid) => !fidsInDatabaseSet.has(fid)
+    );
+
+    // Transforming the fids not in waitlist array to a string array to satisfy the Airstack query
+    const fidsToFindString = fidsToFind.map((fid) => fid.toString());
 
     // Calling Airstack API many times to get all users' profiles
-    const newUsers: UserProfile[] = [];
+    const usersFound: UserProfile[] = [];
     let pointer = "";
 
     do {
-      const res = await fetchFarcasterProfiles(fidsString, pointer);
+      const res = await fetchFarcasterProfiles(fidsToFindString, pointer);
       if (res) {
         const { profiles } = res;
-        newUsers.push(...profiles);
+        usersFound.push(...profiles);
       }
       pointer = res ? res.pageInfo.nextCursor : "";
     } while (pointer);
 
-    // Bulk insert new users
-    const result = await prisma.waitlistedUser.createMany({
-      data: newUsers.map((user) => ({
+    // Concat the users we already have in the database with the users found through Airstack
+    const allUsersToAdd = [
+      ...usersFound.map((user) => ({
+        ...formatAirstackUserData(user),
         waitlistId: parseInt(id),
-        fid: parseInt(user.userId!),
-        address: user.userAddress,
-        displayName: user.profileDisplayName ?? "",
-        username: user.profileName ?? "",
-        avatarUrl: user.profileImage ?? "",
-        powerBadge: user.isFarcasterPowerUser,
-        socialCapitalRank: user.socialCapital?.socialCapitalRank ?? 0,
-        socialCapitalScore: user.socialCapital?.socialCapitalScore ?? 0,
-        followerCount: user.followerCount ?? 0,
-        followingCount: user.followingCount ?? 0,
-        location: user.location ?? "",
-        profileBio: user.profileBio ?? "",
         waitlistedAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       })),
+      ...usersInDatabase.map((user) => ({
+        ...user,
+        id: undefined,
+        waitlistId: parseInt(id),
+      })),
+    ];
+
+    // Bulk insert the Database
+    const result = await prisma.waitlistedUser.createMany({
+      data: allUsersToAdd,
     });
 
     return NextResponse.json(
