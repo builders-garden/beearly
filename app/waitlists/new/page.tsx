@@ -1,5 +1,9 @@
 "use client";
-import { getAuthToken } from "@dynamic-labs/sdk-react-core";
+import {
+  DynamicConnectButton,
+  DynamicWidget,
+  getAuthToken,
+} from "@dynamic-labs/sdk-react-core";
 import {
   DatePicker,
   Checkbox,
@@ -42,7 +46,7 @@ import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 
-const tiers = [
+export const tiers = [
   {
     title: "Bumble Bee",
     price: "Free",
@@ -582,23 +586,27 @@ export default function NewWaitlist() {
                 </div>
               )}
             </div>
-            <div className="flex flex-row gap-4">
-              <Link href="/waitlists">
-                <Button variant="light" color="primary">
-                  Cancel
-                </Button>
-              </Link>
-              <BeearlyButton
-                text={
-                  buttonLoadingMessage
-                    ? buttonLoadingMessage
-                    : "Create waitlist"
-                }
-                onPress={createWaitlist}
-                isLoading={loading}
-                isDisabled={isConnecting || !isConnected || isDisabled}
-              />
-            </div>
+            {isConnected ? (
+              <div className="flex flex-row gap-4">
+                <Link href="/waitlists">
+                  <Button variant="light" color="primary">
+                    Cancel
+                  </Button>
+                </Link>
+                <BeearlyButton
+                  text={
+                    buttonLoadingMessage
+                      ? buttonLoadingMessage
+                      : "Create waitlist"
+                  }
+                  onPress={createWaitlist}
+                  isLoading={loading}
+                  isDisabled={isConnecting || !isConnected || isDisabled}
+                />
+              </div>
+            ) : (
+              <DynamicWidget />
+            )}
           </div>
         </div>
       </div>
