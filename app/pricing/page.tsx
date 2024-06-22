@@ -70,7 +70,7 @@ export default function Pricing() {
             <div className="flex flex-col gap-1 items-center text-center">
               <Image src="/honey.svg" alt="tier-logo" className="h-8 w-8" />
               <div className="text-xl font-bold">Honey Bee</div>
-              <div>More control over your waitlist with advanced features.</div>
+              <div>More features and bigger audience.</div>
             </div>
             <div className="text-3xl font-bold">25$</div>
             <div className="flex flex-col gap-2">
