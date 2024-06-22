@@ -12,10 +12,6 @@ model User {
   address    String
   created_at DateTime?
   updated_at DateTime?
-  id         String    @id @default(cuid())
-  address    String
-  created_at DateTime?
-  updated_at DateTime?
 }
 
 enum WaitlistTier {
@@ -39,23 +35,7 @@ model Waitlist {
   createdAt            DateTime              @map("created_at")
   updatedAt            DateTime              @map("updated_at")
   waitlistedUsers      WaitlistedUser[]
-  id                   Int                   @unique @default(autoincrement())
-  name                 String                @db.VarChar
-  slug                 String                @unique
-  externalUrl          String                @map("external_url")
-  endDate              DateTime              @map("end_date")
-  tier                 WaitlistTier          @default(FREE)
-  imageLanding         String                @map("image_landing")
-  imageSuccess         String                @map("image_success")
-  imageNotEligible     String                @map("image_not_eligible")
-  imageError           String                @map("image_error")
-  userAddress          String                @map("user_address")
-  createdAt            DateTime              @map("created_at")
-  updatedAt            DateTime              @map("updated_at")
-  waitlistedUsers      WaitlistedUser[]
   waitlistRequirements WaitlistRequirement[]
-  waitlistMessages     WaitlistMessages[]
-  waitlistCheckouts    Checkout[]
   waitlistMessages     WaitlistMessages[]
   waitlistCheckouts    Checkout[]
 }
@@ -87,7 +67,6 @@ model WaitlistedUser {
   referralsSquared   WaitlistedUser[] @relation("ReferralsSquared")
 
   @@unique([waitlistId, fid], name: "waitlistId_fid")
-  @@index([waitlistId, fid], name: "waitlistId_fid")
   @@index([waitlistId, fid], name: "waitlistId_fid")
 }
 
