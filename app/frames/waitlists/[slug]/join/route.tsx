@@ -38,6 +38,7 @@ const frameHandler = frames(async (ctx) => {
   // In this case you are a referrer and you should be in the waitlist
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
+  let refSquared = ctx.url.searchParams.get("refSquared");
 
   if (ref && ref !== "1") {
     const isWaitlistUser = await prisma.waitlistedUser.findFirst({
@@ -67,11 +68,13 @@ const frameHandler = frames(async (ctx) => {
   }
 
   // ALREADY WAITLISTED
-  const fid = ctx.message.requesterFid;
+  // const fidSquared = ctx.message.requesterFid ? ctx.message.castId?.fid;
+  const fid = ref ? ref : ctx.message.requesterFid;
+  const fidSquared = ref && refSquared ? refSquared : ""; // FIX
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
       waitlistId: waitlist.id,
-      fid: fid,
+      fid: fid, // ? dovrebbe essere referrerFid ?
     },
   });
   if (waitlistedUser) {
@@ -87,7 +90,12 @@ const frameHandler = frames(async (ctx) => {
         <Button
           action="link"
           key="2"
-          target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+          target={createCastIntent(
+            fid,
+            fidSquared,
+            waitlist.name,
+            waitlist.slug
+          )}
         >
           Share with referral
         </Button>,
@@ -252,7 +260,7 @@ const frameHandler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+        target={createCastIntent(fid, fidSquared, waitlist.name, waitlist.slug)}
       >
         Share with referral
       </Button>,
