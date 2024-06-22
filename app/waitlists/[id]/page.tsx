@@ -1,17 +1,18 @@
 "use client";
 
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Image, Spinner } from "@nextui-org/react";
 import { Waitlist, WaitlistRequirement, WaitlistedUser } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { UsersTable } from "../../../components/UsersTable";
-import { BASE_FRAME_URL, BASE_URL } from "../../../lib/constants";
+import { BASE_FRAME_URL, BASE_URL, TIERS } from "../../../lib/constants";
 import {
   CheckCircleIcon,
   Clipboard,
   Edit,
   ExternalLink,
+  ExternalLinkIcon,
   Send,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,7 +26,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
   const [isFrameUrlCopied, setIsFrameUrlCopied] = useState(false);
   const { isConnected } = useAccount();
   const jwt = getAuthToken();
-  const fetchWaitlists = useCallback(() => {
+  const fetchWaitlist = useCallback(() => {
     setWaitlistLoading(true);
     fetch(`/api/waitlists/${id}`, {
       headers: {
@@ -43,9 +44,9 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
 
   useEffect(() => {
     if (jwt && isConnected) {
-      fetchWaitlists();
+      fetchWaitlist();
     }
-  }, [jwt, isConnected, fetchWaitlists]);
+  }, [jwt, isConnected, fetchWaitlist]);
 
   if (!isConnected) {
     return (
@@ -105,6 +106,23 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
           </div>
           <div className="flex flex-row gap-4 items-center">
             <div className="flex flex-col gap-1">
+              <Link href={"/pricing"} target="_blank">
+                <div className="flex flex-row gap-1 items-center cursor-point">
+                  <div className="text-xs font-medium">Tier</div>
+                  <ExternalLinkIcon size={12} />
+                </div>
+              </Link>
+
+              <div className="flex flex-row gap-1 items-center rounded-sm p-1 w-fit bg-gray-50 ">
+                <p>{waitlist.tier}</p>
+                <Image
+                  src={TIERS[waitlist.tier].image}
+                  alt="tier-logo"
+                  className="h-5 w-5"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
               <div className="text-xs font-medium">Frame URL</div>
               <div className="flex flex-row gap-2 rounded-sm p-1 w-fit bg-gray-50 items-center">
                 <div className="text-gray-400">{`${BASE_FRAME_URL}/${waitlist.slug}`}</div>
@@ -140,7 +158,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
             </div>
           </div>
           {waitlist && !isWaitlistLoading && (
-            <UsersTable waitlistId={waitlist.id} />
+            <UsersTable waitlistId={waitlist.id} waitlistTier={waitlist.tier} />
           )}
           <EditWaitlistModal
             isOpen={isEditModalOpen}
@@ -150,8 +168,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
               }
             }
             onOpenChange={setIsEditModalOpen}
-            setSelectedWaitlist={waitlist as any}
-            refetchWaitlists={() => {}}
+            refetchWaitlist={fetchWaitlist}
           />
         </div>
       )}

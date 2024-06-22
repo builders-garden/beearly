@@ -67,13 +67,8 @@ const Waitlists = () => {
           </Link>
 
           <BeearlyButton
-            isDisabled={waitlistsLoading || waitlists.length >= 1}
-            onPress={() => {
-              setIsOpen(true);
-            }}
-            showTooltip={waitlists.length >= 1}
-            tooltipText="There's currently a limit of 1 waitlist per user"
-            tooltipPlacement="bottom"
+            isDisabled={waitlistsLoading}
+            link="/waitlists/new"
             icon={
               <div className="rounded-2xl">
                 <PlusSquare

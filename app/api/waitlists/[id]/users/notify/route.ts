@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
 import { addToDCsQueue } from "../../../../../../lib/queues";
-import { MESSAGE_COOLDOWN } from "../../../../../../lib/constants";
+import { MESSAGE_COOLDOWN, TIERS } from "../../../../../../lib/constants";
 
 export const POST = async (
   req: NextRequest,
@@ -35,11 +35,11 @@ export const POST = async (
     },
   });
 
-  // check if lastMessage was sent in the last 12 hours
+  // check if lastMessage was sent earlier than cooldown
   if (
     lastMessageSent &&
     new Date().getTime() - lastMessageSent.createdAt.getTime() <
-      MESSAGE_COOLDOWN
+      TIERS[waitlist.tier].broadcastDCCooldown
   ) {
     const nextMessageTime = new Date(
       lastMessageSent.createdAt.getTime() + MESSAGE_COOLDOWN

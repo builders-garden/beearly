@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
-import { WaitlistRequirementType } from "@prisma/client";
+import {
+  Checkout,
+  CheckoutStatus,
+  WaitlistRequirementType,
+  WaitlistTier,
+} from "@prisma/client";
 import {
   getUserWaitlists,
   getWaitlistBySlug,
@@ -12,6 +17,8 @@ import {
   createWaitlistRequirements,
   createWaitlistRequirement,
 } from "../../../lib/db/waitlistRequirements";
+import prisma from "../../../lib/prisma";
+import { Check } from "lucide-react";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
@@ -29,22 +36,14 @@ export const POST = async (req: NextRequest) => {
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
+  const tier = (body.get("tier") as WaitlistTier) || WaitlistTier.FREE;
+
   const address = req.headers.get("x-address");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
-
-  // Prisma call to check if the user has more than 1 waitlist
-  const waitlistsCount = await getUserWaitlistsCount(address!);
-
-  if (waitlistsCount >= 1) {
-    return NextResponse.json(
-      { message: "You can only create one waitlist" },
-      { status: 400 }
-    );
-  }
 
   if (
     !name ||
@@ -60,6 +59,24 @@ export const POST = async (req: NextRequest) => {
       { success: false, message: "Missing required fields" },
       { status: 400 }
     );
+  }
+
+  let claimableCheckout: Checkout | null;
+  if (tier !== WaitlistTier.FREE) {
+    claimableCheckout = await prisma.checkout.findFirst({
+      where: {
+        address: address as string,
+        status: CheckoutStatus.SUCCESS,
+        waitlistId: null,
+        tier,
+      },
+    });
+    if (!claimableCheckout) {
+      return NextResponse.json(
+        { success: false, message: "To create" },
+        { status: 400 }
+      );
+    }
   }
 
   const slugName = slugify(name as string, {
@@ -103,6 +120,7 @@ export const POST = async (req: NextRequest) => {
       imageSuccess: success.url,
       imageNotEligible: notEligible.url,
       imageError: error.url,
+      tier: tier || WaitlistTier.FREE,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -149,6 +167,17 @@ export const POST = async (req: NextRequest) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       })),
+    });
+  }
+
+  if (tier !== WaitlistTier.FREE) {
+    await prisma.checkout.update({
+      where: {
+        id: claimableCheckout!.id,
+      },
+      data: {
+        waitlistId: waitlist.id,
+      },
     });
   }
 

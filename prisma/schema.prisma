@@ -8,55 +8,63 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  address       String
-  created_at    DateTime? 
-  updated_at    DateTime? 
+  id         String    @id @default(cuid())
+  address    String
+  created_at DateTime?
+  updated_at DateTime?
+}
+
+enum WaitlistTier {
+  FREE
+  HONEY
+  QUEEN
 }
 
 model Waitlist {
-  id              Int              @default(autoincrement()) @unique
-  name            String           @db.VarChar
-  slug            String            @unique
-  externalUrl     String            @map("external_url")  
-  endDate         DateTime          @map("end_date")
-  imageLanding    String            @map("image_landing")
-  imageSuccess    String            @map("image_success")
-  imageNotEligible String          @map("image_not_eligible")
-  imageError      String            @map("image_error")
-  userAddress     String            @map("user_address")
-  createdAt       DateTime          @map("created_at")
-  updatedAt       DateTime          @map("updated_at")
-  waitlistedUsers WaitlistedUser[]
+  id                   Int                   @unique @default(autoincrement())
+  name                 String                @db.VarChar
+  slug                 String                @unique
+  externalUrl          String                @map("external_url")
+  endDate              DateTime              @map("end_date")
+  tier                 WaitlistTier          @default(FREE)
+  imageLanding         String                @map("image_landing")
+  imageSuccess         String                @map("image_success")
+  imageNotEligible     String                @map("image_not_eligible")
+  imageError           String                @map("image_error")
+  userAddress          String                @map("user_address")
+  createdAt            DateTime              @map("created_at")
+  updatedAt            DateTime              @map("updated_at")
+  waitlistedUsers      WaitlistedUser[]
   waitlistRequirements WaitlistRequirement[]
-  waitlistMessages WaitlistMessages[]
+  waitlistMessages     WaitlistMessages[]
+  waitlistCheckouts    Checkout[]
 }
 
 model WaitlistedUser {
-  id            Int        @default(autoincrement())
-  waitlistId    Int        @map("waitlist_id")
-  fid           Int
-  address       String
-  displayName   String     @db.VarChar @map("display_name")
-  username      String     @db.VarChar
-  avatarUrl     String?    @map("avatar_url")
-  powerBadge    Boolean?   @default(false) @map("power_badge")
-  socialCapitalRank Int  @default(0)@map("social_capital_rank")
-  socialCapitalScore Float @default(0.00)@map("social_capital_score")
-  followerCount Int       @default(0)@map("follower_count")
-  followingCount Int      @default(0)@map("following_count")
-  location      String?   @default("")
-  profileBio    String?   @default("")@map("profile_bio")
-  referrerFid   Int?       @map("referrer_fid")
-  waitlistedAt  DateTime   
-  createdAt     DateTime   @map("created_at")
-  updatedAt     DateTime   @map("updated_at")
-  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  referrer      WaitlistedUser? @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
-  referrals    WaitlistedUser[] @relation("Referrals")
+  id                 Int              @default(autoincrement())
+  waitlistId         Int              @map("waitlist_id")
+  fid                Int
+  address            String
+  displayName        String           @map("display_name") @db.VarChar
+  username           String           @db.VarChar
+  avatarUrl          String?          @map("avatar_url")
+  powerBadge         Boolean?         @default(false) @map("power_badge")
+  socialCapitalRank  Int              @default(0) @map("social_capital_rank")
+  socialCapitalScore Float            @default(0.00) @map("social_capital_score")
+  followerCount      Int              @default(0) @map("follower_count")
+  followingCount     Int              @default(0) @map("following_count")
+  location           String?          @default("")
+  profileBio         String?          @default("") @map("profile_bio")
+  referrerFid        Int?             @map("referrer_fid")
+  waitlistedAt       DateTime
+  createdAt          DateTime         @map("created_at")
+  updatedAt          DateTime         @map("updated_at")
+  waitlist           Waitlist         @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  referrer           WaitlistedUser?  @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
+  referrals          WaitlistedUser[] @relation("Referrals")
 
-  @@index([waitlistId, fid], name: "waitlistId_fid")
   @@unique([waitlistId, fid], name: "waitlistId_fid")
+  @@index([waitlistId, fid], name: "waitlistId_fid")
 }
 
 enum WaitlistRequirementType {
@@ -66,20 +74,41 @@ enum WaitlistRequirementType {
 }
 
 model WaitlistRequirement {
-  id            Int        @default(autoincrement()) @unique
-  waitlistId    Int        @map("waitlist_id")
-  value         String 
-  type   WaitlistRequirementType     
-  createdAt     DateTime   @map("created_at")
-  updatedAt     DateTime   @map("updated_at")
-  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         Int                     @unique @default(autoincrement())
+  waitlistId Int                     @map("waitlist_id")
+  value      String
+  type       WaitlistRequirementType
+  createdAt  DateTime                @map("created_at")
+  updatedAt  DateTime                @map("updated_at")
+  waitlist   Waitlist                @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model WaitlistMessages {
-  id            Int        @default(autoincrement()) @unique
-  waitlistId    Int        @map("waitlist_id")
-  message       String
-  createdAt     DateTime   @map("created_at")
-  updatedAt     DateTime   @map("updated_at")
-  waitlist      Waitlist  @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         Int      @unique @default(autoincrement())
+  waitlistId Int      @map("waitlist_id")
+  message    String
+  createdAt  DateTime @map("created_at")
+  updatedAt  DateTime @map("updated_at")
+  waitlist   Waitlist @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum CheckoutStatus {
+  PENDING
+  SUCCESS
+  ERROR
+}
+
+model Checkout {
+  id         Int            @unique @default(autoincrement())
+  waitlistId Int?           @map("waitlist_id")
+  address    String
+  tier       WaitlistTier
+  amount     Float
+  status     CheckoutStatus
+  requestId  String         @unique @map("request_id")
+  createdAt  DateTime       @map("created_at")
+  updatedAt  DateTime       @map("updated_at")
+  waitlist   Waitlist?      @relation(fields: [waitlistId], references: [id])
+
+  @@unique([address, requestId])
 }
