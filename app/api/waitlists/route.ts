@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadImage } from "../../../lib/imagekit";
 import slugify from "slugify";
-import { WaitlistRequirementType, WaitlistTier } from "@prisma/client";
+import {
+  Checkout,
+  CheckoutStatus,
+  WaitlistRequirementType,
+  WaitlistTier,
+} from "@prisma/client";
 import {
   getUserWaitlists,
   getWaitlistBySlug,
@@ -12,6 +17,8 @@ import {
   createWaitlistRequirements,
   createWaitlistRequirement,
 } from "../../../lib/db/waitlistRequirements";
+import prisma from "../../../lib/prisma";
+import { Check } from "lucide-react";
 
 export const GET = async (req: NextRequest) => {
   const address = req.headers.get("x-address");
@@ -52,6 +59,24 @@ export const POST = async (req: NextRequest) => {
       { success: false, message: "Missing required fields" },
       { status: 400 }
     );
+  }
+
+  let claimableCheckout: Checkout | null;
+  if (tier !== WaitlistTier.FREE) {
+    claimableCheckout = await prisma.checkout.findFirst({
+      where: {
+        address: address as string,
+        status: CheckoutStatus.SUCCESS,
+        waitlistId: null,
+        tier,
+      },
+    });
+    if (!claimableCheckout) {
+      return NextResponse.json(
+        { success: false, message: "To create" },
+        { status: 400 }
+      );
+    }
   }
 
   const slugName = slugify(name as string, {
@@ -142,6 +167,17 @@ export const POST = async (req: NextRequest) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       })),
+    });
+  }
+
+  if (tier !== WaitlistTier.FREE) {
+    await prisma.checkout.update({
+      where: {
+        id: claimableCheckout!.id,
+      },
+      data: {
+        waitlistId: waitlist.id,
+      },
     });
   }
 

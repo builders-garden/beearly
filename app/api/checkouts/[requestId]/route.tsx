@@ -9,8 +9,8 @@ export const PUT = async (
     params: { requestId: string };
   }
 ) => {
-  const address = req.headers.get("x-address")!;
   const body = await req.json();
+  const address = req.headers.get("x-address")!;
   const { status, waitlistId } = body;
 
   const existingCheckout = await prisma.checkout.findFirst({
@@ -30,7 +30,10 @@ export const PUT = async (
 
   const checkout = await prisma.checkout.update({
     where: { requestId, address },
-    data: { status },
+    data: {
+      ...(status && { status }),
+      ...(waitlistId && { waitlistId }),
+    },
   });
 
   return NextResponse.json(checkout);

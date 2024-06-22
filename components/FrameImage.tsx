@@ -1,5 +1,18 @@
 import { Image } from "@nextui-org/react";
 import { ImageIcon, PlusSquare } from "lucide-react";
+
+export const onSelectedImageFile =
+  (setUploadedImage: (s: string) => void, setSelectedFile: (f: any) => void) =>
+  (event: any) => {
+    if (!event?.target?.files[0]) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setUploadedImage(reader.result?.toString() || "");
+    });
+    reader.readAsDataURL(event.target.files[0]);
+    setSelectedFile(event?.target.files[0]);
+  };
+
 export const FrameImage = ({
   selectedFile,
   uploadedImage,

@@ -1,17 +1,42 @@
 "use client";
-import { getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { DatePicker, Checkbox, Input, Button, Link } from "@nextui-org/react";
-import { ExternalLink, Info } from "lucide-react";
-import { useState } from "react";
+import {
+  DynamicConnectButton,
+  DynamicWidget,
+  getAuthToken,
+} from "@dynamic-labs/sdk-react-core";
+import {
+  DatePicker,
+  Checkbox,
+  Input,
+  Button,
+  Link,
+  select,
+} from "@nextui-org/react";
+import {
+  AlertCircle,
+  CircleCheck,
+  CircleCheckBig,
+  ExternalLink,
+  Info,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import slugify from "slugify";
-import { FrameImage } from "../../../components/FrameImage";
+import {
+  FrameImage,
+  onSelectedImageFile,
+} from "../../../components/FrameImage";
 import {
   BASE_FRAME_URL,
   BASE_USDC_ADDRESS,
   BEEARLY_WALLET_ADDRESS,
 } from "../../../lib/constants";
-import { Waitlist, WaitlistTier } from "@prisma/client";
+import {
+  Checkout,
+  CheckoutStatus,
+  Waitlist,
+  WaitlistTier,
+} from "@prisma/client";
 import { Image } from "@nextui-org/react";
 import { title } from "process";
 import PremiumRequired from "../../../components/PremiumRequired";
@@ -27,7 +52,7 @@ export const tiers = [
     price: "Free",
     image: "/bumble.svg",
     type: WaitlistTier.FREE,
-    waitlistSize: "100",
+    waitlistSize: "100 users",
     broadcastMessage: "1 every 24 hours",
     exportUsers: "No",
   },
@@ -36,7 +61,7 @@ export const tiers = [
     price: "25$",
     image: "/honey.svg",
     type: WaitlistTier.HONEY,
-    waitlistSize: "500",
+    waitlistSize: "500 users",
     broadcastMessage: "1 every 12 hours",
     exportUsers: "Yes",
   },
@@ -62,19 +87,22 @@ export default function NewWaitlist() {
   const router = useRouter();
   const { address, isConnected, isConnecting } = useAccount();
   const [buttonLoadingMessage, setButtonLoadingMessage] = useState<string>("");
+  const [checkouts, setCheckouts] = useState<Checkout[]>([]);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
     PaymentStatus.NOT_STARTED
   );
+  const jwt = getAuthToken();
   const {
     mutate: createAndPayRequest,
     isPending: isCreateAndPayPending,
     isSuccess: isCreateAndPaySuccess,
   } = useCreateAndPayRequest({
-    async onSuccess() {
+    async onSuccess(x: any) {
+      console.log(x);
       console.log("Successfully paid.");
       setPaymentStatus(PaymentStatus.SUCCESS);
-      setButtonLoadingMessage("Creating waitlist");
-      await createWaitlist();
+      setButtonLoadingMessage("");
+      fetchCheckouts();
     },
     onError(error: any) {
       console.error(error);
@@ -115,76 +143,48 @@ export default function NewWaitlist() {
     null
   );
   const [uploadedClosedImage, setUploadedClosedImage] = useState<string>("");
-  const onSelectedLandingImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedLandingImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileLanding(event?.target.files[0]);
-  };
-  const onSelectedSuccessImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedSuccessImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileSuccess(event?.target.files[0]);
-  };
-  const onSelectedNotEligibleImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedNotEligibleImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileNotEligible(event?.target.files[0]);
-  };
-  const onSelectedClosedImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedClosedImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileClosed(event?.target.files[0]);
-  };
-  const isDisabled =
-    !name ||
-    !endDate ||
-    !externalUrl ||
-    !selectedFileLanding ||
-    !selectedFileSuccess ||
-    !selectedFileNotEligible ||
-    !selectedFileClosed;
 
   const [error, setError] = useState<string>("");
-  const confirmWaitlistCreation = async () => {
-    if (selectedTier === WaitlistTier.FREE) {
-      await createWaitlist();
-      return;
-    } else {
-      const amount = selectedTier === WaitlistTier.HONEY ? 25 : 30;
-      const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
-      await createAndPayRequest({
-        setButtonLoadingMessage,
-        requestParams: {
-          payerIdentity: address!,
-          payeeIdentity: BEEARLY_WALLET_ADDRESS,
-          signerIdentity: address!,
-          paymentAddress: BEEARLY_WALLET_ADDRESS,
-          expectedAmount: Number(parseUnits(amount.toString(), 6)),
-          currencyAddress: BASE_USDC_ADDRESS,
-          reason: description,
-        },
-      });
+
+  const fetchCheckouts = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/checkouts?status=${CheckoutStatus.SUCCESS}&claimable=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setCheckouts(data);
+      }
+    } catch (e) {
+      console.error(e);
     }
+  }, [jwt]);
+
+  const confirmCheckout = async () => {
+    const amount = selectedTier === WaitlistTier.HONEY ? 25 : 30;
+    const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
+    await createAndPayRequest({
+      tier: selectedTier,
+      amount,
+      setButtonLoadingMessage,
+      requestParams: {
+        payerIdentity: address!,
+        payeeIdentity: BEEARLY_WALLET_ADDRESS,
+        signerIdentity: address!,
+        paymentAddress: BEEARLY_WALLET_ADDRESS,
+        expectedAmount: Number(parseUnits(amount.toString(), 6)),
+        currencyAddress: BASE_USDC_ADDRESS,
+        reason: description,
+      },
+    });
   };
   const createWaitlist = async () => {
     setLoading(true);
-    setButtonLoadingMessage("Creating waitlist");
     if (
       !name ||
       !endDate ||
@@ -196,7 +196,6 @@ export default function NewWaitlist() {
     ) {
       setError("Please fill all the fields");
       setLoading(false);
-      setButtonLoadingMessage("");
       return;
     }
     const formData = new FormData();
@@ -222,7 +221,7 @@ export default function NewWaitlist() {
         method: "POST",
         body: formData,
         headers: {
-          Authorization: `Bearer ${await getAuthToken()}`,
+          Authorization: `Bearer ${jwt}`,
         },
       });
       if (res.ok) {
@@ -237,7 +236,6 @@ export default function NewWaitlist() {
       setError("An error occurred");
     } finally {
       setLoading(false);
-      setButtonLoadingMessage("");
     }
   };
 
@@ -251,6 +249,32 @@ export default function NewWaitlist() {
     }, 5000);
   };
   const selectedTierDetails = tiers.find((tier) => tier.type === selectedTier);
+  const hasHoneyAvailable = checkouts.some(
+    (checkout) => checkout.tier === WaitlistTier.HONEY
+  );
+  const hasQueenAvailable = checkouts.some(
+    (checkout) => checkout.tier === WaitlistTier.QUEEN
+  );
+  const isTierAvailable =
+    selectedTier === WaitlistTier.FREE ||
+    (selectedTier === WaitlistTier.HONEY && hasHoneyAvailable) ||
+    (selectedTier == WaitlistTier.QUEEN && hasQueenAvailable);
+  const isWaitlistFormValid =
+    name &&
+    endDate &&
+    externalUrl &&
+    selectedFileLanding &&
+    selectedFileSuccess &&
+    selectedFileNotEligible &&
+    selectedFileClosed;
+
+  const isDisabled = !isWaitlistFormValid || !isTierAvailable;
+
+  useEffect(() => {
+    if (jwt && isConnected) {
+      fetchCheckouts();
+    }
+  }, [jwt, isConnected, fetchCheckouts]);
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -259,10 +283,12 @@ export default function NewWaitlist() {
       <div className="mt-4">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2 items-center">
-              <div className="font-semibold text-lg">Tier</div>
-              <ExternalLink size={16} />
-            </div>
+            <Link href={"/pricing"} target="_blank" className="text-black">
+              <div className="flex flex-row gap-2 items-center">
+                <div className="font-semibold text-lg">Tier</div>
+                <ExternalLink size={16} />
+              </div>
+            </Link>
             <div className="flex flex-row gap-8">
               <div className="flex flex-row gap-4">
                 {tiers.map((tier) => {
@@ -313,12 +339,17 @@ export default function NewWaitlist() {
                   );
                 })}
               </div>
-              <div className="flex flex-row gap-2 items-center">
-                <div className="flex flex-col justify-center">
+              <div className="flex flex-col justify-between border-2 bg-blue-700/20 p-2 rounded-sm border-blue-700">
+                <div className="flex flex-col text-sm">
                   <div className="flex flex-row gap-1">
                     <p>Waitlist size:</p>
-                    <p className="font-semibold">
-                      {selectedTierDetails?.waitlistSize}
+                    <p>
+                      <span className="font-semibold">
+                        {selectedTierDetails?.waitlistSize}
+                      </span>{" "}
+                      {selectedTier !== WaitlistTier.QUEEN
+                        ? "- we stop accepting new users after it"
+                        : ""}
                     </p>
                   </div>
                   <div className="flex flex-row gap-1">
@@ -334,6 +365,27 @@ export default function NewWaitlist() {
                     </p>
                   </div>
                 </div>
+                {
+                  // if the selected tier is available, show a message
+                  isTierAvailable ? (
+                    <div className="flex flex-row gap-2 items-center">
+                      <CircleCheckBig size={16} className="text-blue-700" />
+                      <p className="text-blue-700">Tier available</p>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="bg-blue-700 text-white font-semibold w-fit"
+                      onPress={confirmCheckout}
+                      isLoading={isCreateAndPayPending}
+                      isDisabled={isCreateAndPayPending}
+                    >
+                      {buttonLoadingMessage
+                        ? buttonLoadingMessage
+                        : `Pay ${selectedTierDetails?.price} to unlock`}
+                    </Button>
+                  )
+                }
               </div>
             </div>
           </div>
@@ -407,7 +459,10 @@ export default function NewWaitlist() {
                   <FrameImage
                     selectedFile={selectedFileLanding!}
                     uploadedImage={uploadedLandingImage}
-                    onSelectedFile={onSelectedLandingImageFile}
+                    onSelectedFile={onSelectedImageFile(
+                      setUploadedLandingImage,
+                      setSelectedFileLanding
+                    )}
                     label="Cover"
                   />
                 </div>
@@ -415,7 +470,10 @@ export default function NewWaitlist() {
                   <FrameImage
                     selectedFile={selectedFileSuccess!}
                     uploadedImage={uploadedSuccessImage}
-                    onSelectedFile={onSelectedSuccessImageFile}
+                    onSelectedFile={onSelectedImageFile(
+                      setUploadedSuccessImage,
+                      setSelectedFileSuccess
+                    )}
                     label="Success"
                   />
                 </div>
@@ -423,7 +481,10 @@ export default function NewWaitlist() {
                   <FrameImage
                     selectedFile={selectedFileNotEligible!}
                     uploadedImage={uploadedNotEligibleImage}
-                    onSelectedFile={onSelectedNotEligibleImageFile}
+                    onSelectedFile={onSelectedImageFile(
+                      setUploadedNotEligibleImage,
+                      setSelectedFileNotEligible
+                    )}
                     label="Not Eligible"
                   />
                 </div>
@@ -431,8 +492,11 @@ export default function NewWaitlist() {
                   <FrameImage
                     selectedFile={selectedFileClosed!}
                     uploadedImage={uploadedClosedImage}
-                    onSelectedFile={onSelectedClosedImageFile}
-                    label="Closed"
+                    onSelectedFile={onSelectedImageFile(
+                      setUploadedClosedImage,
+                      setSelectedFileClosed
+                    )}
+                    label="Closed (deadline or size limit)"
                   />
                 </div>
               </div>
@@ -494,25 +558,55 @@ export default function NewWaitlist() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row gap-4">
-            <Link href="/waitlists">
-              <Button variant="light" color="primary">
-                Cancel
-              </Button>
-            </Link>
-            <BeearlyButton
-              text={
-                buttonLoadingMessage ? buttonLoadingMessage : "Create waitlist"
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1 text-red-600">
+              {
+                // if there is an error, show the error
+                error ? <div>{error}</div> : null
               }
-              onPress={confirmWaitlistCreation}
-              isLoading={isCreateAndPayPending}
-              isDisabled={
-                isCreateAndPayPending ||
-                isConnecting ||
-                !isConnected ||
-                isDisabled
-              }
-            />
+              {!isWaitlistFormValid ? (
+                <div className="flex flex-row gap-2 items-center">
+                  <AlertCircle size={16} className="text-red-600" />
+                  <div className="text-sm">
+                    Make sure all the required fields are filled in correctly
+                  </div>
+                </div>
+              ) : (
+                <div></div>
+              )}
+              {isTierAvailable ? (
+                <div></div>
+              ) : (
+                <div className="flex flex-row gap-2 items-center">
+                  <AlertCircle size={16} className="text-red-600" />
+                  <div className="text-sm">
+                    To create a {selectedTier} waitlist, you need to unlock it
+                    first
+                  </div>
+                </div>
+              )}
+            </div>
+            {isConnected ? (
+              <div className="flex flex-row gap-4">
+                <Link href="/waitlists">
+                  <Button variant="light" color="primary">
+                    Cancel
+                  </Button>
+                </Link>
+                <BeearlyButton
+                  text={
+                    buttonLoadingMessage
+                      ? buttonLoadingMessage
+                      : "Create waitlist"
+                  }
+                  onPress={createWaitlist}
+                  isLoading={loading}
+                  isDisabled={isConnecting || !isConnected || isDisabled}
+                />
+              </div>
+            ) : (
+              <DynamicWidget />
+            )}
           </div>
         </div>
       </div>
