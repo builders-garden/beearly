@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
 import { addToDCsQueue } from "../../../../../../lib/queues";
-import { MESSAGE_COOLDOWN, TIERS } from "../../../../../../lib/constants";
+import { TIERS } from "../../../../../../lib/constants";
 
 export const POST = async (
   req: NextRequest,
@@ -42,7 +42,8 @@ export const POST = async (
       TIERS[waitlist.tier].broadcastDCCooldown
   ) {
     const nextMessageTime = new Date(
-      lastMessageSent.createdAt.getTime() + MESSAGE_COOLDOWN
+      lastMessageSent.createdAt.getTime() +
+        TIERS[waitlist.tier].broadcastDCCooldown
     );
     return NextResponse.json(
       {
