@@ -77,9 +77,6 @@ export const validateCaptchaChallenge = async (
     return false;
   }
 
-  // Delete the captcha challenge from the database
-  await deleteCaptchaChallenge(id);
-
   // Check if the result is correct
   const { result: storedResult } = captchaChallenge;
   return parseInt(result) === storedResult;
