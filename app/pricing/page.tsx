@@ -11,8 +11,8 @@ export default function Pricing() {
         <div>*pricing is intended per waitlist</div>
       </div>
       <BeearlyButton link={"/waitlists/new"} text="Start now" />
-      <div className="w-full flex flex-row gap-4 justify-center items-center p-24">
-        <div className="w-[30%] rounded-sm p-4 border-2 border-gray-200">
+      <div className="w-full flex sm:flex-row flex-col gap-4 justify-center items-center p-4 sm:p-24">
+        <div className="w-full sm:w-1/3 rounded-sm p-4 border-2 border-gray-200">
           <div className="flex flex-col gap-4 items-center">
             <div className="flex flex-col gap-1 items-center text-center">
               <Image src="/bumble.svg" alt="tier-logo" className="h-8 w-8" />
@@ -65,7 +65,7 @@ export default function Pricing() {
             </Link>
           </div>
         </div>
-        <div className="w-[30%] rounded-sm p-4 border-2 border-gray-200">
+        <div className="w-full sm:w-1/3 rounded-sm p-4 border-2 border-gray-200">
           <div className="flex flex-col gap-4 items-center">
             <div className="flex flex-col gap-1 items-center text-center">
               <Image src="/honey.svg" alt="tier-logo" className="h-8 w-8" />
@@ -118,7 +118,7 @@ export default function Pricing() {
             </Link>
           </div>
         </div>
-        <div className="w-[30%] rounded-sm p-[4px] bg-gradient-to-r from-[#B80000] to-[#FF930F]">
+        <div className="w-full sm:w-1/3 rounded-sm p-[4px] bg-gradient-to-r from-[#B80000] to-[#FF930F]">
           <div className="bg-white rounded-sm p-4">
             <div className="flex flex-col gap-4 items-center">
               <div className="flex flex-col gap-1 items-center text-center">
