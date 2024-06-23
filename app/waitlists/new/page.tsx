@@ -46,7 +46,7 @@ import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 
-export const tiers = [
+const tiers = [
   {
     title: "Bumble Bee",
     price: "Free",
