@@ -15,12 +15,15 @@ import {
 } from "../../../../../lib/warpcast";
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
+import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 
 const frameHandler = frames(async (ctx) => {
+  // Check if the message is valid
   if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }
 
+  // Get the waitlist slug and fetch the waitlist from the database
   const urlSplit = ctx.url.pathname.split("/");
   const slug = urlSplit[urlSplit.length - 2];
   const waitlist = await prisma.waitlist.findUnique({
@@ -39,6 +42,7 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  // If the waitlist is full, show the error frame
   if (waitlist.tier !== WaitlistTier.QUEEN) {
     if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
       return {
@@ -55,10 +59,40 @@ const frameHandler = frames(async (ctx) => {
     }
   }
 
-  // In this case you are a referrer and you should be in the waitlist
+  // Get the captcha id, ref and refSquared from the search params
+  const captchaId = ctx.url.searchParams.get("id");
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
+  const refSquared = ctx.url.searchParams.get("refSquared");
 
+  if (waitlist.hasCaptcha && captchaId) {
+    const inputText = ctx.message.inputText;
+    const isCaptchaPassed = await validateCaptchaChallenge(
+      parseInt(captchaId),
+      inputText
+    );
+    if (!isCaptchaPassed) {
+      return {
+        image: waitlist.imageError,
+        buttons: [
+          <Button
+            action="post"
+            key="1"
+            target={{
+              pathname: `/captcha/${slug}`,
+              search:
+                `${ref ? `&ref=${ref}` : ""}` +
+                `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+            }}
+          >
+            🔄 Try again
+          </Button>,
+        ],
+      };
+    }
+  }
+
+  // In this case you are a referrer and you should be in the waitlist
   if (ref && ref !== "1") {
     const isWaitlistUser = await prisma.waitlistedUser.findFirst({
       where: {
