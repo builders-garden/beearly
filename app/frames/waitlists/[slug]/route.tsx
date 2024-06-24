@@ -11,7 +11,7 @@ const frameHandler = frames(async (ctx) => {
   }*/
   const ref = ctx.url.searchParams.get("ref");
   const refSquared = ctx.url.searchParams.get("refSquared");
-  let slug = ctx.url.pathname.split("/").pop();
+  const slug = ctx.url.pathname.split("/").pop();
   const waitlist = await prisma.waitlist.findUnique({
     where: {
       slug,
@@ -21,6 +21,11 @@ const frameHandler = frames(async (ctx) => {
     // TODO: show an error image
     throw new Error("Invalid waitlist");
   }
+
+  // The button target's pathname depends on if the waitlist requires solving a captcha or not
+  const pathname = waitlist.hasCaptcha
+    ? `/captcha/${slug}`
+    : `/waitlists/${slug}/join`;
 
   return {
     image: waitlist.imageLanding,
@@ -32,10 +37,10 @@ const frameHandler = frames(async (ctx) => {
         action="post"
         key="1"
         target={{
-          pathname: `/waitlists/${waitlist.slug}/join`,
-          search: ref
-            ? `?ref=${ref}${refSquared ? `&refSquared=${refSquared}` : ""}`
-            : "",
+          pathname: pathname,
+          search:
+            `${ref ? `&ref=${ref}` : ""}` +
+            `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
         }}
       >
         Join Waitlist

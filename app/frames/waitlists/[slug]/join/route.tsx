@@ -15,12 +15,17 @@ import {
 } from "../../../../../lib/warpcast";
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
+import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 
+// this frameHandler called when user clicks "join waitlist" button of frame
 const frameHandler = frames(async (ctx) => {
+  // Check if the message is valid
   if (!ctx?.message?.isValid) {
     throw new Error("Invalid message");
   }
 
+  // Go find the waitlist the user clicked to join (error if it doesn't exist)
+  // Get the waitlist slug and fetch the waitlist from the database
   const urlSplit = ctx.url.pathname.split("/");
   const slug = urlSplit[urlSplit.length - 2];
   const waitlist = await prisma.waitlist.findUnique({
@@ -39,6 +44,7 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  // If the waitlist is full, show the error frame
   if (waitlist.tier !== WaitlistTier.QUEEN) {
     if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
       return {
@@ -55,15 +61,13 @@ const frameHandler = frames(async (ctx) => {
     }
   }
 
-  // In this case you are a referrer and you should be in the waitlist
+  // Get the captcha id, ref and refSquared from the search params
+  const captchaId = ctx.url.searchParams.get("id");
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
-  let refSquared = ctx.url.searchParams.get("refSquared") ?? "";
+  const refSquared = ctx.url.searchParams.get("refSquared");
 
-  // update logic below to be dynamic for ref & refSquared
-  // if check var (could be ref or refSquared)
-  // if waitlisted?
-
+  // Check if the ref and refSquared are waitlisted users
   async function checkWaitlistedUser(_fid: string, _waitlistId: number) {
     if (_fid !== "1") {
       const isWaitlistUser = await prisma.waitlistedUser.findFirst({
@@ -75,19 +79,42 @@ const frameHandler = frames(async (ctx) => {
       return isWaitlistUser;
     }
   }
+  const isRefInWaitlist =
+    ref && (await checkWaitlistedUser(ref, waitlist.id)) ? true : false;
+  const isRefSquaredInWaitlist =
+    refSquared && (await checkWaitlistedUser(refSquared, waitlist.id))
+      ? true
+      : false;
 
-  let referrer;
-  let referrerSquared;
-  if (ref) {
-    referrer = checkWaitlistedUser(ref, waitlist.id);
+  // if the waitlist has a captcha, check if user passes captcha, if not return error frame
+  if (waitlist.hasCaptcha && captchaId) {
+    const inputText = ctx.message.inputText;
+    const isCaptchaPassed = await validateCaptchaChallenge(
+      parseInt(captchaId),
+      inputText
+    );
+    if (!isCaptchaPassed) {
+      return {
+        image: waitlist.imageError,
+        buttons: [
+          <Button
+            action="post"
+            key="1"
+            target={{
+              pathname: `/captcha/${slug}`,
+              search:
+                `${ref ? `&ref=${ref}` : ""}` +
+                `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+            }}
+          >
+            🔄 Try again
+          </Button>,
+        ],
+      };
+    }
   }
-  if (refSquared) {
-    referrerSquared = checkWaitlistedUser(refSquared, waitlist.id);
-  }
 
-  console.log("ref", referrer);
-
-  // ALREADY WAITLISTED
+  // if user already in THIS waitlist, don't add to database, show success frame
   const fid = ctx.message.requesterFid;
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
@@ -108,12 +135,7 @@ const frameHandler = frames(async (ctx) => {
         <Button
           action="link"
           key="2"
-          target={createCastIntent(
-            fid,
-            waitlist.name,
-            waitlist.slug,
-            refSquared
-          )}
+          target={createCastIntent(fid, waitlist.name, slug!, refSquared)}
         >
           Share with referral
         </Button>,
@@ -128,7 +150,7 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  // WAITLIST REGISTRATIONS CLOSED
+  // if waitlist end date is passed, show error frame
   if (Date.now() > waitlist.endDate.getTime()) {
     return {
       image: waitlist.imageError,
@@ -143,26 +165,26 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  // Check if the user is already in the database
-  const existingWaitlistedUser = await prisma.waitlistedUser.findFirst({
+  // Define user to add, copying from db or fetching from Airstack
+  const anyWaitlistUser = await prisma.waitlistedUser.findFirst({
     where: { fid: fid },
   });
 
   let userToAdd;
 
-  // User was found in database
-  if (existingWaitlistedUser) {
+  // if user already in ANY waitlist, get user data from our db
+  if (anyWaitlistUser) {
     userToAdd = {
-      ...existingWaitlistedUser,
+      ...anyWaitlistUser,
       id: undefined,
-      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      referrerFid: ref && isRefInWaitlist ? parseInt(ref) : null,
       referrerSquaredFid:
-        refSquared && refSquared !== "1" ? parseInt(refSquared) : null,
+        refSquared && isRefSquaredInWaitlist ? parseInt(refSquared) : null,
       waitlistId: waitlist.id,
       waitlistedAt: new Date(),
     };
   }
-  // Fetch from Airstack if user was not found in database
+  // If user not already in  ANY waitlist, fetch from Airstack
   else {
     const farcasterProfile: UserProfile | boolean | undefined =
       await fetchFarcasterProfile(fid.toString());
@@ -180,6 +202,7 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
+  // requirements check: power badge, channel follow, user follow
   if (waitlist.waitlistRequirements.length > 0) {
     const powerBadgeRequirement = waitlist.waitlistRequirements.find(
       (r) => r.type === WaitlistRequirementType.POWER_BADGE
@@ -201,7 +224,12 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -227,7 +255,12 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -253,7 +286,12 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -280,7 +318,7 @@ const frameHandler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target={createCastIntent(fid, refSquared, waitlist.name, waitlist.slug)}
+        target={createCastIntent(fid, refSquared, waitlist.name, slug)}
       >
         Share with referral
       </Button>,
