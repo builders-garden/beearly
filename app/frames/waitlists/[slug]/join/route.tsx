@@ -58,7 +58,30 @@ const frameHandler = frames(async (ctx) => {
   // In this case you are a referrer and you should be in the waitlist
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
-  let refSquared = ctx.url.searchParams.get("refSquared");
+  let refSquared = ctx.url.searchParams.get("refSquared") ?? "";
+
+  // update logic below to be dynamic for ref & refSquared
+  // if check var (could be ref or refSquared)
+  // if waitlisted?
+
+  function checkWaitlistedUser(_fid: string, _waitlistId: number) {
+    if (_fid !== "1") {
+      const isWaitlistUser = await prisma.waitlistedUser.findFirst({
+        where: {
+          fid: parseInt(_fid),
+          waitlistId: _waitlistId,
+        },
+      });
+      return isWaitlistUser;
+    }
+  }
+
+  if (ref) {
+    checkWaitlistedUser(ref, waitlist.id);
+  }
+  if (refSquared) {
+    checkWaitlistedUser(refSquared, waitlist.id);
+  }
 
   if (ref && ref !== "1") {
     const isWaitlistUser = await prisma.waitlistedUser.findFirst({
@@ -66,35 +89,17 @@ const frameHandler = frames(async (ctx) => {
         fid: parseInt(ref),
       },
     });
-    // If the referrer is not in the waitlist, we need to fetch the profile
-    if (!isWaitlistUser) {
-      const farcasterProfile = await fetchFarcasterProfile(ref);
-      if (!farcasterProfile) {
-        ref = "";
-      } else {
-        await prisma.waitlistedUser.create({
-          data: {
-            ...formatAirstackUserData(farcasterProfile),
-            waitlistId: waitlist.id,
-            fid: parseInt(ref),
-            referrerFid: null,
-            waitlistedAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      }
+    if (refSquared && refSquared !== "1") {
     }
+    // if (!isWaitlistUser) {}
   }
 
   // ALREADY WAITLISTED
-  // const fidSquared = ctx.message.requesterFid ? ctx.message.castId?.fid;
-  const fid = ref ? ref : ctx.message.requesterFid;
-  const fidSquared = ref && refSquared ? refSquared : ""; // FIX
+  const fid = ctx.message.requesterFid;
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
       waitlistId: waitlist.id,
-      fid: fid, // ? dovrebbe essere referrerFid ?
+      fid: fid,
     },
   });
   if (waitlistedUser) {
@@ -112,9 +117,9 @@ const frameHandler = frames(async (ctx) => {
           key="2"
           target={createCastIntent(
             fid,
-            fidSquared,
             waitlist.name,
-            waitlist.slug
+            waitlist.slug,
+            refSquared
           )}
         >
           Share with referral
@@ -158,6 +163,8 @@ const frameHandler = frames(async (ctx) => {
       ...existingWaitlistedUser,
       id: undefined,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      referrerSquaredFid:
+        refSquared && refSquared !== "1" ? parseInt(refSquared) : null,
       waitlistId: waitlist.id,
       waitlistedAt: new Date(),
     };
@@ -280,7 +287,7 @@ const frameHandler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target={createCastIntent(fid, fidSquared, waitlist.name, waitlist.slug)}
+        target={createCastIntent(fid, refSquared, waitlist.name, waitlist.slug)}
       >
         Share with referral
       </Button>,

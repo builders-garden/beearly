@@ -10,6 +10,7 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid message");
   }*/
   const ref = ctx.url.searchParams.get("ref");
+  const refSquared = ctx.url.searchParams.get("refSquared");
   let slug = ctx.url.pathname.split("/").pop();
   const waitlist = await prisma.waitlist.findUnique({
     where: {
@@ -32,7 +33,9 @@ const frameHandler = frames(async (ctx) => {
         key="1"
         target={{
           pathname: `/waitlists/${waitlist.slug}/join`,
-          search: ref ? `?ref=${ref}` : "",
+          search: ref
+            ? `?ref=${ref}${refSquared ? `&refSquared=${refSquared}` : ""}`
+            : "",
         }}
       >
         Join Waitlist
