@@ -16,6 +16,7 @@ import {
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
 import { validateCaptchaChallenge } from "../../../../../lib/captcha";
+import { appURL } from "../../../../utils";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message is valid
@@ -65,7 +66,11 @@ const frameHandler = frames(async (ctx) => {
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
   const refSquared = ctx.url.searchParams.get("refSquared");
 
-  if (waitlist.hasCaptcha && captchaId) {
+  if (waitlist.hasCaptcha) {
+    if (!captchaId) {
+      // TODO: show error frame
+      throw new Error("Invalid captcha id");
+    }
     const inputText = ctx.message.inputText;
     const isCaptchaPassed = await validateCaptchaChallenge(
       parseInt(captchaId),
@@ -73,7 +78,11 @@ const frameHandler = frames(async (ctx) => {
     );
     if (!isCaptchaPassed) {
       return {
-        image: waitlist.imageError,
+        image: (
+          <div tw="relative flex items-center justify-center">
+            <img src={`${appURL()}/captcha/incorrect.png`} tw="absolute" />
+          </div>
+        ),
         buttons: [
           <Button
             action="post"
@@ -141,7 +150,7 @@ const frameHandler = frames(async (ctx) => {
         <Button
           action="link"
           key="2"
-          target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+          target={createCastIntent(fid, waitlist.name, slug!, ref)}
         >
           Share with referral
         </Button>,
@@ -227,7 +236,14 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: waitlist.hasCaptcha
+                  ? `/captcha/${slug}`
+                  : `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -253,7 +269,14 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: waitlist.hasCaptcha
+                  ? `/captcha/${slug}`
+                  : `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -279,7 +302,14 @@ const frameHandler = frames(async (ctx) => {
             <Button
               action="post"
               key="1"
-              target={`/waitlists/${waitlist.slug}/join`}
+              target={{
+                pathname: waitlist.hasCaptcha
+                  ? `/captcha/${slug}`
+                  : `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
             >
               Try again
             </Button>,
@@ -306,7 +336,7 @@ const frameHandler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target={createCastIntent(fid, waitlist.name, waitlist.slug)}
+        target={createCastIntent(fid, waitlist.name, slug!, ref)}
       >
         Share with referral
       </Button>,
