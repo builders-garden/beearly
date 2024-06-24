@@ -15,7 +15,6 @@ import {
 } from "../../../../../lib/warpcast";
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
-import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 
 // this frameHandler called when user clicks "join waitlist" button of frame
 const frameHandler = frames(async (ctx) => {
@@ -61,8 +60,7 @@ const frameHandler = frames(async (ctx) => {
     }
   }
 
-  // Get the captcha id, ref and refSquared from the search params
-  const captchaId = ctx.url.searchParams.get("id");
+  // Get the ref and refSquared from the search params
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
   const refSquared = ctx.url.searchParams.get("refSquared");
@@ -86,34 +84,6 @@ const frameHandler = frames(async (ctx) => {
       ? true
       : false;
 
-  // if the waitlist has a captcha, check if user passes captcha, if not return error frame
-  if (waitlist.hasCaptcha && captchaId) {
-    const inputText = ctx.message.inputText;
-    const isCaptchaPassed = await validateCaptchaChallenge(
-      parseInt(captchaId),
-      inputText
-    );
-    if (!isCaptchaPassed) {
-      return {
-        image: waitlist.imageError,
-        buttons: [
-          <Button
-            action="post"
-            key="1"
-            target={{
-              pathname: `/captcha/${slug}`,
-              search:
-                `${ref ? `&ref=${ref}` : ""}` +
-                `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
-            }}
-          >
-            🔄 Try again
-          </Button>,
-        ],
-      };
-    }
-  }
-
   // if user already in THIS waitlist, don't add to database, show success frame
   const fid = ctx.message.requesterFid;
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
@@ -135,7 +105,7 @@ const frameHandler = frames(async (ctx) => {
         <Button
           action="link"
           key="2"
-          target={createCastIntent(fid, waitlist.name, slug!, refSquared)}
+          target={createCastIntent(fid, waitlist.name, slug!, ref)}
         >
           Share with referral
         </Button>,
@@ -318,7 +288,7 @@ const frameHandler = frames(async (ctx) => {
       <Button
         action="link"
         key="2"
-        target={createCastIntent(fid, refSquared, waitlist.name, slug)}
+        target={createCastIntent(fid, waitlist.name, slug!, ref)}
       >
         Share with referral
       </Button>,

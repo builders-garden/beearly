@@ -27,7 +27,6 @@ model Waitlist {
   externalUrl          String                @map("external_url")
   endDate              DateTime              @map("end_date")
   tier                 WaitlistTier          @default(FREE)
-  hasCaptcha           Boolean               @default(false) @map("has_captcha")
   imageLanding         String                @map("image_landing")
   imageSuccess         String                @map("image_success")
   imageNotEligible     String                @map("image_not_eligible")
@@ -39,18 +38,6 @@ model Waitlist {
   waitlistRequirements WaitlistRequirement[]
   waitlistMessages     WaitlistMessages[]
   waitlistCheckouts    Checkout[]
-  captchaChallenges    CaptchaChallenge[]
-}
-
-model CaptchaChallenge {
-  id         Int      @unique @default(autoincrement())
-  waitlistId Int      @map("waitlist_id")
-  userAddress String
-  numA       Int
-  numB       Int
-  result     Int
-  createdAt  DateTime @map("created_at")
-  waitlist   Waitlist @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model WaitlistedUser {

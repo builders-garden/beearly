@@ -22,10 +22,7 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
-  // The button target's pathname depends on if the waitlist requires solving a captcha or not
-  const pathname = waitlist.hasCaptcha
-    ? `/captcha/${slug}`
-    : `/waitlists/${slug}/join`;
+  const pathname = `/waitlists/${slug}/join`;
 
   return {
     image: waitlist.imageLanding,
