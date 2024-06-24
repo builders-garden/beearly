@@ -66,21 +66,26 @@ export const validateCaptchaChallenge = async (
   id: number,
   result: string | undefined
 ) => {
-  // If the result is not a number, return false
-  if (!result || isNaN(parseInt(result))) {
+  try {
+    // If the result is not a number, return false
+    if (!result || isNaN(parseInt(result))) {
+      throw new Error("Invalid text input for captcha challenge");
+    }
+
+    // Get the captcha challenge from the database
+    const captchaChallenge = await getCaptchaChallenge(id);
+    if (!captchaChallenge) {
+      throw new Error("Captcha challenge not found");
+    }
+
+    // Check if the result is correct
+    const { result: storedResult } = captchaChallenge;
+    return parseInt(result) === storedResult;
+  } catch (error: any) {
+    console.log("Error while validating captcha: ", error.message);
     return false;
+  } finally {
+    // Whatever happens, delete the captcha challenge record
+    await deleteCaptchaChallenge(id);
   }
-
-  // Get the captcha challenge from the database
-  const captchaChallenge = await getCaptchaChallenge(id);
-  if (!captchaChallenge) {
-    return false;
-  }
-
-  // Delete the challenge from the database
-  await deleteCaptchaChallenge(id);
-
-  // Check if the result is correct
-  const { result: storedResult } = captchaChallenge;
-  return parseInt(result) === storedResult;
 };
