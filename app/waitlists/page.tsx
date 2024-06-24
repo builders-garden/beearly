@@ -8,7 +8,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
-import { CreateWaitlistModal } from "../../components/CreateWaitlistModal";
 import { BeearlyButton } from "../../components/BeearlyButton";
 import { ExternalLink, PlusSquare } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +16,6 @@ const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
   const [selectedWaitlist, setSelectedWaitlist] =
     useState<WaitlistWithRequirements | null>();
-  const [isOpen, setIsOpen] = useState(false);
   const jwt = getAuthToken();
   const [waitlistsLoading, setWaitlistsLoading] = useState(true);
   const { isConnected } = useAccount();
@@ -111,9 +109,7 @@ const Waitlists = () => {
                     </div>
                   </div>
                   <BeearlyButton
-                    onPress={() => {
-                      setIsOpen(true);
-                    }}
+                    link="/waitlists/new"
                     icon={
                       <div className="rounded-2xl">
                         <PlusSquare
@@ -151,12 +147,6 @@ const Waitlists = () => {
           </div>
         )
       }
-
-      <CreateWaitlistModal
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        refetchWaitlists={fetchWaitlists}
-      />
     </div>
   );
 };

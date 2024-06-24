@@ -181,5 +181,42 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
+  // Sending a Discord Webhook message to monitor new waitlists
+  const discordWebhook = process.env.DISCORD_WEBHOOK_URL!;
+
+  const waitlistCreator = await prisma.waitlistedUser.findFirst({
+    where: {
+      address: address,
+    },
+    select: {
+      displayName: true,
+    },
+  });
+
+  await fetch(discordWebhook, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      content: `
+  # **New Waitlist Created!** 🐝\n
+  - **Waitlist name: ** ${waitlist.name}
+  - **Creator: ** ${waitlistCreator?.displayName || address}
+  - **End Date: ** ${new Date(endDate as string).toLocaleDateString("it-IT")}
+  - **External URL: ** [Link]${"(<" + externalUrl + ">)"}
+  - **Tier: ** ${tier || WaitlistTier.FREE}\n
+        `,
+      embeds: [
+        {
+          image: {
+            url: landing.url,
+          },
+          color: 16776960,
+        },
+      ],
+    }),
+  });
+
   return NextResponse.json(waitlist);
 };
