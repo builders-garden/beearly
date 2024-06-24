@@ -64,7 +64,7 @@ const frameHandler = frames(async (ctx) => {
   // if check var (could be ref or refSquared)
   // if waitlisted?
 
-  function checkWaitlistedUser(_fid: string, _waitlistId: number) {
+  async function checkWaitlistedUser(_fid: string, _waitlistId: number) {
     if (_fid !== "1") {
       const isWaitlistUser = await prisma.waitlistedUser.findFirst({
         where: {
@@ -76,23 +76,16 @@ const frameHandler = frames(async (ctx) => {
     }
   }
 
+  let referrer;
+  let referrerSquared;
   if (ref) {
-    checkWaitlistedUser(ref, waitlist.id);
+    referrer = checkWaitlistedUser(ref, waitlist.id);
   }
   if (refSquared) {
-    checkWaitlistedUser(refSquared, waitlist.id);
+    referrerSquared = checkWaitlistedUser(refSquared, waitlist.id);
   }
 
-  if (ref && ref !== "1") {
-    const isWaitlistUser = await prisma.waitlistedUser.findFirst({
-      where: {
-        fid: parseInt(ref),
-      },
-    });
-    if (refSquared && refSquared !== "1") {
-    }
-    // if (!isWaitlistUser) {}
-  }
+  console.log("ref", referrer);
 
   // ALREADY WAITLISTED
   const fid = ctx.message.requesterFid;
