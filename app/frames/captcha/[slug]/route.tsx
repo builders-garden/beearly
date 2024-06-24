@@ -2,6 +2,7 @@ import { Button } from "frames.js/next";
 import { generateCaptchaChallenge } from "../../../../lib/captcha";
 import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
+import { appURL } from "../../../utils";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message is valid
@@ -32,8 +33,11 @@ const frameHandler = frames(async (ctx) => {
   const { id, numA, numB } = await generateCaptchaChallenge(fid, waitlist.id);
   return {
     image: (
-      <div tw="relative z-10 flex items-center justify-center text-9xl text-black font-bold">
-        {numA} + {numB} = ?
+      <div tw="relative flex items-center justify-center">
+        <img src={`${appURL()}/captcha/challenge.png`} tw="absolute" />
+        <div tw="relative z-10 flex items-center justify-center text-8xl pt-40 text-black font-bold">
+          {numA} + {numB} = ?
+        </div>
       </div>
     ),
     imageOptions: {
