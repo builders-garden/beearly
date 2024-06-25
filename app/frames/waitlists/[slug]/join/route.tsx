@@ -17,6 +17,7 @@ import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
 import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
+import { getTalentPassportByWallet } from "../../../../../lib/talent";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message is valid
@@ -225,6 +226,9 @@ const frameHandler = frames(async (ctx) => {
     const requiredUsersFollow = waitlist.waitlistRequirements.filter(
       (r) => r.type === WaitlistRequirementType.USER_FOLLOW
     );
+    const requiredBuilderScore = waitlist.waitlistRequirements.find(
+      (r) => r.type === WaitlistRequirementType.TALENT_BUILDER_SCORE
+    );
     if (powerBadgeRequirement?.value === "true") {
       if (!userToAdd?.powerBadge) {
         return {
@@ -320,10 +324,50 @@ const frameHandler = frames(async (ctx) => {
         };
       }
     }
+    if (requiredBuilderScore) {
+      const talentPassportProfile = await getTalentPassportByWallet(
+        ctx.message.requesterVerifiedAddresses[0] ??
+          ctx.message.requesterCustodyAddress
+      );
+
+      if (
+        !talentPassportProfile ||
+        talentPassportProfile.passport.score <
+          parseInt(requiredBuilderScore.value)
+      ) {
+        return {
+          image: waitlist.imageNotEligible,
+          imageOptions: {
+            aspectRatio: "1.91:1",
+          },
+          buttons: [
+            <Button
+              action="post"
+              key="1"
+              target={{
+                pathname: waitlist.hasCaptcha
+                  ? `/captcha/${slug}`
+                  : `/waitlists/${slug}/join`,
+                search:
+                  `${ref ? `ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
+            >
+              Try again
+            </Button>,
+            <Button action="link" key="2" target={waitlist.externalUrl}>
+              Learn more
+            </Button>,
+          ],
+        };
+      }
+    }
   }
+
   await prisma.waitlistedUser.create({
     data: userToAdd,
   });
+
   return {
     image: waitlist.imageSuccess,
     imageOptions: {
