@@ -90,7 +90,7 @@ const frameHandler = frames(async (ctx) => {
             target={{
               pathname: `/captcha/${slug}`,
               search:
-                `${ref ? `&ref=${ref}` : ""}` +
+                `${ref ? `ref=${ref}` : ""}` +
                 `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
             }}
           >
@@ -241,7 +241,7 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref ? `ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
@@ -274,7 +274,7 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref ? `ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
@@ -307,7 +307,7 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref ? `ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
