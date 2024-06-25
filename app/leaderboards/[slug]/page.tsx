@@ -2,10 +2,7 @@ import { Metadata } from "next";
 import prisma from "../../../lib/prisma";
 import Leaderboard from "../../../components/Leaderboard";
 
-const description = [
-  "BUILD is a meme and a social game designed to reward builders via",
-  "onchain nominations.",
-].join(" ");
+const description = ["Don't worry,", "Be early"].join(" ");
 
 type Props = {
   params: { slug: string };

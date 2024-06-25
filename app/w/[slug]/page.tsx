@@ -17,9 +17,11 @@ export async function generateMetadata({
   };
   searchParams: {
     ref?: string;
+    refSquared?: string;
   };
 }): Promise<Metadata> {
   const ref = searchParams.ref;
+  const refSquared = searchParams.refSquared;
   const { slug } = params;
   const waitlist = await prisma.waitlist.findUnique({
     where: {
@@ -29,6 +31,9 @@ export async function generateMetadata({
   const frameUrl = new URL(`/frames/waitlists/${slug}`, appURL());
   if (ref) {
     frameUrl.searchParams.set("ref", ref);
+  }
+  if (refSquared) {
+    frameUrl.searchParams.set("refSquared", refSquared);
   }
   return {
     title: `Beearly - ${waitlist?.name}`,

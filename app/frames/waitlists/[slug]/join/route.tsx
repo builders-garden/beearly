@@ -165,7 +165,9 @@ const frameHandler = frames(async (ctx) => {
     userToAdd = {
       ...formatAirstackUserData(farcasterProfile),
       waitlistId: waitlist.id,
-      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      referrerFid: ref && isRefInWaitlist ? parseInt(ref) : null,
+      referrerSquaredFid:
+        refSquared && isRefSquaredInWaitlist ? parseInt(refSquared) : null,
       waitlistedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),

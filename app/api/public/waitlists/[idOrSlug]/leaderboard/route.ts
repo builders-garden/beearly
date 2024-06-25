@@ -10,6 +10,82 @@ export interface LeaderboardUser {
   powerBadge: string;
 }
 
+////////////////////////////////////////////////
+
+// Punti totali Giulio: 105 = 35 + 25 + 45
+// Giulio: 35 joined
+
+// Mattia: 25 joined
+// Limone: 45 joined
+// ...
+
+// Punti totali = 35 + (25 + 45)/ratio
+// Giulio: 35 joined http://localhost:3000/w/mostro-di-scheggia?ref=4
+
+// Mattia: 25 joined
+// Limone: 45 joined
+// ...
+
+// joe = 50 + 10
+// jim = 20 + 70
+// jack = 40 + 0
+// john = 0 + 40
+
+// lista1 = [joe: 50, jim: 20, jack: 40]
+// lista2 = [joe: 1000, jim: 7000, john: 4000]
+
+// check for elements in lista2 that aren't in lista 1
+// lista1 = [joe: 50, jim: 20, jack: 40, john: 40]
+// lista2 = [joe: 10, jim: 70]
+
+// sum lista1 & lista2
+// for x in lista1
+//   for y in lista2
+//     if lista1.fid == lista2.referrerFid
+//       x += y
+
+////////////////////////////////////////////////
+// async function getLeaderboard(prisma) {
+//   // Fetch referrer counts
+//   const referrerCounts = await prisma.waitlistedUser.groupBy({
+//     by: ['referrerFid'],
+//     _count: {
+//       referrerFid: true,
+//     },
+//     where: {
+//       referrerFid: {
+//         not: null,
+//       },
+//     },
+//   });
+
+//   // Fetch referrerSquared counts and halve the counts
+//   const referrerSquaredCounts = await prisma.waitlistedUser.groupBy({
+//     by: ['referrerSquaredFid'],
+//     _count: {
+//       referrerSquaredFid: true,
+//     },
+//     where: {
+//       referrerSquaredFid: {
+//         not: null,
+//       },
+//     },
+//   }).then(results => results.map(result => ({
+//     ...result,
+//     _count: { referrerSquaredFid: result._count.referrerSquaredFid * 0.5 },
+//   })));
+
+//   // Combine counts
+//   const combinedCounts = {};
+//   referrerCounts.forEach(({ referrerFid, _count }) => {
+//     combinedCounts[referrerFid] = (_count.referrerFid || 0);
+//   });
+//   referrerSquaredCounts.forEach(({ referrerSquaredFid, _count }) => {
+//     combinedCounts[referrerSquaredFid] = (_count.referrerSquaredFid || 0) + (combinedCounts[referrerSquaredFid] || 0);
+//   });
+
+////////////////////////////////////////////////
+
 export const GET = async (
   req: NextRequest,
   { params: { idOrSlug } }: { params: { idOrSlug: string } }
@@ -56,6 +132,7 @@ export const GET = async (
     );
     return {
       referrals: referrer._count.referrerFid,
+      // referralsSquared: referrer._count.referrerSquaredFid,
       ...referrerProfile,
     };
   });
