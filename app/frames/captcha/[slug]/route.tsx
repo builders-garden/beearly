@@ -30,7 +30,10 @@ const frameHandler = frames(async (ctx) => {
   const refSquared = ctx.url.searchParams.get("refSquared");
   const fid = ctx.message.castId?.fid.toString()!;
 
-  const { id, numA, numB } = await generateCaptchaChallenge(fid, waitlist.id);
+  const { id, numA, numB } = await generateCaptchaChallenge(
+    parseInt(fid),
+    waitlist.id
+  );
   return {
     image: (
       <div tw="relative flex items-center justify-center">

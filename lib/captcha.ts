@@ -23,7 +23,7 @@ export const getCaptchaChallenge = async (id: number) => {
  * @returns The id of the new captcha challenge record created in the database and the two numbers the user needs to add
  **/
 export const generateCaptchaChallenge = async (
-  userAddress: string,
+  fid: number,
   waitlistId: number
 ) => {
   const numA = generateRandomNumberInRange(10, 20);
@@ -31,7 +31,7 @@ export const generateCaptchaChallenge = async (
   const newChallenge = await prisma.captchaChallenge.create({
     data: {
       waitlistId: waitlistId,
-      userAddress: userAddress,
+      fid: fid,
       numA: numA,
       numB: numB,
       result: numA + numB,

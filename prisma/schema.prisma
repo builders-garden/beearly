@@ -45,7 +45,7 @@ model Waitlist {
 model CaptchaChallenge {
   id         Int      @unique @default(autoincrement())
   waitlistId Int      @map("waitlist_id")
-  userAddress String
+  fid        Int
   numA       Int
   numB       Int
   result     Int
