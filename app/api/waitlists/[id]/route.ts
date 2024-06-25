@@ -47,6 +47,7 @@ export const PUT = async (
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
+  const requiredBuilderScore = body.get("requiredBuilderScore");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
@@ -177,6 +178,7 @@ export const PUT = async (
       )
     );
   }
+
   if (requiredUsersFollow?.toString()?.length! > 0) {
     const users = requiredUsersFollow
       ?.toString()
@@ -197,11 +199,24 @@ export const PUT = async (
     );
   }
 
+  if (requiredBuilderScore) {
+    await prisma.waitlistRequirement.create({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.TALENT_BUILDER_SCORE,
+        value: String(requiredBuilderScore),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
   const waitlistRequirements = await prisma.waitlistRequirement.findMany({
     where: {
       waitlistId: waitlist.id,
     },
   });
+
   return NextResponse.json({
     ...waitlist,
     waitlistRequirements,
@@ -228,5 +243,15 @@ export const DELETE = async (
       { status: 404 }
     );
   }
+
+  // delete waitlist requirements
+  await prisma.waitlistRequirement.deleteMany({
+    where: {
+      waitlistId: waitlist.id,
+    },
+  });
+
+  // Maybe we also need to delete waitlisted users?
+
   return NextResponse.json({ success: true });
 };
