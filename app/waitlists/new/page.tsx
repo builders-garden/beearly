@@ -18,6 +18,7 @@ import {
   CircleCheckBig,
   ExternalLink,
   Info,
+  InfoIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { parseAbsoluteToLocal } from "@internationalized/date";
@@ -365,27 +366,39 @@ export default function NewWaitlist() {
                     </p>
                   </div>
                 </div>
-                {
-                  // if the selected tier is available, show a message
-                  isTierAvailable ? (
-                    <div className="flex flex-row gap-2 items-center">
-                      <CircleCheckBig size={16} className="text-blue-700" />
-                      <p className="text-blue-700">Tier available</p>
+                <div className="flex flex-row justify-between">
+                  {
+                    // if the selected tier is available, show a message
+                    isTierAvailable ? (
+                      <div className="flex flex-row gap-2 items-center">
+                        <CircleCheckBig size={16} className="text-blue-700" />
+                        <p className="text-blue-700">Tier available</p>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="bg-blue-700 text-white font-semibold w-fit"
+                        onPress={confirmCheckout}
+                        isLoading={isCreateAndPayPending}
+                        isDisabled={isCreateAndPayPending}
+                      >
+                        {buttonLoadingMessage
+                          ? buttonLoadingMessage
+                          : `Pay ${selectedTierDetails?.price} to unlock`}
+                      </Button>
+                    )
+                  }
+                  <Link
+                    href="/pricing"
+                    target="_blank"
+                    className="text-black underline"
+                  >
+                    <div className="flex flex-row gap-1 items-center">
+                      <p className="text-xs">Learn more about pricing</p>
+                      <InfoIcon size={14} />
                     </div>
-                  ) : (
-                    <Button
-                      size="sm"
-                      className="bg-blue-700 text-white font-semibold w-fit"
-                      onPress={confirmCheckout}
-                      isLoading={isCreateAndPayPending}
-                      isDisabled={isCreateAndPayPending}
-                    >
-                      {buttonLoadingMessage
-                        ? buttonLoadingMessage
-                        : `Pay ${selectedTierDetails?.price} to unlock`}
-                    </Button>
-                  )
-                }
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

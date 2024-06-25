@@ -20,7 +20,7 @@ export default function Home() {
             radius="none"
           />
           <div className="text-2xl font-semibold">
-            Manage early access to your product with Frames on Farcaster
+            Easily gather early users for your product on Farcaster
           </div>
         </div>
         <div className="flex flex-row items-center gap-4">
