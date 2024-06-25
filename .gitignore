@@ -10,6 +10,9 @@
 # testing
 /coverage
 
+# vscode config file
+.vscode/settings.json
+
 # next.js
 /.next/
 /out/
