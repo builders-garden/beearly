@@ -2,8 +2,6 @@
 import { Button } from "frames.js/next";
 import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
-import { getFrameMessage } from "frames.js/getFrameMessage";
-import { createCastIntent } from "../../../../lib/warpcast";
 
 const frameHandler = frames(async (ctx) => {
   /*if (!ctx?.message?.isValid) {
@@ -39,7 +37,7 @@ const frameHandler = frames(async (ctx) => {
         target={{
           pathname: pathname,
           search:
-            `${ref ? `&ref=${ref}` : ""}` +
+            `${ref ? `ref=${ref}` : ""}` +
             `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
         }}
       >
