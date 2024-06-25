@@ -4,9 +4,6 @@ import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 
 const frameHandler = frames(async (ctx) => {
-  /*if (!ctx?.message?.isValid) {
-    throw new Error("Invalid message");
-  }*/
   const ref = ctx.url.searchParams.get("ref");
   const refSquared = ctx.url.searchParams.get("refSquared");
   const slug = ctx.url.pathname.split("/").pop();
