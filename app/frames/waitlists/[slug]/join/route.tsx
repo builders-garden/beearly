@@ -325,7 +325,6 @@ const frameHandler = frames(async (ctx) => {
       }
     }
     if (requiredBuilderScore) {
-      console.log("requiredBuilderScore: ", requiredBuilderScore.value);
       const talentPassportProfile = await getTalentPassportByWalletOrId(
         userToAdd.address
       );
