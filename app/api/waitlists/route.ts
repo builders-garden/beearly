@@ -33,6 +33,7 @@ export const POST = async (req: NextRequest) => {
   const name = body.get("name");
   const endDate = body.get("endDate");
   const hasCaptcha = body.get("hasCaptcha");
+  const requiresEmail = body.get("requiresEmail");
   const externalUrl = body.get("externalUrl");
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
@@ -117,6 +118,7 @@ export const POST = async (req: NextRequest) => {
       slug: slugName,
       endDate: new Date(endDate as string),
       hasCaptcha: hasCaptcha ? true : false,
+      requiresEmail: requiresEmail ? true : false,
       externalUrl: externalUrl as string,
       userAddress: address!,
       imageLanding: landing.url,
