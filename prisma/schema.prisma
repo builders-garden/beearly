@@ -84,6 +84,7 @@ enum WaitlistRequirementType {
   CHANNEL_FOLLOW
   USER_FOLLOW
   POWER_BADGE
+  TALENT_BUILDER_SCORE
 }
 
 model WaitlistRequirement {

@@ -37,6 +37,7 @@ export const POST = async (req: NextRequest) => {
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
+  const requiredBuilderScore = body.get("requiredBuilderScore");
   const tier = (body.get("tier") as WaitlistTier) || WaitlistTier.FREE;
 
   const address = req.headers.get("x-address");
@@ -169,6 +170,18 @@ export const POST = async (req: NextRequest) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       })),
+    });
+  }
+
+  if (requiredBuilderScore) {
+    await createWaitlistRequirement({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.TALENT_BUILDER_SCORE,
+        value: String(requiredBuilderScore),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     });
   }
 
