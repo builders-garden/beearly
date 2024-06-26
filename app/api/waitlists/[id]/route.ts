@@ -244,14 +244,5 @@ export const DELETE = async (
     );
   }
 
-  // delete waitlist requirements
-  await prisma.waitlistRequirement.deleteMany({
-    where: {
-      waitlistId: waitlist.id,
-    },
-  });
-
-  // Maybe we also need to delete waitlisted users?
-
   return NextResponse.json({ success: true });
 };
