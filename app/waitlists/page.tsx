@@ -43,9 +43,7 @@ const Waitlists = () => {
       <div className="flex flex-col gap-8">
         <div className="text-3xl font-bold">Waitlists</div>
         <div className="flex flex-col p-24 items-center justify-center gap-4">
-          <DynamicWidget
-            innerButtonComponent={<Button>Login to view your waitlists</Button>}
-          />
+          <DynamicWidget />
         </div>
       </div>
     );

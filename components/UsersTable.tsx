@@ -261,7 +261,7 @@ export const UsersTable = ({
                 className="flex flex-row gap-1 items-center cursor-pointer"
                 onClick={() => toggleOrderBy(OrderByMode.SOCIAL_CAPITAL_SCORE)}
               >
-                <div>AIRSTACK SOCIAL SCORE</div>
+                <div>SOCIAL SCORE</div>
                 {orderBy === OrderByMode.SOCIAL_CAPITAL_SCORE ? (
                   orderDirection === "asc" ? (
                     <ChevronUp size={12} />
@@ -302,7 +302,7 @@ export const UsersTable = ({
                 className="flex flex-row gap-1 items-center cursor-pointer"
                 onClick={() => toggleOrderBy(OrderByMode.SOCIAL_CAPITAL_RANK)}
               >
-                <div>AIRSTACK SOCIAL RANK</div>
+                <div>SOCIAL RANK</div>
                 {orderBy === OrderByMode.SOCIAL_CAPITAL_RANK ? (
                   orderDirection === "asc" ? (
                     <ChevronUp size={12} />
