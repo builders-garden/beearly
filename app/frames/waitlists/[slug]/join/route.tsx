@@ -68,8 +68,6 @@ const frameHandler = frames(async (ctx) => {
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
   const refSquared = ctx.url.searchParams.get("refSquared");
 
-  console.log("email: ", email);
-
   // If the waitlist requires solving a captcha, validate the user's answer
   if (waitlist.hasCaptcha) {
     if (!captchaId) {
