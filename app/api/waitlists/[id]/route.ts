@@ -45,6 +45,7 @@ export const PUT = async (
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
+  const hasCaptcha = body.get("hasCaptcha");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
   const requiredBuilderScore = body.get("requiredBuilderScore");
@@ -133,6 +134,7 @@ export const PUT = async (
       slug: slugName,
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
+      hasCaptcha: hasCaptcha?.toString() === "true",
       ...(landing.url ? { imageLanding: landing.url } : {}),
       ...(success.url ? { imageSuccess: success.url } : {}),
       ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
