@@ -587,10 +587,12 @@ export default function NewWaitlist() {
                       </Link>
                     </span>
                   </div>
+                  <PremiumRequired />
                 </div>
                 <Checkbox
                   isSelected={isBuilderScoreRequired}
                   onValueChange={setIsBuilderScoreRequired}
+                  isDisabled={selectedTier === WaitlistTier.FREE}
                 >
                   Proof of Humanity required
                 </Checkbox>

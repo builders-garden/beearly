@@ -403,10 +403,12 @@ export const EditWaitlistModal = ({
                             </Link>
                           </span>
                         </div>
+                        <PremiumRequired />
                       </div>
                       <Checkbox
                         isSelected={isBuilderScoreRequired}
                         onValueChange={setIsBuilderScoreRequired}
+                        isDisabled={waitlist.tier === "FREE"}
                       >
                         Proof of Humanity required
                       </Checkbox>
