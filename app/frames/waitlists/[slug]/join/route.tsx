@@ -326,8 +326,7 @@ const frameHandler = frames(async (ctx) => {
     }
     if (requiredBuilderScore) {
       const talentPassportProfile = await getTalentPassportByWallet(
-        ctx.message.requesterVerifiedAddresses[0] ??
-          ctx.message.requesterCustodyAddress
+        userToAdd.address
       );
 
       if (
