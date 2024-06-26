@@ -366,7 +366,7 @@ export default function NewWaitlist() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row gap-8 justify-between">
                   {
                     // if the selected tier is available, show a message
                     isTierAvailable ? (
