@@ -44,7 +44,6 @@ export const PUT = async (
   const endDate = body.get("endDate");
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
-  const hasCaptcha = body.get("hasCaptcha");
   const requiresEmail = body.get("requiresEmail");
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const hasCaptcha = body.get("hasCaptcha");
@@ -134,7 +133,6 @@ export const PUT = async (
     data: {
       name: name as string,
       slug: slugName,
-      hasCaptcha: hasCaptcha ? true : false,
       requiresEmail: requiresEmail ? true : false,
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
