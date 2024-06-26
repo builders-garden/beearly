@@ -25,10 +25,39 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
-  // Get the search params containing the user fid, ref and refSquared
+  // Get the search params containing the user fid, ref, refSquared and email
   const ref = ctx.url.searchParams.get("ref");
   const refSquared = ctx.url.searchParams.get("refSquared");
   const fid = ctx.message.castId?.fid.toString()!;
+  const email = ctx.url.searchParams.get("email") ?? ctx.message.inputText;
+
+  // If the waitlist requires the email, validate the email input
+  if (waitlist.requiresEmail) {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!email || !regex.test(email)) {
+      return {
+        image: (
+          <div tw="relative flex items-center justify-center">
+            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+          </div>
+        ),
+        buttons: [
+          <Button
+            action="post"
+            key="1"
+            target={{
+              pathname: `/waitlists/${slug}`,
+              search:
+                `${ref ? `ref=${ref}` : ""}` +
+                `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+            }}
+          >
+            🔄 Try again
+          </Button>,
+        ],
+      };
+    }
+  }
 
   const { id, numA, numB } = await generateCaptchaChallenge(
     parseInt(fid),
@@ -38,7 +67,7 @@ const frameHandler = frames(async (ctx) => {
     image: (
       <div tw="relative flex items-center justify-center">
         <img src={`${appURL()}/captcha/challenge.png`} tw="absolute" />
-        <div tw="relative z-10 flex items-center justify-center text-8xl pt-40 text-black font-bold">
+        <div tw="relative flex items-center justify-center text-8xl pt-40 text-black font-bold">
           {numA} + {numB} = ?
         </div>
       </div>
@@ -55,6 +84,7 @@ const frameHandler = frames(async (ctx) => {
           pathname: `/waitlists/${slug}/join`,
           search:
             `?id=${id}` +
+            `${email ? `&email=${email}` : ""}` +
             `${ref ? `&ref=${ref}` : ""}` +
             `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
         }}
