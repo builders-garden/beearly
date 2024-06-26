@@ -21,6 +21,7 @@ export const ReferrersTable = ({ users }: { users: LeaderboardUser[] }) => {
         <TableColumn>NAME</TableColumn>
         <TableColumn>FID</TableColumn>
         <TableColumn>#REFERRALS</TableColumn>
+        <TableColumn>#REFERRALS^2</TableColumn>
         <TableColumn>
           <div></div>
         </TableColumn>
@@ -56,6 +57,7 @@ export const ReferrersTable = ({ users }: { users: LeaderboardUser[] }) => {
             </TableCell>
             <TableCell>{user.fid}</TableCell>
             <TableCell>{user.referrals}</TableCell>
+            <TableCell>{user.referralsSquared}</TableCell>
             <TableCell>
               <Link
                 href={`https://warpcast.com/${user.username}`}
