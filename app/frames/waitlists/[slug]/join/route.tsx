@@ -63,10 +63,14 @@ const frameHandler = frames(async (ctx) => {
 
   // Get the captcha id, ref and refSquared from the search params
   const captchaId = ctx.url.searchParams.get("id");
+  const email = ctx.url.searchParams.get("email") ?? ctx.message.inputText;
   let ref =
     ctx.url.searchParams.get("ref") || ctx.message.castId?.fid.toString();
   const refSquared = ctx.url.searchParams.get("refSquared");
 
+  console.log("email: ", email);
+
+  // If the waitlist requires solving a captcha, validate the user's answer
   if (waitlist.hasCaptcha) {
     if (!captchaId) {
       // TODO: show error frame
@@ -90,6 +94,36 @@ const frameHandler = frames(async (ctx) => {
             key="1"
             target={{
               pathname: `/captcha/${slug}`,
+              search:
+                `${email ? `email=${email}` : ""}` +
+                `${ref ? `&ref=${ref}` : ""}` +
+                `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+            }}
+          >
+            🔄 Try again
+          </Button>,
+        ],
+      };
+    }
+  }
+
+  // If the waitlist requires the email, validate the email input
+  // If the waitlist has a captcha requirement, the email was already validated in the /captcha/[slug] endpoint
+  if (waitlist.requiresEmail && !waitlist.hasCaptcha) {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!email || !regex.test(email)) {
+      return {
+        image: (
+          <div tw="relative flex items-center justify-center">
+            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+          </div>
+        ),
+        buttons: [
+          <Button
+            action="post"
+            key="1"
+            target={{
+              pathname: `/waitlists/${slug}`,
               search:
                 `${ref ? `ref=${ref}` : ""}` +
                 `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
@@ -193,6 +227,7 @@ const frameHandler = frames(async (ctx) => {
     userToAdd = {
       ...existingWaitlistedUser,
       id: undefined,
+      email: email ? email : existingWaitlistedUser.email,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
       waitlistId: waitlist.id,
       waitlistedAt: new Date(),
@@ -209,6 +244,7 @@ const frameHandler = frames(async (ctx) => {
     userToAdd = {
       ...formatAirstackUserData(farcasterProfile),
       waitlistId: waitlist.id,
+      email: email ?? null,
       referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
       waitlistedAt: new Date(),
       createdAt: new Date(),
@@ -245,7 +281,8 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `ref=${ref}` : ""}` +
+                  `${email ? `email=${email}` : ""}` +
+                  `${ref ? `&ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
@@ -278,7 +315,8 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `ref=${ref}` : ""}` +
+                  `${email ? `email=${email}` : ""}` +
+                  `${ref ? `&ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
@@ -311,7 +349,8 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `ref=${ref}` : ""}` +
+                  `${email ? `email=${email}` : ""}` +
+                  `${ref ? `&ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
@@ -348,7 +387,8 @@ const frameHandler = frames(async (ctx) => {
                   ? `/captcha/${slug}`
                   : `/waitlists/${slug}/join`,
                 search:
-                  `${ref ? `ref=${ref}` : ""}` +
+                  `${email ? `email=${email}` : ""}` +
+                  `${ref ? `&ref=${ref}` : ""}` +
                   `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
               }}
             >
