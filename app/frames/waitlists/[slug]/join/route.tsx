@@ -17,7 +17,7 @@ import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
 import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
-import { getTalentPassportByWallet } from "../../../../../lib/talent";
+import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message is valid
@@ -325,7 +325,8 @@ const frameHandler = frames(async (ctx) => {
       }
     }
     if (requiredBuilderScore) {
-      const talentPassportProfile = await getTalentPassportByWallet(
+      console.log("requiredBuilderScore: ", requiredBuilderScore.value);
+      const talentPassportProfile = await getTalentPassportByWalletOrId(
         userToAdd.address
       );
 
