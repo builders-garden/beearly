@@ -34,24 +34,33 @@ interface TalentPassportUserResponse {
 }
 
 /**
- * Gets a Talent Passport User using the wallet address.
- * @param wallet - The wallet address of the Talent Passport.
+ * Gets a Talent Passport User using the wallet address or his id.
+ * @param walletOrId - A wallet address connected to the Talent Passport or the user's ID.
  * @returns The Talent Passport User or null if not found.
  **/
-export const getTalentPassportByWallet = async (
-  wallet: string
+export const getTalentPassportByWalletOrId = async (
+  walletOrId: string
 ): Promise<TalentPassportUserResponse | null> => {
+  // Try to fetch the Talent Passport User
   const response = await fetch(
-    `https://api.talentprotocol.com/api/v2/passports/${wallet}`,
+    `https://api.talentprotocol.com/api/v2/passports/${walletOrId}`,
     {
       method: "GET",
-      headers: { "X-API-KEY": process.env.TALENT_API_KEY! },
+      headers: {
+        "X-Api-Key": process.env.TALENT_API_KEY!,
+        "Content-Type": "application/json",
+      },
     }
   );
 
-  if (!response.ok) {
+  // Get the JSON response
+  const responseJson = await response.json();
+
+  // If the response is not ok or the JSON is empty, return null
+  if (!response.ok || !responseJson) {
     return null;
   }
 
-  return await response.json();
+  // Return the Talent Passport User
+  return responseJson;
 };
