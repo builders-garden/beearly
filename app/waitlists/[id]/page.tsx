@@ -53,9 +53,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
       <div className="flex flex-col gap-8">
         <div className="text-3xl font-bold">Waitlist</div>
         <div className="flex flex-col p-24 items-center justify-center gap-4">
-          <DynamicWidget
-            innerButtonComponent={<Button>You need to login first</Button>}
-          />
+          <DynamicWidget />
         </div>
       </div>
     );
