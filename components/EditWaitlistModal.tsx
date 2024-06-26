@@ -9,6 +9,7 @@ import {
   DatePicker,
   Image,
   Checkbox,
+  Link,
 } from "@nextui-org/react";
 import { Info } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -39,6 +40,13 @@ export const EditWaitlistModal = ({
     parseAbsoluteToLocal(new Date(waitlist.endDate).toISOString())
   );
   const [externalUrl, setExternalUrl] = useState<string>(waitlist.externalUrl);
+  const [hasCaptcha, setHasCaptcha] = useState<boolean>(waitlist.hasCaptcha);
+  console.log(waitlist.waitlistRequirements);
+  const [isBuilderScoreRequired, setIsBuilderScoreRequired] = useState<boolean>(
+    waitlist.waitlistRequirements!.find(
+      (r) => r.type === WaitlistRequirementType.TALENT_BUILDER_SCORE
+    )?.value === "15"
+  );
   const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>(
     waitlist.waitlistRequirements!.find(
       (r) => r.type === WaitlistRequirementType.POWER_BADGE
@@ -153,6 +161,12 @@ export const EditWaitlistModal = ({
     if (selectedFileNotEligible)
       formData.append("files[2]", selectedFileNotEligible);
     if (selectedFileClosed) formData.append("files[3]", selectedFileClosed);
+    if (hasCaptcha?.toString()) {
+      formData.append("hasCaptcha", hasCaptcha.toString());
+    }
+    if (isBuilderScoreRequired) {
+      formData.append("requiredBuilderScore", "15");
+    }
     if (isPowerBadgeRequired?.toString()) {
       formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
     }
@@ -162,6 +176,7 @@ export const EditWaitlistModal = ({
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
     }
+
     const res = await fetch(`/api/waitlists/${waitlist.id}`, {
       method: "PUT",
       body: formData,
@@ -248,18 +263,40 @@ export const EditWaitlistModal = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="text-sm text-gray-500">External url</div>
-                    <Input
-                      type="text"
-                      variant={"bordered"}
-                      value={externalUrl}
-                      onValueChange={setExternalUrl}
-                      placeholder="https://yourwebsite.xyz"
-                    />
-                    <div className="text-xs text-gray-500">
-                      This is the website you want your users to visit after
-                      being whitelist
+                  <div className="flex flex-row gap-2 w-full">
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="text-sm text-gray-500">External url</div>
+                      <Input
+                        type="text"
+                        variant={"bordered"}
+                        value={externalUrl}
+                        onValueChange={setExternalUrl}
+                        placeholder="https://yourwebsite.xyz"
+                      />
+                      <div className="text-xs text-gray-500">
+                        This is the website you want your users to visit after
+                        being whitelist
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Captcha Step
+                        </div>
+                        <PremiumRequired />
+                      </div>
+                      <Checkbox
+                        isSelected={hasCaptcha}
+                        onValueChange={setHasCaptcha}
+                        isDisabled={waitlist.tier === "FREE"}
+                      >
+                        Enable Captcha Step
+                      </Checkbox>
+
+                      <div className="text-xs text-gray-500">
+                        Users must go through a simple captcha step before
+                        joining
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -352,6 +389,32 @@ export const EditWaitlistModal = ({
                     </div>
                   </div>
                   <div className="flex flex-row gap-2 w-full">
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Proof of Humanity with{" "}
+                          <span className="underline">
+                            <Link
+                              href="https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741"
+                              target="_blank"
+                              className="underline"
+                            >
+                              Builder Score
+                            </Link>
+                          </span>
+                        </div>
+                      </div>
+                      <Checkbox
+                        isSelected={isBuilderScoreRequired}
+                        onValueChange={setIsBuilderScoreRequired}
+                      >
+                        Proof of Humanity required
+                      </Checkbox>
+                      <div className="text-xs text-gray-500">
+                        Eligibility requires a minimum Builder Score of 15,
+                        demonstrating humanity
+                      </div>
+                    </div>
                     <div className="flex flex-col gap-1 w-[50%]">
                       <div className="flex flex-row gap-1 items-center">
                         <div className="text-sm text-gray-500">Power Badge</div>
