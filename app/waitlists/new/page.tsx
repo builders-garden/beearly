@@ -130,6 +130,7 @@ export default function NewWaitlist() {
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
     useState<boolean>();
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(false);
+  const [requiresEmail, setRequiresEmail] = useState<boolean>(false);
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
   );
@@ -213,6 +214,9 @@ export default function NewWaitlist() {
     formData.append("files[3]", selectedFileClosed);
     if (hasCaptcha) {
       formData.append("hasCaptcha", hasCaptcha.toString());
+    }
+    if (requiresEmail) {
+      formData.append("requiresEmail", requiresEmail.toString());
     }
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
@@ -426,7 +430,7 @@ export default function NewWaitlist() {
                   }`}</span>
                 </div>
               </div>
-              <div className="flex flex-col gap-1 w-[50%]">
+              <div className="flex flex-col gap-1 w-[25%]">
                 <div className="text-sm text-gray-500">Closing time</div>
                 <DatePicker
                   aria-labelledby="Closing time"
@@ -442,8 +446,6 @@ export default function NewWaitlist() {
                   The time you want your waitlist to close
                 </div>
               </div>
-            </div>
-            <div className="flex flex-row gap-4 w-full">
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="text-sm text-gray-500">External url</div>
                 <Input
@@ -458,7 +460,9 @@ export default function NewWaitlist() {
                   whitelist
                 </div>
               </div>
-              <div className="flex flex-col gap-1 w-[50%]">
+            </div>
+            <div className="flex flex-row gap-4 w-full">
+              <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">Captcha Step</div>
                   <PremiumRequired />
@@ -473,6 +477,23 @@ export default function NewWaitlist() {
 
                 <div className="text-xs text-gray-500">
                   Users must go through a simple captcha step before joining
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 w-[25%]">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">Email Collection</div>
+                  <PremiumRequired />
+                </div>
+                <Checkbox
+                  isSelected={requiresEmail}
+                  onValueChange={setRequiresEmail}
+                  isDisabled={selectedTier === "FREE"}
+                >
+                  Enable Email collection
+                </Checkbox>
+
+                <div className="text-xs text-gray-500">
+                  Users must provide their email address before joining
                 </div>
               </div>
             </div>
