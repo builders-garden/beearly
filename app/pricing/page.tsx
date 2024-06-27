@@ -1,6 +1,7 @@
 import { Button, Image, Link } from "@nextui-org/react";
 import { CheckIcon, DeleteIcon, XIcon } from "lucide-react";
 import { BeearlyButton } from "../../components/BeearlyButton";
+import TierCard from "../../components/TierCard";
 
 // a page with 3 cards showing the pricing and features included in each tier
 export default function Pricing() {
@@ -12,173 +13,73 @@ export default function Pricing() {
       </div>
       <BeearlyButton link={"/waitlists/new"} text="Start now" />
       <div className="w-full flex sm:flex-row flex-col gap-4 justify-center items-center p-4 sm:p-24">
-        <div className="w-full sm:w-1/3 rounded-sm p-4 border-2 border-gray-200">
-          <div className="flex flex-col gap-4 items-center">
-            <div className="flex flex-col gap-1 items-center text-center">
-              <Image src="/bumble.svg" alt="tier-logo" className="h-8 w-8" />
-              <div className="text-xl font-bold">Bumble Bee</div>
-              <div>Just to get you started.</div>
-            </div>
-            <div className="text-3xl font-bold">FREE</div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2 items-center">
-                <CheckIcon size={20} className="text-green-500" />
-                <p>
-                  Waitlist Size: <span className="font-semibold">100</span>
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="font-semibold">
-                  Waitlist requirements options
-                </div>
-                <div className="flex flex-col gap-1 ml-4">
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <CheckIcon size={16} className="text-green-500" />
-                    <p>Channel follow</p>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <XIcon size={16} className="text-red-500" />
-                    <p className="text-gray-300">User follow</p>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <XIcon size={16} className="text-red-500" />
-                    <p className="text-gray-300">Power Badge</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <CheckIcon size={20} className="text-green-500" />
-                <p>
-                  Broadcast Direct Casts:{" "}
-                  <span className="font-semibold">1 every 24 hours</span>
-                </p>
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <XIcon size={20} className="text-red-500" />
-                <p className="text-gray-300">Export users</p>
-              </div>
-            </div>
-            <Link href={"/waitlists/new"} target="_blank">
-              <Button color="primary" variant="ghost">
-                Start now
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <div className="w-full sm:w-1/3 rounded-sm p-4 border-2 border-gray-200">
-          <div className="flex flex-col gap-4 items-center">
-            <div className="flex flex-col gap-1 items-center text-center">
-              <Image src="/honey.svg" alt="tier-logo" className="h-8 w-8" />
-              <div className="text-xl font-bold">Honey Bee</div>
-              <div>More features and bigger audience.</div>
-            </div>
-            <div className="text-3xl font-bold">25$</div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2 items-center">
-                <CheckIcon size={20} className="text-green-500" />
-                <p>
-                  Waitlist Size: <span className="font-semibold">500</span>
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="font-semibold">
-                  Waitlist requirements options
-                </div>
-                <div className="flex flex-col gap-1 ml-4">
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <CheckIcon size={16} className="text-green-500" />
-                    <p>Channel follow</p>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <CheckIcon size={16} className="text-green-500" />
-                    <p>User follow</p>
-                  </div>
-                  <div className="flex flex-row gap-2 items-center text-sm">
-                    <CheckIcon size={16} className="text-green-500" />
-                    <p>Power Badge</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <CheckIcon size={20} className="text-green-500" />
-                <p>
-                  Broadcast Direct Casts:{" "}
-                  <span className="font-semibold">1 every 12 hours</span>
-                </p>
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <CheckIcon size={20} className="text-green-500" />
-                <p>Export users</p>
-              </div>
-            </div>
-            <Link href={"/waitlists/new"} target="_blank">
-              <Button color="primary" variant="ghost">
-                Start now
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <div className="w-full sm:w-1/3 rounded-sm p-[4px] bg-gradient-to-r from-[#B80000] to-[#FF930F]">
-          <div className="bg-white rounded-sm p-4">
-            <div className="flex flex-col gap-4 items-center">
-              <div className="flex flex-col gap-1 items-center text-center">
-                <Image src="/queen.svg" alt="tier-logo" className="h-8 w-8" />
-                <div className="text-xl font-bold">Queen Bee</div>
-                <div>
-                  Fully fledged waitlist with all the features you need.
-                </div>
-              </div>
-              <div className="text-3xl font-bold">30$</div>
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2 items-center">
-                  <CheckIcon size={20} className="text-green-500" />
-                  <p>
-                    Waitlist Size:{" "}
-                    <span className="font-semibold">Unlimited ∞</span>
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="font-semibold">
-                    Waitlist requirements options
-                  </div>
-                  <div className="flex flex-col gap-1 ml-4">
-                    <div className="flex flex-row gap-2 items-center text-sm">
-                      <CheckIcon size={16} className="text-green-500" />
-                      <p>Channel follow</p>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center text-sm">
-                      <CheckIcon size={16} className="text-green-500" />
-                      <p>User follow</p>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center text-sm">
-                      <CheckIcon size={16} className="text-green-500" />
-                      <p>Power Badge</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <CheckIcon size={20} className="text-green-500" />
-                  <p>
-                    Broadcast Direct Casts:{" "}
-                    <span className="font-semibold">1 every 10 minutes</span>
-                  </p>
-                </div>
-                <div className="flex flex-row gap-2 items-center">
-                  <CheckIcon size={20} className="text-green-500" />
-                  <p>Export users</p>
-                </div>
-              </div>
-              <Link href={"/waitlists/new"} target="_blank">
-                <Button
-                  className="text-white font-semibold bg-gradient-to-r from-[#B80000] to-[#FF930F]"
-                  variant="solid"
-                >
-                  Start now
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+        <TierCard
+          tierLogo="/bumble.svg"
+          tierName="Bumble Bee"
+          description="Just to get you started."
+          price="FREE"
+          requirementsOptions={[
+            { name: "Channel follow", available: true },
+            { name: "User follow", available: false },
+            { name: "Power Badge", available: false },
+            { name: "Proof of Humanity", available: false },
+          ]}
+          spamProtectionOptions={[{ name: "Captcha", available: false }]}
+          features={[
+            { name: "Waitlist Size: 100", available: true },
+            {
+              name: "Broadcast Direct Casts: 1 every 24 hours",
+              available: true,
+            },
+            { name: "Export users", available: false },
+          ]}
+          actionLink="/waitlists/new"
+        />
+        <TierCard
+          tierLogo="/honey.svg"
+          tierName="Honey Bee"
+          description="More features and bigger audience."
+          price="25$"
+          requirementsOptions={[
+            { name: "Channel follow", available: true },
+            { name: "User follow", available: true },
+            { name: "Power Badge", available: true },
+            { name: "Proof of Humanity", available: true },
+          ]}
+          spamProtectionOptions={[{ name: "Captcha", available: true }]}
+          features={[
+            { name: "Waitlist Size: 500", available: true },
+            {
+              name: "Broadcast Direct Casts: 1 every 12 hours",
+              available: true,
+            },
+            { name: "Export users", available: true },
+          ]}
+          actionLink="/waitlists/new"
+        />
+        <TierCard
+          isTopTier={true}
+          tierLogo="/queen.svg"
+          tierName="Queen Bee"
+          description="Fully fledged waitlist with all the features you need."
+          price="30$"
+          requirementsOptions={[
+            { name: "Channel follow", available: true },
+            { name: "User follow", available: true },
+            { name: "Power Badge", available: true },
+            { name: "Proof of Humanity", available: true },
+          ]}
+          spamProtectionOptions={[{ name: "Captcha", available: true }]}
+          features={[
+            { name: "Waitlist Size: Unlimited ∞", available: true },
+            {
+              name: "Broadcast Direct Casts: 1 every 10 minutes",
+              available: true,
+            },
+            { name: "Export users", available: true },
+          ]}
+          actionLink="/waitlists/new"
+        />
       </div>
     </div>
   );

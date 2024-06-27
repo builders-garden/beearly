@@ -366,7 +366,7 @@ export default function NewWaitlist() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row gap-8 justify-between">
                   {
                     // if the selected tier is available, show a message
                     isTierAvailable ? (
@@ -572,8 +572,8 @@ export default function NewWaitlist() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-8 w-full">
-              <div className="flex flex-col gap-1">
+            <div className="flex flex-row w-full">
+              <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">
                     Proof of Humanity with{" "}
@@ -587,10 +587,12 @@ export default function NewWaitlist() {
                       </Link>
                     </span>
                   </div>
+                  <PremiumRequired />
                 </div>
                 <Checkbox
                   isSelected={isBuilderScoreRequired}
                   onValueChange={setIsBuilderScoreRequired}
+                  isDisabled={selectedTier === WaitlistTier.FREE}
                 >
                   Proof of Humanity required
                 </Checkbox>
@@ -599,7 +601,7 @@ export default function NewWaitlist() {
                   demonstrating humanity
                 </div>
               </div>
-              <div className="flex flex-col gap-1 w-[50%]">
+              <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">Power Badge</div>
                   <PremiumRequired />
