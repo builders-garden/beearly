@@ -35,16 +35,24 @@ export const GET = async (
         referrerFid: "desc",
       },
     },
-    take: limit ? parseInt(limit) : 500, // a sensible upper limit? consider we have to sort
+    take: limit ? parseInt(limit) : 500, // a sensible upper limit? because now we have to sort
     skip: page ? parseInt(page) * parseInt(limit) : 0,
   });
+
+  // Right now, score is calculated below as (sum of all referrerFid) + sqrt(sum of all referrerSquaredFid)
+  // Idea: we could instead calculate as (sum of all referrerFid) + (sum of all referrerSquaredFid * ratio)
+  // const ratio is (sum of all referrerSquaredFid) / (sum of all referrerFid)
+  // const ratio = topReferrers.reduce(
+  //   (acc, referrer) => acc + referrer._count.referrerSquaredFid,
+  //   0
+  // ) / topReferrers.reduce((acc, referrer) => acc + referrer._count.referrerFid, 0);
 
   const top10 = topReferrers
     .sort(
       (a, b) =>
         b._count.referrerFid +
-        b._count.referrerSquaredFid -
-        (a._count.referrerFid + a._count.referrerSquaredFid)
+        Math.sqrt(b._count.referrerSquaredFid) -
+        (a._count.referrerFid + Math.sqrt(a._count.referrerSquaredFid))
     )
     .slice(0, 10);
 
