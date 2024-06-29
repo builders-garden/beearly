@@ -49,15 +49,14 @@ Buying a tier unlocks the possibility to create exactly one (1) waitlist with th
 
 The tiers and their benefits are listed in the table below
 
-| | Bumble Bee ![Bumble Bee](./public/bumble.svg)
-<img src="./public/bumble.svg"> | Honey Bee | Queen Bee |
-| --------------------------------------------- | ---------------- | ---------------- | ------------------ |
-| Price | Free | 25$ | 30$ |
-| Waitlist size | 100 | 500 | Unlimited |
-| Broadcast Direct Casts | 1 every 24 hours | 1 every 12 hours | 1 every 10 minutes |
-| Export Users | ❌ | ✔️ | ✔️ |
-| Channel follow requirement | ✔️ | ✔️ | ✔️ |
-| User follow requirement | ❌ | ✔️ | ✔️ |
-| Power Badge requirement | ❌ | ✔️ | ✔️ |
-| Proof of Humanity with Talent's Builder Score | ❌ | ✔️ | ✔️ |
-| Spam protection Captcha | ❌ | ✔️ | ✔️ |
+|                                               | Bumble Bee ![Alt text](./public/bumble.svg) | Honey Bee ![Alt text](./public/honey.svg) | Queen Bee ![Alt text](./public/queen.svg) |
+| --------------------------------------------- | ------------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| Price                                         | Free                                        | 25$                                       | 30$                                       |
+| Waitlist size                                 | 100                                         | 500                                       | Unlimited                                 |
+| Broadcast Direct Casts                        | 1 every 24 hours                            | 1 every 12 hours                          | 1 every 10 minutes                        |
+| Export Users                                  | ❌                                          | ✔️                                        | ✔️                                        |
+| Channel follow requirement                    | ✔️                                          | ✔️                                        | ✔️                                        |
+| User follow requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
+| Power Badge requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
+| Proof of Humanity with Talent's Builder Score | ❌                                          | ✔️                                        | ✔️                                        |
+| Spam protection Captcha                       | ❌                                          | ✔️                                        | ✔️                                        |
