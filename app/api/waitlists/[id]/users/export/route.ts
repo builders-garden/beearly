@@ -31,6 +31,7 @@ export const GET = async (
       displayName: true,
       powerBadge: true,
       address: true,
+      email: true,
     },
   });
   const csv = ["fid,username,displayName,address,powerBadge"]
@@ -40,6 +41,7 @@ export const GET = async (
           user.fid,
           user.username.trim().replace(/\r?\n|\r/g, ""),
           user.displayName.trim().replace(/\r?\n|\r/g, ""),
+          user.email ? user.email.trim().replace(/\r?\n|\r/g, "") : "",
           user.address,
           user.powerBadge,
         ].join(",");
