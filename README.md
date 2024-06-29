@@ -38,7 +38,8 @@ From the management page you can also:
 
 Every waitlist has a leaderboard associated.\
 The leaderboard lets you see all the users that shared your frame on Farcaster and also how many people joined your waitlist thanks to them.\
-Maybe you can plan an airdrop or mint an NFT for the most industrious ones, who knows?\
+Maybe you can plan an airdrop or mint an NFT for the most industrious ones, who knows?
+
 Again, feel free to choose the purpose of this leaderboard!
 
 ## Tiers and pricing
@@ -48,14 +49,15 @@ Buying a tier unlocks the possibility to create exactly one (1) waitlist with th
 
 The tiers and their benefits are listed in the table below
 
-| /                                             | Bumble Bee       | Honey Bee        | Queen Bee          |
+| | Bumble Bee ![Bumble Bee](./public/bumble.svg)
+<img src="./public/bumble.svg"> | Honey Bee | Queen Bee |
 | --------------------------------------------- | ---------------- | ---------------- | ------------------ |
-| Price                                         | Free             | 25$              | 30$                |
-| Waitlist size                                 | 100              | 500              | Unlimited          |
-| Broadcast Direct Casts                        | 1 every 24 hours | 1 every 12 hours | 1 every 10 minutes |
-| Export Users                                  | ❌               | ✔️               | ✔️                 |
-| Channel follow requirement                    | ✔️               | ✔️               | ✔️                 |
-| User follow requirement                       | ❌               | ✔️               | ✔️                 |
-| Power Badge requirement                       | ❌               | ✔️               | ✔️                 |
-| Proof of Humanity with Talent's Builder Score | ❌               | ✔️               | ✔️                 |
-| Spam protection Captcha                       | ❌               | ✔️               | ✔️                 |
+| Price | Free | 25$ | 30$ |
+| Waitlist size | 100 | 500 | Unlimited |
+| Broadcast Direct Casts | 1 every 24 hours | 1 every 12 hours | 1 every 10 minutes |
+| Export Users | ❌ | ✔️ | ✔️ |
+| Channel follow requirement | ✔️ | ✔️ | ✔️ |
+| User follow requirement | ❌ | ✔️ | ✔️ |
+| Power Badge requirement | ❌ | ✔️ | ✔️ |
+| Proof of Humanity with Talent's Builder Score | ❌ | ✔️ | ✔️ |
+| Spam protection Captcha | ❌ | ✔️ | ✔️ |
