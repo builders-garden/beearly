@@ -34,7 +34,7 @@ export const GET = async (
       email: true,
     },
   });
-  const csv = ["fid,username,displayName,address,powerBadge"]
+  const csv = ["fid,username,displayName,email,address,powerBadge"]
     .concat(
       users.map((user) => {
         return [
