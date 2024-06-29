@@ -37,6 +37,7 @@ export const formatAirstackUserData = (user: UserProfile) => {
     | "createdAt"
     | "referrerFid"
     | "waitlistedAt"
+    | "email"
     | "updatedAt"
   > = {
     fid: parseInt(user.userId!),
