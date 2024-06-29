@@ -41,7 +41,9 @@ export const EditWaitlistModal = ({
   );
   const [externalUrl, setExternalUrl] = useState<string>(waitlist.externalUrl);
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(waitlist.hasCaptcha);
-  console.log(waitlist.waitlistRequirements);
+  const [requiresEmail, setRequiresEmail] = useState<boolean>(
+    waitlist.requiresEmail
+  );
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] = useState<boolean>(
     waitlist.waitlistRequirements!.find(
       (r) => r.type === WaitlistRequirementType.TALENT_BUILDER_SCORE
@@ -163,6 +165,9 @@ export const EditWaitlistModal = ({
     if (selectedFileClosed) formData.append("files[3]", selectedFileClosed);
     if (hasCaptcha?.toString()) {
       formData.append("hasCaptcha", hasCaptcha.toString());
+    }
+    if (requiresEmail?.toString()) {
+      formData.append("requiresEmail", requiresEmail.toString());
     }
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
@@ -296,6 +301,25 @@ export const EditWaitlistModal = ({
                       <div className="text-xs text-gray-500">
                         Users must go through a simple captcha step before
                         joining
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Email Collection
+                        </div>
+                        <PremiumRequired />
+                      </div>
+                      <Checkbox
+                        isSelected={requiresEmail}
+                        onValueChange={setRequiresEmail}
+                        isDisabled={waitlist.tier === "FREE"}
+                      >
+                        Enable Email Collection
+                      </Checkbox>
+
+                      <div className="text-xs text-gray-500">
+                        Users must provide their email address before joining
                       </div>
                     </div>
                   </div>

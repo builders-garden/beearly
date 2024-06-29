@@ -32,6 +32,7 @@ export default function Pricing() {
               available: true,
             },
             { name: "Export users", available: false },
+            { name: "Email collection", available: false },
           ]}
           actionLink="/waitlists/new"
         />
@@ -54,6 +55,7 @@ export default function Pricing() {
               available: true,
             },
             { name: "Export users", available: true },
+            { name: "Email collection", available: true },
           ]}
           actionLink="/waitlists/new"
         />
@@ -77,6 +79,7 @@ export default function Pricing() {
               available: true,
             },
             { name: "Export users", available: true },
+            { name: "Email collection", available: true },
           ]}
           actionLink="/waitlists/new"
         />

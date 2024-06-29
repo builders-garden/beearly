@@ -28,6 +28,7 @@ model Waitlist {
   endDate              DateTime              @map("end_date")
   tier                 WaitlistTier          @default(FREE)
   hasCaptcha           Boolean               @default(false) @map("has_captcha")
+  requiresEmail        Boolean               @default(false) @map("requires_email")
   imageLanding         String                @map("image_landing")
   imageSuccess         String                @map("image_success")
   imageNotEligible     String                @map("image_not_eligible")
@@ -61,6 +62,7 @@ model WaitlistedUser {
   displayName        String           @map("display_name") @db.VarChar
   username           String           @db.VarChar
   avatarUrl          String?          @map("avatar_url")
+  email              String?          @db.VarChar
   powerBadge         Boolean?         @default(false) @map("power_badge")
   socialCapitalRank  Int              @default(0) @map("social_capital_rank")
   socialCapitalScore Float            @default(0.00) @map("social_capital_score")

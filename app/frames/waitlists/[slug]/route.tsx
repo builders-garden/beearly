@@ -27,6 +27,7 @@ const frameHandler = frames(async (ctx) => {
     imageOptions: {
       aspectRatio: "1.91:1",
     },
+    textInput: waitlist.requiresEmail ? "Enter your email address" : undefined,
     buttons: [
       <Button
         action="post"
