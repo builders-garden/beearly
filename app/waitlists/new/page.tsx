@@ -324,6 +324,9 @@ export default function NewWaitlist() {
                       onClick={() => {
                         if (tier.type === WaitlistTier.FREE) {
                           setIsPowerBadgeRequired(false);
+                          setHasCaptcha(false);
+                          setRequiresEmail(false);
+                          setIsBuilderScoreRequired(false);
                           setRequiredUsersFollow("");
                         }
                         setSelectedTier(tier.type);
