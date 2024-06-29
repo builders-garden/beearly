@@ -15,6 +15,7 @@ Those requirements are pretty useful to limit bots from joining or even to creat
 The requirements you cat set are:
 
 - Solve a simple captcha step before joining
+- Insert an email address (to be collected)
 - Follow specific Farcaster channels
 - Follow specific Farcaster users
 - Have a minimum [Builder Score](https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741) (powered by Talent Protocol)
@@ -55,6 +56,7 @@ The tiers and their benefits are listed in the table below:
 | Waitlist size                                 | 100                                         | 500                                       | Unlimited                                 |
 | Broadcast Direct Casts                        | 1 every 24 hours                            | 1 every 12 hours                          | 1 every 10 minutes                        |
 | Export Users                                  | ❌                                          | ✔️                                        | ✔️                                        |
+| Email collection                              | ❌                                          | ✔️                                        | ✔️                                        |
 | Channel follow requirement                    | ✔️                                          | ✔️                                        | ✔️                                        |
 | User follow requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Power Badge requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
