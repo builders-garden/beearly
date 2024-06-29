@@ -3,7 +3,6 @@ import { Button } from "frames.js/next";
 import { frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
 import {
-  fetchFarcasterChannels,
   fetchFarcasterProfile,
   isUserFollowingUsers,
   UserProfile,
