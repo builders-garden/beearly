@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
-import { addToDCsQueue } from "../../../../../../lib/queues";
+import { addToDCsQueue, addToXMTPQueue } from "../../../../../../lib/queues";
 import { TIERS } from "../../../../../../lib/constants";
 
 export const POST = async (
@@ -55,29 +55,42 @@ export const POST = async (
     );
   }
 
-  let fidsToNotify: number[];
+  let UsersToNotify: { fid: number; address: string }[];
   if (!fids || fids[0] === "all") {
-    fidsToNotify = await prisma.waitlistedUser
-      .findMany({
-        where: {
-          waitlistId: parseInt(id),
-          ...(powerBadge && {
-            powerBadge: true,
-          }),
-        },
-        select: {
-          fid: true,
-        },
-      })
-      .then((users) => users.map((user) => user.fid));
+    UsersToNotify = await prisma.waitlistedUser.findMany({
+      where: {
+        waitlistId: parseInt(id),
+        ...(powerBadge && {
+          powerBadge: true,
+        }),
+      },
+      select: {
+        fid: true,
+        address: true,
+      },
+    });
   } else {
-    fidsToNotify = fids.map((fid: string) => parseInt(fid));
+    const fidsToNotify = fids.map((fid: string) => parseInt(fid));
+    UsersToNotify = await prisma.waitlistedUser.findMany({
+      where: {
+        waitlistId: parseInt(id),
+        fid: {
+          in: fidsToNotify,
+        },
+      },
+      select: {
+        fid: true,
+        address: true,
+      },
+    });
   }
 
   const enrichedMessage = `📢🐝\n\n"${message}"\n\nYou are receiveing this message because you joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
   try {
     await Promise.all(
-      fidsToNotify.map((fid) => addToDCsQueue({ fid, text: enrichedMessage }))
+      UsersToNotify.map((user) =>
+        addToDCsQueue({ fid: user.fid, text: enrichedMessage })
+      )
     );
   } catch (e) {
     console.error("Failed to send broadcast", e);
@@ -91,6 +104,7 @@ export const POST = async (
       }
     );
   } finally {
+    // Save the message in the database
     await prisma.waitlistMessages.create({
       data: {
         waitlistId: parseInt(id),
@@ -99,6 +113,26 @@ export const POST = async (
         updatedAt: new Date(),
       },
     });
+
+    // Send XMTP message to all the users
+    try {
+      await Promise.all(
+        UsersToNotify.map((user) =>
+          addToXMTPQueue({ address: user.address, text: enrichedMessage })
+        )
+      );
+    } catch (e) {
+      console.error("Failed to send broadcast", e);
+      return NextResponse.json(
+        {
+          message:
+            "An error occurred while sending the broadcast. Please try again later.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
   }
 
   return NextResponse.json({ success: true });
