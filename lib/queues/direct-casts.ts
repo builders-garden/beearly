@@ -16,16 +16,21 @@ export interface MessageWithFarcasterIdBody {
 export const processDC = async (job: { data: MessageWithFarcasterIdBody }) => {
   const { text, fid } = job.data;
 
-  console.log(`[dcs worker] [${Date.now()}] - new dc received. iterating.`);
+  console.log(
+    `[dcs worker] [${new Date(Date.now()).toLocaleString()}] - new dc received. iterating.`
+  );
 
   await sendDirectCast(fid, text);
 
-  console.log(`[dcs worker] [${Date.now()}] - dc job processed.`);
+  console.log(
+    `[dcs worker] [${new Date(Date.now()).toLocaleString()}] - dc job processed.`
+  );
 };
 
 if (process.env.REDIS_HOST) {
-  console.log(`[dcs worker] [${Date.now()}] - starting dcs worker.`);
-  // @ts-ignore
+  console.log(
+    `[dcs worker] [${new Date(Date.now()).toLocaleString()}] - starting dcs worker.`
+  );
   const dcsWorker = new Worker(DCS_QUEUE_NAME, processDC, {
     connection: redisConnection,
   });

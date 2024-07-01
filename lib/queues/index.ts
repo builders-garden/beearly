@@ -19,11 +19,15 @@ const XMTP_JOB_NAME = "send-xmtp";
  */
 export const addToDCsQueue = async (data: MessageWithFarcasterIdBody) => {
   if (dcsQueue) {
-    console.log(`[dcs] [${Date.now()}] - adding dc to queue.`);
+    console.log(
+      `[dcs] [${new Date(Date.now()).toLocaleString()}] - adding dc to queue.`
+    );
     await dcsQueue.add(DCS_JOB_NAME, data);
     return;
   }
-  console.log(`[dcs] [${Date.now()}] - processing dc directly.`);
+  console.log(
+    `[dcs] [${new Date(Date.now()).toLocaleString()}] - processing dc directly.`
+  );
   await processDC({ data });
 };
 
@@ -33,10 +37,14 @@ export const addToDCsQueue = async (data: MessageWithFarcasterIdBody) => {
  */
 export const addToXMTPQueue = async (data: MessageWithAddressBody) => {
   if (xmtpQueue) {
-    console.log(`[xmtp] [${Date.now()}] - adding xmtp message to queue.`);
+    console.log(
+      `[xmtp] [${new Date(Date.now()).toLocaleString()}] - adding xmtp message to queue.`
+    );
     await xmtpQueue.add(XMTP_JOB_NAME, data);
     return;
   }
-  console.log(`[xmtp] [${Date.now()}] - processing xmtp message directly.`);
+  console.log(
+    `[xmtp] [${new Date(Date.now()).toLocaleString()}] - processing xmtp message directly.`
+  );
   await processXMTPmessage({ data });
 };

@@ -19,16 +19,20 @@ export const processXMTPmessage = async (job: {
   const { address, text } = job.data;
 
   console.log(
-    `[xmtp worker] [${Date.now()}] - new xmtp job received. iterating.`
+    `[xmtp worker] [${new Date(Date.now()).toLocaleString()}] - new xmtp job received. iterating.`
   );
 
   await sendXMTPMessage(address, text);
 
-  console.log(`[xmtp worker] [${Date.now()}] - xmtp job processed.`);
+  console.log(
+    `[xmtp worker] [${new Date(Date.now()).toLocaleString()}] - xmtp job processed.`
+  );
 };
 
 if (process.env.REDIS_HOST) {
-  console.log(`[xmtp worker] [${Date.now()}] - starting xmtp worker.`);
+  console.log(
+    `[xmtp worker] [${new Date(Date.now()).toLocaleString()}] - starting xmtp worker.`
+  );
   const xmtpWorker = new Worker(XMTP_QUEUE_NAME, processXMTPmessage, {
     connection: redisConnection,
   });
