@@ -31,15 +31,17 @@ export const GET = async (
       displayName: true,
       powerBadge: true,
       address: true,
+      email: true,
     },
   });
-  const csv = ["fid,username,displayName,address,powerBadge"]
+  const csv = ["fid,username,displayName,email,address,powerBadge"]
     .concat(
       users.map((user) => {
         return [
           user.fid,
           user.username.trim().replace(/\r?\n|\r/g, ""),
           user.displayName.trim().replace(/\r?\n|\r/g, ""),
+          user.email ? user.email.trim().replace(/\r?\n|\r/g, "") : "",
           user.address,
           user.powerBadge,
         ].join(",");

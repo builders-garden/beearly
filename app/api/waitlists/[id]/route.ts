@@ -44,8 +44,9 @@ export const PUT = async (
   const endDate = body.get("endDate");
   const externalUrl = body.get("externalUrl");
   const address = req.headers.get("x-address");
-  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
+  const requiresEmail = body.get("requiresEmail");
   const hasCaptcha = body.get("hasCaptcha");
+  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
   const requiredBuilderScore = body.get("requiredBuilderScore");
@@ -132,9 +133,10 @@ export const PUT = async (
     data: {
       name: name as string,
       slug: slugName,
+      requiresEmail: requiresEmail?.toString() === "true",
+      hasCaptcha: hasCaptcha?.toString() === "true",
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
-      hasCaptcha: hasCaptcha?.toString() === "true",
       ...(landing.url ? { imageLanding: landing.url } : {}),
       ...(success.url ? { imageSuccess: success.url } : {}),
       ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
