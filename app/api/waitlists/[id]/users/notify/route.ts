@@ -74,6 +74,9 @@ export const POST = async (
     usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
+        ...(powerBadge && {
+          powerBadge: true,
+        }),
         fid: {
           in: fidsToNotify,
         },
@@ -114,7 +117,7 @@ export const POST = async (
       },
     });
 
-    // Send XMTP message to all the users
+    // Send XMTP message to all the desired users
     try {
       await Promise.all(
         usersToNotify.map((user) =>
