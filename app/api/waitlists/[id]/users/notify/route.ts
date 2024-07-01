@@ -55,9 +55,9 @@ export const POST = async (
     );
   }
 
-  let UsersToNotify: { fid: number; address: string }[];
+  let usersToNotify: { fid: number; address: string }[];
   if (!fids || fids[0] === "all") {
-    UsersToNotify = await prisma.waitlistedUser.findMany({
+    usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
         ...(powerBadge && {
@@ -71,7 +71,7 @@ export const POST = async (
     });
   } else {
     const fidsToNotify = fids.map((fid: string) => parseInt(fid));
-    UsersToNotify = await prisma.waitlistedUser.findMany({
+    usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
         fid: {
@@ -88,7 +88,7 @@ export const POST = async (
   const enrichedMessage = `📢🐝\n\n"${message}"\n\nYou are receiveing this message because you joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
   try {
     await Promise.all(
-      UsersToNotify.map((user) =>
+      usersToNotify.map((user) =>
         addToDCsQueue({ fid: user.fid, text: enrichedMessage })
       )
     );
@@ -117,7 +117,7 @@ export const POST = async (
     // Send XMTP message to all the users
     try {
       await Promise.all(
-        UsersToNotify.map((user) =>
+        usersToNotify.map((user) =>
           addToXMTPQueue({ address: user.address, text: enrichedMessage })
         )
       );
