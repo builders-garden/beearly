@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
-import { TIERS } from "../../../../../../lib/constants";
 import { publishToQstash } from "../../../../../../lib/qstash";
+import { TIERS } from "../../../../../../lib/constants";
 
 export const POST = async (
   req: NextRequest,
@@ -128,7 +128,7 @@ const notifyOnWarpcast = async (users: { fid: number }[], text: string) => {
     await Promise.all(
       users.map((user) =>
         publishToQstash(
-          `${process.env.BASE_URL}/api/qstash/workers/broadcast-dc`,
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
           { fid: user.fid, text },
           0
         )
@@ -154,7 +154,7 @@ const notifyOnXMTP = async (users: { address: string }[], text: string) => {
     await Promise.all(
       users.map((user) =>
         publishToQstash(
-          `${process.env.BASE_URL}/api/qstash/workers/broadcast-xmtp-msg`,
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
           { address: user.address, text },
           0
         )

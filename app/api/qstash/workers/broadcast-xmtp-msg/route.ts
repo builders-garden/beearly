@@ -9,6 +9,8 @@ async function handler(request: NextRequest) {
   const body: BroadcastXMTPPayload = await request.json();
   const { address, text } = body.data;
 
+  console.log("Received XMTP message broadcast request", body.data);
+
   // Try sending the XMTP message
   const response = await sendXMTPMessage(address, text);
   if (!response?.ok) {
