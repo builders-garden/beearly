@@ -1,3 +1,5 @@
 export type UsersSyncPayload = {
-  offset: number;
+  data: {
+    offset: number;
+  };
 };
