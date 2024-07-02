@@ -23,23 +23,44 @@ const createXMTPClient = async (): Promise<Client> => {
  * @param {string} recipient wallet address of the recipient
  * @param {string} text the text of the message to send
  */
-export const sendXMTPMessage = async (recipient: string, text: string) => {
+export const sendXMTPMessage = async (
+  recipient: string,
+  text: string
+): Promise<{ ok: boolean; error?: string }> => {
   const client = await createXMTPClient();
+
+  if (!client) {
+    return { ok: false, error: "Failed to create XMTP client" };
+  }
 
   const conversations = await client.conversations.list();
   const conversation = conversations.find((c) => c.peerAddress === recipient);
 
   if (conversation) {
     // send the message to the existing conversation
-    await conversation.send(text);
+    const response = await conversation.send(text);
+    if (!response || response.error) {
+      return {
+        ok: false,
+        error: "Error while sending an XMTP message: " + response.error,
+      };
+    }
+    return { ok: true };
   } else {
     // create new conversation
     const canMessage = await client.canMessage(recipient);
     if (!canMessage) {
-      throw new Error(`${recipient} cannot be messaged.`);
+      return { ok: false, error: "Cannot message the recipient" };
     }
     const newConversation =
       await client.conversations.newConversation(recipient);
-    await newConversation.send(text);
+    const response = await newConversation.send(text);
+    if (!response || response.error) {
+      return {
+        ok: false,
+        error: "Error while sending an XMTP message: " + response.error,
+      };
+    }
+    return { ok: true };
   }
 };
