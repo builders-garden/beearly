@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
-import { addToDCsQueue, addToXMTPQueue } from "../../../../../../lib/queues";
 import { TIERS } from "../../../../../../lib/constants";
+import { publishToQstash } from "../../../../../../lib/qstash";
 
 export const POST = async (
   req: NextRequest,
   { params: { id } }: { params: { id: string } }
 ) => {
+  // Get the payload from the request and extract the offset
   const body = await req.json();
   const { fids, powerBadge, message } = body;
   const waitlist = await prisma.waitlist.findUnique({
@@ -125,7 +126,13 @@ const notifyOnWarpcast = async (users: { fid: number }[], text: string) => {
   // Send Warpcast message to all the desired users
   try {
     await Promise.all(
-      users.map((user) => addToDCsQueue({ fid: user.fid, text }))
+      users.map((user) =>
+        publishToQstash(
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast-dc`,
+          { fid: user.fid, text },
+          0
+        )
+      )
     );
   } catch (e) {
     console.error("Failed to send broadcast on Warpcast", e);
@@ -145,7 +152,13 @@ const notifyOnXMTP = async (users: { address: string }[], text: string) => {
   // Send XMTP message to all the desired users
   try {
     await Promise.all(
-      users.map((user) => addToXMTPQueue({ address: user.address, text }))
+      users.map((user) =>
+        publishToQstash(
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast-xmtp-msg`,
+          { address: user.address, text },
+          0
+        )
+      )
     );
   } catch (e) {
     console.error("Failed to send broadcast on XMTP", e);
