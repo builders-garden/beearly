@@ -2,7 +2,7 @@ import { Client } from "@upstash/qstash";
 
 export async function publishToQstash(
   endpoint: string,
-  offset: number,
+  data: { [key: string]: any },
   delay: number
 ): Promise<{ response: string }> {
   // Get the Qstash client
@@ -15,7 +15,7 @@ export async function publishToQstash(
     await qstashClient.publishJSON({
       url: endpoint,
       body: {
-        offset: offset,
+        data: data,
       },
       delay: delay,
     });

@@ -14,7 +14,7 @@ export const GET = async (req: NextRequest) => {
   // Send the first payload to QStash to start sync users
   const { response } = await publishToQstash(
     `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
-    0,
+    { offset: 0 },
     0
   );
 

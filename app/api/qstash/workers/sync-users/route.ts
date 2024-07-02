@@ -13,7 +13,7 @@ import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 async function handler(request: NextRequest) {
   // Get the payload from the request and extract the offset
   const body: UsersSyncPayload = await request.json();
-  const { offset } = body;
+  const { offset } = body.data;
 
   // Declaring the batch size
   const batchSize = 400;
@@ -102,7 +102,7 @@ async function handler(request: NextRequest) {
     // Else send the next payload to QStash to continue syncing users, whatever the outcome
     const { response } = await publishToQstash(
       `${process.env.BASE_URL}/api/qstash/workers/sync-users`,
-      offset + batchSize,
+      { offset: offset + batchSize },
       delay
     );
     if (response === "ko") {

@@ -4,6 +4,11 @@ const nextConfig = {
   reactStrictMode: false,
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: "asset/resource",
+    });
+
     return config;
   },
   images: {

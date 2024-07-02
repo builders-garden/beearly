@@ -30,6 +30,7 @@
     "@upstash/qstash": "^2.5.4",
     "@vercel/kv": "^1.0.1",
     "@xmtp/frames-validator": "^0.5.0",
+    "@xmtp/xmtp-js": "9.0.0",
     "bullmq": "^5.7.12",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
