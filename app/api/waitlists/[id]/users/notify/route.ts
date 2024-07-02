@@ -37,7 +37,7 @@ export const POST = async (
   });
 
   // check if lastMessage was sent earlier than cooldown
-  if (
+  /*if (
     lastMessageSent &&
     new Date().getTime() - lastMessageSent.createdAt.getTime() <
       TIERS[waitlist.tier].broadcastDCCooldown
@@ -54,7 +54,7 @@ export const POST = async (
         status: 400,
       }
     );
-  }
+  }*/
 
   let usersToNotify: { fid: number; address: string }[];
   if (!fids || fids[0] === "all") {

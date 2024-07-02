@@ -1,5 +1,4 @@
 import { Client } from "@xmtp/xmtp-js";
-import { GrpcApiClient } from "@xmtp/grpc-api-client";
 import { Wallet } from "ethers";
 
 /**
@@ -12,7 +11,6 @@ const createXMTPClient = async (): Promise<Client> => {
 
   const client = await Client.create(wallet, {
     env: "production",
-    apiClientFactory: GrpcApiClient.fromOptions,
   });
 
   return client;

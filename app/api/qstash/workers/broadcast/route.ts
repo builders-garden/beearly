@@ -5,7 +5,6 @@ import { sendDirectCast } from "../../../../../lib/farcaster";
 import { sendXMTPMessage } from "../../../../../lib/xmtp";
 
 export async function POST(request: NextRequest) {
-  console.log("Broadcast message received");
   // Get the payload from the request and extract the fid and text
   const body: any = await request.json();
   const { fid, address, text } = body.data;
