@@ -89,12 +89,12 @@ export const POST = async (
   }
 
   const enrichedMessage = `📢🐝\n\n"${message}"\n\nYou are receiveing this message because you joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
+
   try {
-    await Promise.all(
-      usersToNotify.map((user) =>
-        addToDCsQueue({ fid: user.fid, text: enrichedMessage })
-      )
-    );
+    await Promise.all([
+      notifyOnWarpcast(usersToNotify, enrichedMessage),
+      notifyOnXMTP(usersToNotify, enrichedMessage),
+    ]);
   } catch (e) {
     console.error("Failed to send broadcast", e);
     return NextResponse.json(
@@ -116,27 +116,47 @@ export const POST = async (
         updatedAt: new Date(),
       },
     });
-
-    // Send XMTP message to all the desired users
-    try {
-      await Promise.all(
-        usersToNotify.map((user) =>
-          addToXMTPQueue({ address: user.address, text: enrichedMessage })
-        )
-      );
-    } catch (e) {
-      console.error("Failed to send broadcast", e);
-      return NextResponse.json(
-        {
-          message:
-            "An error occurred while sending the broadcast. Please try again later.",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
   }
 
   return NextResponse.json({ success: true });
+};
+
+const notifyOnWarpcast = async (users: { fid: number }[], text: string) => {
+  // Send Warpcast message to all the desired users
+  try {
+    await Promise.all(
+      users.map((user) => addToDCsQueue({ fid: user.fid, text }))
+    );
+  } catch (e) {
+    console.error("Failed to send broadcast on Warpcast", e);
+    return NextResponse.json(
+      {
+        message:
+          "An error occurred while sending the broadcast on Warpcast. Please try again later.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+};
+
+const notifyOnXMTP = async (users: { address: string }[], text: string) => {
+  // Send XMTP message to all the desired users
+  try {
+    await Promise.all(
+      users.map((user) => addToXMTPQueue({ address: user.address, text }))
+    );
+  } catch (e) {
+    console.error("Failed to send broadcast on XMTP", e);
+    return NextResponse.json(
+      {
+        message:
+          "An error occurred while sending the broadcast on XMTP. Please try again later.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 };
