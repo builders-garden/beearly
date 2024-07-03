@@ -337,6 +337,7 @@ export const UsersTable = ({
               </Tooltip>
             </div>
           </TableColumn>
+          <TableColumn>EMAIL ADDRESS</TableColumn>
           <TableColumn>
             <div
               className="flex flex-row gap-1 items-center cursor-pointer"
@@ -397,6 +398,7 @@ export const UsersTable = ({
               <TableCell>{user.followingCount}</TableCell>
               <TableCell>{user.socialCapitalScore}</TableCell>
               <TableCell>{user.socialCapitalRank}</TableCell>
+              <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.waitlistedAt).toDateString()}
               </TableCell>
