@@ -22,7 +22,10 @@ export const sendDirectCast = async (recipient: number, text: string) => {
     }),
   });
   if (!res.ok) {
-    console.error(`error sending direct cast to ${recipient}.`);
+    console.error(`error sending direct cast to ${recipient}.`, {
+      status: res.status,
+      body: await res.text(),
+    });
     return { ok: false };
   }
   console.log(`direct cast sent to ${recipient}.`);
