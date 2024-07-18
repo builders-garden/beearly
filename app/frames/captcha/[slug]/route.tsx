@@ -3,10 +3,14 @@ import { generateCaptchaChallenge } from "../../../../lib/captcha";
 import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 import { appURL } from "../../../utils";
+import { fetchFidFromAddress } from "../../../../lib/airstack";
 
 const frameHandler = frames(async (ctx) => {
-  // Check if the message is valid
-  if (!ctx?.message?.isValid) {
+  // Check if the message exists and is valid when sent from Farcaster
+  if (
+    !ctx?.message ||
+    (ctx.clientProtocol?.id === "farcaster" && !ctx?.message?.isValid)
+  ) {
     throw new Error("Invalid message");
   }
 
@@ -28,8 +32,19 @@ const frameHandler = frames(async (ctx) => {
   // Get the search params containing the user fid, ref, refSquared and email
   const ref = ctx.url.searchParams.get("ref");
   const refSquared = ctx.url.searchParams.get("refSquared");
-  const fid = ctx.message.castId?.fid.toString()!;
+  let fid = ctx.message.castId?.fid.toString()!;
   const email = ctx.url.searchParams.get("email") ?? ctx.message.inputText;
+
+  // Get the user's fid through Airstack if the call is coming from XMTP
+  if (ctx.clientProtocol?.id === "xmtp") {
+    const response = await fetchFidFromAddress(
+      ctx.message?.verifiedWalletAddress as `0x${string}`
+    );
+    if (!response) {
+      throw new Error("Address not found on Farcaster");
+    }
+    fid = response;
+  }
 
   // If the waitlist requires the email, validate the email input
   if (waitlist.requiresEmail) {
