@@ -304,3 +304,27 @@ export const searchFarcasterUsers = async (profileName: string, limit = 10) => {
   }
   return data.Socials.Social;
 };
+
+const fidFromAddressQuery = `
+query fidFromAddress ($address: Address) {
+  Socials(
+    input: {filter: {dappName: {_eq: farcaster}, userAssociatedAddresses: {_eq: $address}}, blockchain: ethereum}
+  ) {
+    Social {
+      userId
+    }
+  }
+}`;
+
+export const fetchFidFromAddress = async (address: string) => {
+  const { data, error }: ProfileQueryResponse = await fetchQuery(
+    fidFromAddressQuery,
+    {
+      address,
+    }
+  );
+  if (error || !data || !data.Socials || !data.Socials.Social) {
+    return null;
+  }
+  return data.Socials.Social[0]?.userId;
+};
