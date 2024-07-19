@@ -4,6 +4,7 @@ import { frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
 import {
   fetchFarcasterProfile,
+  fetchFidFromAddress,
   isUserFollowingUsers,
   UserProfile,
 } from "../../../../../lib/airstack";
@@ -19,8 +20,11 @@ import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 
 const frameHandler = frames(async (ctx) => {
-  // Check if the message is valid
-  if (!ctx?.message?.isValid) {
+  // Check if the message exists and is valid when sent from Farcaster
+  if (
+    !ctx?.message ||
+    (ctx.clientProtocol?.id === "farcaster" && !ctx?.message?.isValid)
+  ) {
     throw new Error("Invalid message");
   }
 
@@ -162,7 +166,18 @@ const frameHandler = frames(async (ctx) => {
   }
 
   // ALREADY WAITLISTED
-  const fid = ctx.message.requesterFid;
+  let fid: number | undefined = ctx.message.requesterFid;
+
+  // Get the user's fid through Airstack if the call is made from the XMTP protocol
+  if (ctx.clientProtocol?.id === "xmtp") {
+    const response = await fetchFidFromAddress(
+      ctx.message?.verifiedWalletAddress as `0x${string}`
+    );
+    if (!response) {
+      throw new Error("Address not found on Farcaster");
+    }
+    fid = parseInt(response);
+  }
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
       waitlistId: waitlist.id,
