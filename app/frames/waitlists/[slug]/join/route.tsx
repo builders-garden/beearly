@@ -18,6 +18,7 @@ import { TIERS } from "../../../../../lib/constants";
 import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
+import { validateReferrer } from "../../../../../lib/db/utils";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -137,35 +138,7 @@ const frameHandler = frames(async (ctx) => {
     }
   }
 
-  // In this case you are a referrer and you should be in the waitlist
-  if (ref && ref !== "1") {
-    const isWaitlistUser = await prisma.waitlistedUser.findFirst({
-      where: {
-        fid: parseInt(ref),
-      },
-    });
-    // If the referrer is not in the waitlist, we need to fetch the profile
-    if (!isWaitlistUser) {
-      const farcasterProfile = await fetchFarcasterProfile(ref);
-      if (!farcasterProfile) {
-        ref = "";
-      } else {
-        await prisma.waitlistedUser.create({
-          data: {
-            ...formatAirstackUserData(farcasterProfile),
-            waitlistId: waitlist.id,
-            fid: parseInt(ref),
-            referrerFid: null,
-            waitlistedAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      }
-    }
-  }
-
-  // ALREADY WAITLISTED
+  // Get the user's fid from the message if it exists
   let fid: number | undefined = ctx.message.requesterFid;
 
   // Get the user's fid through Airstack if the call is made from the XMTP protocol
@@ -178,6 +151,8 @@ const frameHandler = frames(async (ctx) => {
     }
     fid = parseInt(response);
   }
+
+  // Check if the user is already waitlisted, if so show the success frame and return
   const waitlistedUser = await prisma.waitlistedUser.findFirst({
     where: {
       waitlistId: waitlist.id,
@@ -212,7 +187,7 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  // WAITLIST REGISTRATIONS CLOSED
+  // If the waitlist has ended, show the error frame
   if (Date.now() > waitlist.endDate.getTime()) {
     return {
       image: waitlist.imageError,
@@ -227,7 +202,7 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
-  // Check if the user is already in the database
+  // Check if the user is already in the database (in a different waitlist)
   const existingWaitlistedUser = await prisma.waitlistedUser.findFirst({
     where: { fid: fid },
   });
@@ -240,7 +215,7 @@ const frameHandler = frames(async (ctx) => {
       ...existingWaitlistedUser,
       id: undefined,
       email: email ? email : existingWaitlistedUser.email,
-      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      referrerFid: await validateReferrer(ref, waitlist.id),
       waitlistId: waitlist.id,
       waitlistedAt: new Date(),
     };
@@ -257,7 +232,7 @@ const frameHandler = frames(async (ctx) => {
       ...formatAirstackUserData(farcasterProfile),
       waitlistId: waitlist.id,
       email: email ?? null,
-      referrerFid: ref && ref !== "1" ? parseInt(ref) : null,
+      referrerFid: await validateReferrer(ref, waitlist.id),
       waitlistedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
