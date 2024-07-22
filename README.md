@@ -29,6 +29,7 @@ From the management page you can also:
 
 - Modify the joining requirements
 - Customise the joining frame images
+- Customise the frame's join button text
 - Test the waitlist's frame before sharing it
 - Find the frame and the leaderboard's URLs
 - Broadcast Farcaster direct casts to your users
@@ -56,9 +57,9 @@ The tiers and their benefits are listed in the table below:
 | Waitlist size                                 | 100                                         | 500                                       | Unlimited                                 |
 | Broadcast Direct Casts                        | 1 every 24 hours                            | 1 every 12 hours                          | 1 every 10 minutes                        |
 | Export Users                                  | ❌                                          | ✔️                                        | ✔️                                        |
-| Email collection                              | ❌                                          | ✔️                                        | ✔️                                        |
 | Channel follow requirement                    | ✔️                                          | ✔️                                        | ✔️                                        |
 | User follow requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Power Badge requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Proof of Humanity with Talent's Builder Score | ❌                                          | ✔️                                        | ✔️                                        |
 | Spam protection Captcha                       | ❌                                          | ✔️                                        | ✔️                                        |
+| Join button custom text                       | ❌                                          | ✔️                                        | ✔️                                        |
