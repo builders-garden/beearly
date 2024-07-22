@@ -11,14 +11,12 @@ import {
   getUserWaitlists,
   getWaitlistBySlug,
   createWaitlist,
-  getUserWaitlistsCount,
 } from "../../../lib/db/waitlist";
 import {
   createWaitlistRequirements,
   createWaitlistRequirement,
 } from "../../../lib/db/waitlistRequirements";
 import prisma from "../../../lib/prisma";
-import { Check } from "lucide-react";
 import { BASE_URL } from "../../../lib/constants";
 
 export const GET = async (req: NextRequest) => {
@@ -36,6 +34,7 @@ export const POST = async (req: NextRequest) => {
   const hasCaptcha = body.get("hasCaptcha");
   const requiresEmail = body.get("requiresEmail");
   const externalUrl = body.get("externalUrl");
+  const joinButtonText = body.get("joinButtonText");
   const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
@@ -121,6 +120,7 @@ export const POST = async (req: NextRequest) => {
       requiresEmail: requiresEmail?.toString() === "true",
       hasCaptcha: hasCaptcha?.toString() === "true",
       externalUrl: externalUrl as string,
+      joinButtonText: joinButtonText as string,
       userAddress: address!,
       imageLanding: landing.url,
       imageSuccess: success.url,
