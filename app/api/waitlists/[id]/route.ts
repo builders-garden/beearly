@@ -43,6 +43,7 @@ export const PUT = async (
   const name = body.get("name");
   const endDate = body.get("endDate");
   const externalUrl = body.get("externalUrl");
+  const joinButtonText = body.get("joinButtonText");
   const address = req.headers.get("x-address");
   const requiresEmail = body.get("requiresEmail");
   const hasCaptcha = body.get("hasCaptcha");
@@ -137,6 +138,7 @@ export const PUT = async (
       hasCaptcha: hasCaptcha?.toString() === "true",
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
+      joinButtonText: joinButtonText as string,
       ...(landing.url ? { imageLanding: landing.url } : {}),
       ...(success.url ? { imageSuccess: success.url } : {}),
       ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
