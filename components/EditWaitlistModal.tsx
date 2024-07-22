@@ -7,15 +7,14 @@ import {
   Button,
   Input,
   DatePicker,
-  Image,
   Checkbox,
   Link,
 } from "@nextui-org/react";
 import { Info } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import slugify from "slugify";
 import { parseAbsoluteToLocal } from "@internationalized/date";
-import { FrameImage } from "./FrameImage";
+import { FrameImage, onSelectedImageFile } from "./FrameImage";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { BASE_FRAME_URL } from "../lib/constants";
 import { WaitlistRequirementType } from "@prisma/client";
@@ -93,42 +92,6 @@ export const EditWaitlistModal = ({
   const [uploadedClosedImage, setUploadedClosedImage] = useState<string>(
     waitlist.imageError
   );
-  const onSelectedLandingImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedLandingImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileLanding(event?.target.files[0]);
-  };
-  const onSelectedSuccessImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedSuccessImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileSuccess(event?.target.files[0]);
-  };
-  const onSelectedNotEligibleImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedNotEligibleImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileNotEligible(event?.target.files[0]);
-  };
-  const onSelectedClosedImageFile = (event: any) => {
-    if (!event?.target?.files[0]) return;
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setUploadedClosedImage(reader.result?.toString() || "");
-    });
-    reader.readAsDataURL(event.target.files[0]);
-    setSelectedFileClosed(event?.target.files[0]);
-  };
   const isDisabled =
     !name ||
     !endDate ||
@@ -338,7 +301,10 @@ export const EditWaitlistModal = ({
                       <FrameImage
                         selectedFile={selectedFileLanding!}
                         uploadedImage={uploadedLandingImage}
-                        onSelectedFile={onSelectedLandingImageFile}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedLandingImage,
+                          setSelectedFileLanding
+                        )}
                         label="Cover"
                       />
                     </div>
@@ -346,7 +312,10 @@ export const EditWaitlistModal = ({
                       <FrameImage
                         selectedFile={selectedFileSuccess!}
                         uploadedImage={uploadedSuccessImage}
-                        onSelectedFile={onSelectedSuccessImageFile}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedSuccessImage,
+                          setSelectedFileSuccess
+                        )}
                         label="Success"
                       />
                     </div>
@@ -356,7 +325,10 @@ export const EditWaitlistModal = ({
                       <FrameImage
                         selectedFile={selectedFileNotEligible!}
                         uploadedImage={uploadedNotEligibleImage}
-                        onSelectedFile={onSelectedNotEligibleImageFile}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedNotEligibleImage,
+                          setSelectedFileNotEligible
+                        )}
                         label="Not Eligible"
                       />
                     </div>
@@ -364,8 +336,11 @@ export const EditWaitlistModal = ({
                       <FrameImage
                         selectedFile={selectedFileClosed!}
                         uploadedImage={uploadedClosedImage}
-                        onSelectedFile={onSelectedClosedImageFile}
-                        label="Closed"
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedClosedImage,
+                          setSelectedFileClosed
+                        )}
+                        label="Closed (deadline or size limit)"
                       />
                     </div>
                   </div>

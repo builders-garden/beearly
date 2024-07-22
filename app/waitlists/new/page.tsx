@@ -1,20 +1,8 @@
 "use client";
-import {
-  DynamicConnectButton,
-  DynamicWidget,
-  getAuthToken,
-} from "@dynamic-labs/sdk-react-core";
-import {
-  DatePicker,
-  Checkbox,
-  Input,
-  Button,
-  Link,
-  select,
-} from "@nextui-org/react";
+import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
+import { DatePicker, Checkbox, Input, Button, Link } from "@nextui-org/react";
 import {
   AlertCircle,
-  CircleCheck,
   CircleCheckBig,
   ExternalLink,
   Info,
@@ -32,14 +20,8 @@ import {
   BASE_USDC_ADDRESS,
   BEEARLY_WALLET_ADDRESS,
 } from "../../../lib/constants";
-import {
-  Checkout,
-  CheckoutStatus,
-  Waitlist,
-  WaitlistTier,
-} from "@prisma/client";
+import { Checkout, CheckoutStatus, WaitlistTier } from "@prisma/client";
 import { Image } from "@nextui-org/react";
-import { title } from "process";
 import PremiumRequired from "../../../components/PremiumRequired";
 import { BeearlyButton } from "../../../components/BeearlyButton";
 import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
