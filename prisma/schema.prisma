@@ -29,6 +29,7 @@ model Waitlist {
   tier                 WaitlistTier          @default(FREE)
   hasCaptcha           Boolean               @default(false) @map("has_captcha")
   requiresEmail        Boolean               @default(false) @map("requires_email")
+  joinButtonText       String?               @map("join_button_text")
   imageLanding         String                @map("image_landing")
   imageSuccess         String                @map("image_success")
   imageNotEligible     String                @map("image_not_eligible")
