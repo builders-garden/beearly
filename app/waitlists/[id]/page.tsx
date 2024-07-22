@@ -1,8 +1,7 @@
 "use client";
-
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Button, Image, Spinner } from "@nextui-org/react";
-import { Waitlist, WaitlistRequirement, WaitlistedUser } from "@prisma/client";
+import { Waitlist, WaitlistRequirement } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { UsersTable } from "../../../components/UsersTable";
@@ -13,7 +12,6 @@ import {
   Edit,
   ExternalLink,
   ExternalLinkIcon,
-  Send,
 } from "lucide-react";
 import Link from "next/link";
 import { EditWaitlistModal } from "../../../components/EditWaitlistModal";
