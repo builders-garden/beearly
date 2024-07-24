@@ -39,6 +39,9 @@ export const EditWaitlistModal = ({
     parseAbsoluteToLocal(new Date(waitlist.endDate).toISOString())
   );
   const [externalUrl, setExternalUrl] = useState<string>(waitlist.externalUrl);
+  const [joinButtonText, setJoinButtonText] = useState<string>(
+    waitlist.joinButtonText || ""
+  );
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(waitlist.hasCaptcha);
   const [requiresEmail, setRequiresEmail] = useState<boolean>(
     waitlist.requiresEmail
@@ -121,6 +124,7 @@ export const EditWaitlistModal = ({
     formData.append("name", name);
     formData.append("endDate", endDate.toAbsoluteString());
     formData.append("externalUrl", externalUrl);
+    if (joinButtonText) formData.append("joinButtonText", joinButtonText);
     if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
     if (selectedFileSuccess) formData.append("files[1]", selectedFileSuccess);
     if (selectedFileNotEligible)
@@ -246,6 +250,28 @@ export const EditWaitlistModal = ({
                         being whitelist
                       </div>
                     </div>
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Custom button text
+                        </div>
+                        <PremiumRequired />
+                      </div>
+                      <Input
+                        type="text"
+                        variant={"bordered"}
+                        value={joinButtonText}
+                        onValueChange={setJoinButtonText}
+                        placeholder="Join My Waitlist, Get Access, etc."
+                        isDisabled={waitlist.tier === "FREE"}
+                      />
+                      <div className="text-xs text-gray-500">
+                        A custom text you want to see on the button that users
+                        will click to
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-2 w-full">
                     <div className="flex flex-col gap-1 w-[50%]">
                       <div className="flex flex-row gap-1 items-center">
                         <div className="text-sm text-gray-500">

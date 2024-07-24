@@ -22,6 +22,9 @@ const frameHandler = frames(async (ctx) => {
     ? `/captcha/${slug}`
     : `/waitlists/${slug}/join`;
 
+  // Get the join button text from the database, if it doesn't exist or it's empty, use the default text
+  const joinButtonText = waitlist.joinButtonText || "Join Waitlist";
+
   return {
     image: waitlist.imageLanding,
     imageOptions: {
@@ -39,7 +42,7 @@ const frameHandler = frames(async (ctx) => {
             `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
         }}
       >
-        Join Waitlist
+        {joinButtonText}
       </Button>,
     ],
   };

@@ -97,7 +97,6 @@ export default function NewWaitlist() {
     WaitlistTier.FREE
   );
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [isCopied, setIsCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [endDate, setEndDate] = useState(
@@ -106,6 +105,7 @@ export default function NewWaitlist() {
     )
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
+  const [joinButtonText, setJoinButtonText] = useState<string>("");
   const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>();
   const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>();
   const [requiredChannels, setRequiredChannels] = useState<string>();
@@ -194,6 +194,9 @@ export default function NewWaitlist() {
     formData.append("files[1]", selectedFileSuccess);
     formData.append("files[2]", selectedFileNotEligible);
     formData.append("files[3]", selectedFileClosed);
+    if (joinButtonText) {
+      formData.append("joinButtonText", joinButtonText);
+    }
     if (hasCaptcha) {
       formData.append("hasCaptcha", hasCaptcha.toString());
     }
@@ -309,6 +312,7 @@ export default function NewWaitlist() {
                           setHasCaptcha(false);
                           setRequiresEmail(false);
                           setIsBuilderScoreRequired(false);
+                          setJoinButtonText("");
                           setRequiredUsersFollow("");
                         }
                         setSelectedTier(tier.type);
@@ -393,7 +397,7 @@ export default function NewWaitlist() {
           </div>
           <div className="flex flex-col gap-2">
             <div className="font-semibold text-lg">Main details</div>
-            <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-row gap-6 w-full">
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="text-sm text-gray-500">Name</div>
                 <Input
@@ -446,7 +450,27 @@ export default function NewWaitlist() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-row gap-6 w-full">
+              <div className="flex flex-col gap-1 w-[25%]">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">
+                    Custom button text
+                  </div>
+                  <PremiumRequired />
+                </div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={joinButtonText}
+                  onValueChange={setJoinButtonText}
+                  placeholder="Join My Waitlist, Get Access, etc."
+                  isDisabled={selectedTier === WaitlistTier.FREE}
+                />
+                <div className="text-xs text-gray-500">
+                  A custom text you want to see on the button that users will
+                  click to
+                </div>
+              </div>
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">Captcha Step</div>
