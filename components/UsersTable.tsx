@@ -18,12 +18,10 @@ import {
   DropdownTrigger,
 } from "@nextui-org/react";
 import { WaitlistTier, WaitlistedUser } from "@prisma/client";
-import { count } from "console";
 import {
   ChevronDown,
   ChevronUp,
   Download,
-  ExternalLink,
   InfoIcon,
   PlusCircle,
   Send,
