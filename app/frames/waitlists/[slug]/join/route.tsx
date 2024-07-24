@@ -19,6 +19,7 @@ import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 import { validateReferrer } from "../../../../../lib/db/utils";
+import { sendDirectCast } from "../../../../../lib/farcaster";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -393,6 +394,15 @@ const frameHandler = frames(async (ctx) => {
   await prisma.waitlistedUser.create({
     data: userToAdd,
   });
+
+  // Send the user a direct cast to notify them that they have been waitlisted
+  if (appURL() !== "http://localhost:3000") {
+    const enrichedMessage = `📢🐝\n\nCongratulations!\nYou have succesfully joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
+    const response = await sendDirectCast(fid, enrichedMessage);
+    if (!response.ok) {
+      console.error("Failed to send join notification direct cast");
+    }
+  }
 
   return {
     image: waitlist.imageSuccess,
