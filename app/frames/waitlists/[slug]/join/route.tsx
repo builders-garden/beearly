@@ -49,9 +49,15 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
-  // If the waitlist is full, show the error frame
+  // If the waitlist is not in the QUEEN tier
+  // 1. Check if the waitlist is full before going further
+  // 2. Send a notification to the waitlist owner if the waitlist is exactly at 80% capacity
   if (waitlist.tier !== WaitlistTier.QUEEN) {
-    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+    const tierLimitSize = TIERS[waitlist.tier].size;
+    const currentWaitlistSize = waitlist._count.waitlistedUsers;
+
+    // If the waitlist is full, show the error frame
+    if (currentWaitlistSize >= tierLimitSize) {
       return {
         image: waitlist.imageError,
         imageOptions: {
@@ -63,6 +69,29 @@ const frameHandler = frames(async (ctx) => {
           </Button>,
         ],
       };
+    }
+    // If the waitlist is at 80% capacity, send a notification to the waitlist owner
+    else if (
+      process.env.NODE_ENV === "production" &&
+      currentWaitlistSize === Math.round(tierLimitSize * 0.8) - 1
+    ) {
+      const alertMessage = `📢🐝\n\nAlert!\nYou are receiving this message because your waitlist "${waitlist.name}" has reached 80% of its full capacity.\n\nIf you are looking for an upgrade reach out to @limone.eth or @blackicon.eth`;
+      const ownerFid = await fetchFidFromAddress(waitlist.userAddress);
+      // Send the direct cast by publishing it to Qstash if the waitlist's owner fid is found
+      if (ownerFid) {
+        const res = await publishToQstash(
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
+          { fid: ownerFid, text: alertMessage },
+          0
+        );
+        if (res.response !== "ok") {
+          console.error(
+            "Failed to send limit notification direct cast to the waitlist owner"
+          );
+        }
+      } else {
+        console.error("Owner fid not found");
+      }
     }
   }
 
