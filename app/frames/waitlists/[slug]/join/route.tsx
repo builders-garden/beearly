@@ -19,6 +19,7 @@ import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 import { validateReferrer } from "../../../../../lib/db/utils";
+import { publishToQstash } from "../../../../../lib/qstash";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -393,6 +394,20 @@ const frameHandler = frames(async (ctx) => {
   await prisma.waitlistedUser.create({
     data: userToAdd,
   });
+
+  // Send the user a direct cast to notify them that they have been waitlisted
+  if (process.env.NODE_ENV === "production") {
+    const enrichedMessage = `📢🐝\n\nCongratulations!\nYou have succesfully joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
+    // Send the direct cast by publishing it to Qstash
+    const res = await publishToQstash(
+      `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
+      { fid: fid, text: enrichedMessage },
+      0
+    );
+    if (res.response !== "ok") {
+      console.error("Failed to send join notification direct cast");
+    }
+  }
 
   return {
     image: waitlist.imageSuccess,
