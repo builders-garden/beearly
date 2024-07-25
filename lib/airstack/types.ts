@@ -504,6 +504,78 @@ export type FarcasterChannelsOutput = {
   pageInfo: Maybe<PageInfo>;
 };
 
+export type FarcasterFanTokenAuction = {
+  auctionId: Maybe<Scalars['Int']['output']>;
+  auctionSupply: Maybe<Scalars['Float']['output']>;
+  channel: Maybe<FarcasterChannel>;
+  decimals: Maybe<Scalars['Int']['output']>;
+  entityId: Scalars['String']['output'];
+  entityName: Maybe<Scalars['String']['output']>;
+  entitySymbol: Maybe<Scalars['String']['output']>;
+  entityType: FarcasterFanTokenAuctionEntityType;
+  estimatedEndTimestamp: Scalars['Time']['output'];
+  estimatedStartTimestamp: Scalars['Time']['output'];
+  launchCastUrl: Maybe<Scalars['String']['output']>;
+  minBiddingAmount: Maybe<Scalars['Float']['output']>;
+  minFundingAmount: Maybe<Scalars['Float']['output']>;
+  minPriceInMoxie: Maybe<Scalars['Float']['output']>;
+  socials: Maybe<Array<Maybe<Social>>>;
+  status: FarcasterFanTokenAuctionStatusType;
+  subjectAddress: Maybe<Scalars['String']['output']>;
+};
+
+
+export type FarcasterFanTokenAuctionSocialsArgs = {
+  input: InputMaybe<SocialsNestedInput>;
+};
+
+export enum FarcasterFanTokenAuctionEntityType {
+  Channel = 'CHANNEL',
+  Network = 'NETWORK',
+  User = 'USER'
+}
+
+export type FarcasterFanTokenAuctionEntityType_Comparator_Exp = {
+  _eq: InputMaybe<FarcasterFanTokenAuctionEntityType>;
+  _in: InputMaybe<Array<FarcasterFanTokenAuctionEntityType>>;
+};
+
+export enum FarcasterFanTokenAuctionStatusType {
+  Active = 'ACTIVE',
+  Completed = 'COMPLETED',
+  Upcoming = 'UPCOMING'
+}
+
+export type FarcasterFanTokenAuctionStatusType_Comparator_Exp = {
+  _eq: InputMaybe<FarcasterFanTokenAuctionStatusType>;
+  _in: InputMaybe<Array<FarcasterFanTokenAuctionStatusType>>;
+};
+
+export type FarcasterFanTokenAuctionsFilter = {
+  entityId: InputMaybe<String_Eq_In_Comparator_Exp>;
+  entityName: InputMaybe<String_Eq_In_Comparator_Exp>;
+  entityType: FarcasterFanTokenAuctionEntityType_Comparator_Exp;
+  status: InputMaybe<FarcasterFanTokenAuctionStatusType_Comparator_Exp>;
+};
+
+export type FarcasterFanTokenAuctionsInput = {
+  blockchain: EveryBlockchain;
+  cursor: InputMaybe<Scalars['String']['input']>;
+  filter: InputMaybe<FarcasterFanTokenAuctionsFilter>;
+  limit: InputMaybe<Scalars['Int']['input']>;
+  order: InputMaybe<Array<FarcasterFanTokenAuctionsOrderBy>>;
+};
+
+export type FarcasterFanTokenAuctionsOrderBy = {
+  estimatedEndTimestamp: InputMaybe<OrderBy>;
+  estimatedStartTimestamp: InputMaybe<OrderBy>;
+};
+
+export type FarcasterFanTokenAuctionsOutput = {
+  FarcasterFanTokenAuction: Maybe<Array<FarcasterFanTokenAuction>>;
+  pageInfo: Maybe<PageInfo>;
+};
+
 export type FarcasterFrame = {
   buttons: Maybe<Array<FrameButton>>;
   castedAtTimestamp: Maybe<Scalars['Time']['output']>;
@@ -1055,6 +1127,7 @@ export type Query = {
   FarcasterCasts: Maybe<FarcasterCastOutput>;
   FarcasterChannelParticipants: Maybe<FarcasterChannelParticipantsOutput>;
   FarcasterChannels: Maybe<FarcasterChannelsOutput>;
+  FarcasterFanTokenAuctions: Maybe<FarcasterFanTokenAuctionsOutput>;
   FarcasterQuotedRecasts: Maybe<FarcasterQuotedRecastsOutput>;
   FarcasterReactions: Maybe<FarcasterReactionsOutput>;
   FarcasterReplies: Maybe<FarcasterRepliesOutput>;
@@ -1100,6 +1173,11 @@ export type QueryFarcasterChannelParticipantsArgs = {
 
 export type QueryFarcasterChannelsArgs = {
   input: FarcasterChannelsInput;
+};
+
+
+export type QueryFarcasterFanTokenAuctionsArgs = {
+  input: FarcasterFanTokenAuctionsInput;
 };
 
 
