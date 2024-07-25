@@ -396,7 +396,7 @@ const frameHandler = frames(async (ctx) => {
   });
 
   // Send the user a direct cast to notify them that they have been waitlisted
-  if (appURL() !== "http://localhost:3000") {
+  if (process.env.NODE_ENV === "production") {
     const enrichedMessage = `📢🐝\n\nCongratulations!\nYou have succesfully joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
     const response = await sendDirectCast(fid, enrichedMessage);
     if (!response.ok) {
