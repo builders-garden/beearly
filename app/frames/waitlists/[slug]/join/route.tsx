@@ -340,19 +340,17 @@ const frameHandler = frames(async (ctx) => {
             >
               Try again
             </Button>,
-            requiredChannelsList[0] ? (
-              <Button
-                action="link"
-                key="2"
-                target={`https://warpcast.com/~/channel/${requiredChannelsList[0]}`}
-              >
-                {`Follow /${requiredChannelsList[0]}`}
-              </Button>
-            ) : null,
+            <Button
+              action="link"
+              key="2"
+              target={`https://warpcast.com/~/channel/${requiredChannelsList[0]}`}
+            >
+              {`Follow /${requiredChannelsList[0]}`}
+            </Button>,
             requiredChannelsList[1] ? (
               <Button
                 action="link"
-                key={requiredChannelsList[0] ? "3" : "2"}
+                key="3"
                 target={`https://warpcast.com/~/channel/${requiredChannelsList[1]}`}
               >
                 {`Follow /${requiredChannelsList[1]}`}
@@ -360,9 +358,7 @@ const frameHandler = frames(async (ctx) => {
             ) : null,
             <Button
               action="link"
-              key={(
-                [requiredChannelsList[0], requiredChannelsList[1]].length + 2
-              ).toString()}
+              key={requiredChannelsList[1] ? "4" : "3"}
               target={waitlist.externalUrl}
             >
               Learn more
