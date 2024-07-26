@@ -313,9 +313,10 @@ const frameHandler = frames(async (ctx) => {
       }
     }
     if (requiredChannels.length > 0) {
+      const requiredChannelsList = requiredChannels.map((r) => r.value);
       const isUserFollowingRequiredChannels = await isUserFollowingChannels(
         fid,
-        requiredChannels.map((r) => r.value)
+        requiredChannelsList
       );
       if (!isUserFollowingRequiredChannels) {
         return {
@@ -339,7 +340,27 @@ const frameHandler = frames(async (ctx) => {
             >
               Try again
             </Button>,
-            <Button action="link" key="1" target={waitlist.externalUrl}>
+            <Button
+              action="link"
+              key="2"
+              target={`https://warpcast.com/~/channel/${requiredChannelsList[0]}`}
+            >
+              {`Follow /${requiredChannelsList[0]}`}
+            </Button>,
+            requiredChannelsList[1] ? (
+              <Button
+                action="link"
+                key="3"
+                target={`https://warpcast.com/~/channel/${requiredChannelsList[1]}`}
+              >
+                {`Follow /${requiredChannelsList[1]}`}
+              </Button>
+            ) : null,
+            <Button
+              action="link"
+              key={requiredChannelsList[1] ? "4" : "3"}
+              target={waitlist.externalUrl}
+            >
               Learn more
             </Button>,
           ],
