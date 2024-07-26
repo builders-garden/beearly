@@ -132,6 +132,12 @@ export type Boolean_Comparator_Exp = {
   _eq: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type CastValue = {
+  formattedValue: Maybe<Scalars['Float']['output']>;
+  hash: Maybe<Scalars['String']['output']>;
+  rawValue: Maybe<Scalars['String']['output']>;
+};
+
 export type ConnectedAddress = {
   address: Maybe<Scalars['Address']['output']>;
   blockchain: Maybe<Scalars['String']['output']>;
@@ -316,6 +322,7 @@ export enum EveryBlockchain {
 }
 
 export type FarcasterCast = {
+  castValue: Maybe<CastValue>;
   castedAtTimestamp: Maybe<Scalars['Time']['output']>;
   castedBy: Maybe<Social>;
   channel: Maybe<FarcasterChannel>;
@@ -678,6 +685,12 @@ export type FarcasterRepliesInput = {
 export type FarcasterRepliesOutput = {
   Reply: Maybe<Array<FarcasterCast>>;
   pageInfo: Maybe<PageInfo>;
+};
+
+export type FarcasterScore = {
+  farRank: Maybe<Scalars['Int']['output']>;
+  farScore: Maybe<Scalars['Float']['output']>;
+  farScoreRaw: Maybe<Scalars['String']['output']>;
 };
 
 export type Float_Comparator_Exp = {
@@ -1366,6 +1379,7 @@ export type Social = {
   dappSlug: Maybe<SocialDappSlug>;
   /** Airstack unique dapp version number */
   dappVersion: Maybe<Scalars['String']['output']>;
+  farcasterScore: Maybe<FarcasterScore>;
   fnames: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   followerCount: Maybe<Scalars['Int']['output']>;
   followerTokenAddress: Maybe<Scalars['Address']['output']>;
@@ -1465,6 +1479,8 @@ export type SocialDappSlug_Comparator_Exp = {
 export type SocialFilter = {
   dappName: InputMaybe<SocialDappName_Comparator_Exp>;
   dappSlug: InputMaybe<SocialDappSlug_Comparator_Exp>;
+  farRank: InputMaybe<Int_Comparator_Exp>;
+  farScore: InputMaybe<Float_Comparator_Exp>;
   followerCount: InputMaybe<Int_Comparator_Exp>;
   followingCount: InputMaybe<Int_Comparator_Exp>;
   identity: InputMaybe<Identity_Comparator_Exp>;
@@ -1577,6 +1593,8 @@ export type SocialFollowingOutput = {
 };
 
 export type SocialOrderBy = {
+  farRank: InputMaybe<OrderBy>;
+  farScore: InputMaybe<OrderBy>;
   followerCount: InputMaybe<OrderBy>;
   followingCount: InputMaybe<OrderBy>;
   profileCreatedAtBlockTimestamp: InputMaybe<OrderBy>;
@@ -2000,6 +2018,8 @@ export enum TrendingBlockchain {
 
 export type TrendingCast = {
   cast: Maybe<FarcasterCast>;
+  castValueFormatted: Maybe<Scalars['Float']['output']>;
+  castValueRaw: Maybe<Scalars['String']['output']>;
   channel: Maybe<FarcasterChannel>;
   criteria: Maybe<Scalars['String']['output']>;
   criteriaCount: Maybe<Scalars['Float']['output']>;
