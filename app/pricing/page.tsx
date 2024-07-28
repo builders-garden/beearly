@@ -40,7 +40,7 @@ export default function Pricing() {
           tierLogo="/honey.svg"
           tierName="Honey Bee"
           description="More features and bigger audience."
-          price="25$"
+          price="25 USDC"
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
@@ -64,7 +64,7 @@ export default function Pricing() {
           tierLogo="/queen.svg"
           tierName="Queen Bee"
           description="Fully fledged waitlist with all the features you need."
-          price="30$"
+          price="30 USDC"
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
