@@ -41,7 +41,7 @@ const tiers = [
   },
   {
     title: "Honey Bee",
-    price: "25$",
+    price: "25 USDC",
     image: "/honey.svg",
     type: WaitlistTier.HONEY,
     waitlistSize: "500 users",
@@ -50,7 +50,7 @@ const tiers = [
   },
   {
     title: "Queen Bee",
-    price: "30$",
+    price: "30 USDC",
     image: "/queen.svg",
     type: WaitlistTier.QUEEN,
     waitlistSize: "Unlimited ∞",
