@@ -4,9 +4,8 @@ import { appURL } from "../../utils";
 import prisma from "../../../lib/prisma";
 import { redirect } from "next/navigation";
 import { BeearlyButton } from "../../../components/BeearlyButton";
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, ZapIcon } from "lucide-react";
 import { Image } from "@nextui-org/react";
-import { frame } from "framer-motion";
 
 export async function generateMetadata({
   params,
@@ -64,14 +63,27 @@ export default async function WaitlistShortPage({
   if (!waitlist) {
     return redirect("/waitlists");
   }
+
   return (
-    <div className="flex flex-col justify-center items-center gap-2">
-      <Image src={waitlist.imageLanding} alt="waitlist" />
-      <BeearlyButton
-        link={waitlist.externalUrl}
-        text="Learn more"
-        icon={<ExternalLinkIcon />}
+    <div className="flex flex-col justify-center items-center gap-2 py-5">
+      <div className="text-2xl font-bold">{waitlist.name}</div>
+      <Image
+        className="max-w-screen-lg border-medium border-default-100 my-5"
+        src={waitlist.imageLanding}
+        alt="waitlist landing image"
       />
+      <div className="flex flex-row gap-5">
+        <BeearlyButton
+          link={waitlist.externalUrl}
+          text="Learn more"
+          icon={<ExternalLinkIcon />}
+        />
+        <BeearlyButton
+          link={waitlist.externalUrl}
+          text="Join Waitlist"
+          icon={<ZapIcon />}
+        />
+      </div>
     </div>
   );
 }
