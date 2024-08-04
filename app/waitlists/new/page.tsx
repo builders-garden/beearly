@@ -1,6 +1,14 @@
 "use client";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { DatePicker, Checkbox, Input, Button, Link } from "@nextui-org/react";
+import {
+  DatePicker,
+  Checkbox,
+  Input,
+  Button,
+  Link,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
 import {
   AlertCircle,
   CircleCheckBig,
@@ -8,7 +16,7 @@ import {
   Info,
   InfoIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import slugify from "slugify";
 import {
@@ -24,10 +32,12 @@ import { Checkout, CheckoutStatus, WaitlistTier } from "@prisma/client";
 import { Image } from "@nextui-org/react";
 import PremiumRequired from "../../../components/PremiumRequired";
 import { BeearlyButton } from "../../../components/BeearlyButton";
-import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
-import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
+import _ from "lodash";
+import { getFanTokenBalances } from "../../../lib/graphql";
+import { parseUnits } from "viem";
+import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
 
 const tiers = [
   {
@@ -111,6 +121,9 @@ export default function NewWaitlist() {
   const [requiredChannels, setRequiredChannels] = useState<string>();
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
     useState<boolean>();
+  const [fanTokenType, setFanTokenType] = useState<string>("cid");
+  const [fanTokenName, setFanTokenName] = useState<string>();
+  const [fanTokenAmount, setFanTokenAmount] = useState<string>();
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(false);
   const [requiresEmail, setRequiresEmail] = useState<boolean>(false);
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
@@ -131,6 +144,7 @@ export default function NewWaitlist() {
   );
   const [uploadedClosedImage, setUploadedClosedImage] = useState<string>("");
 
+  const [tokenNotFound, setTokenNotFound] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const fetchCheckouts = useCallback(async () => {
@@ -179,7 +193,8 @@ export default function NewWaitlist() {
       !selectedFileLanding ||
       !selectedFileSuccess ||
       !selectedFileNotEligible ||
-      !selectedFileClosed
+      !selectedFileClosed ||
+      tokenNotFound
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -215,6 +230,12 @@ export default function NewWaitlist() {
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
     }
+    if (fanTokenName && fanTokenAmount) {
+      formData.append(
+        "fanTokenSymbolAndAmount",
+        fanTokenType + ":" + fanTokenName + ";" + fanTokenAmount
+      );
+    }
     try {
       const res = await fetch("/api/waitlists", {
         method: "POST",
@@ -238,6 +259,24 @@ export default function NewWaitlist() {
     }
   };
 
+  // This function is used to check if the token exists and it's debounced to avoid making too many requests
+  const debouncedCheckToken = useRef(
+    _.debounce(async (fanTokenName, fanTokenType) => {
+      const data = await getFanTokenBalances(fanTokenType + ":" + fanTokenName);
+      if (!data) {
+        setTokenNotFound(true);
+      } else {
+        setTokenNotFound(false);
+      }
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    if (fanTokenType && fanTokenName) {
+      debouncedCheckToken(fanTokenName, fanTokenType);
+    }
+  }, [fanTokenType, fanTokenName, debouncedCheckToken]);
+
   const selectedTierDetails = tiers.find((tier) => tier.type === selectedTier);
   const hasHoneyAvailable = checkouts.some(
     (checkout) => checkout.tier === WaitlistTier.HONEY
@@ -256,6 +295,7 @@ export default function NewWaitlist() {
     selectedFileLanding &&
     selectedFileSuccess &&
     selectedFileNotEligible &&
+    !tokenNotFound &&
     selectedFileClosed;
 
   const isDisabled = !isWaitlistFormValid || !isTierAvailable;
@@ -314,6 +354,9 @@ export default function NewWaitlist() {
                           setIsBuilderScoreRequired(false);
                           setJoinButtonText("");
                           setRequiredUsersFollow("");
+                          setFanTokenAmount("");
+                          setFanTokenName("");
+                          setTokenNotFound(false);
                         }
                         setSelectedTier(tier.type);
                       }}
@@ -581,6 +624,56 @@ export default function NewWaitlist() {
                 <div className="text-xs text-gray-500">
                   Comma separated list of channel IDs that the users must follow
                   to be eligible
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">Fan Token</div>
+                  <PremiumRequired />
+                  {tokenNotFound ? (
+                    <div className="text-xs text-red-700 pl-4">
+                      Token not found
+                    </div>
+                  ) : null}
+                </div>
+                <div className="flex flex-row gap-1">
+                  <Select
+                    aria-label="Fan Token"
+                    className="w-[60%]"
+                    defaultSelectedKeys="1"
+                    onChange={(e) => {
+                      setFanTokenType(e.target.value === "1" ? "cid" : "fid");
+                    }}
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  >
+                    <SelectItem key="1">Channel</SelectItem>
+                    <SelectItem key="2">User FID</SelectItem>
+                  </Select>
+                  <Input
+                    type="text"
+                    variant={"bordered"}
+                    value={fanTokenName}
+                    onValueChange={async (e) => {
+                      setFanTokenName(e);
+                    }}
+                    placeholder="Channel Name, User FID"
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                  <Input
+                    className="w-[80%]"
+                    type="Number"
+                    variant={"bordered"}
+                    value={fanTokenAmount}
+                    onValueChange={(e) => {
+                      setFanTokenAmount(e);
+                    }}
+                    placeholder="amount"
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                </div>
+                <div className="text-xs text-gray-500">
+                  A channel or user fan token and the amount required to be
+                  eligible to join the waitlist
                 </div>
               </div>
               <div className="flex flex-col gap-1">
