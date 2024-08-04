@@ -122,8 +122,8 @@ export default function NewWaitlist() {
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
     useState<boolean>();
   const [fanTokenType, setFanTokenType] = useState<string>("cid");
-  const [fanTokenName, setFanTokenName] = useState<string>();
-  const [fanTokenAmount, setFanTokenAmount] = useState<string>();
+  const [fanTokenName, setFanTokenName] = useState<string>("");
+  const [fanTokenAmount, setFanTokenAmount] = useState<string>("");
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(false);
   const [requiresEmail, setRequiresEmail] = useState<boolean>(false);
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
@@ -193,8 +193,7 @@ export default function NewWaitlist() {
       !selectedFileLanding ||
       !selectedFileSuccess ||
       !selectedFileNotEligible ||
-      !selectedFileClosed ||
-      tokenNotFound
+      !selectedFileClosed
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -230,10 +229,16 @@ export default function NewWaitlist() {
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
     }
-    if (fanTokenName && fanTokenAmount) {
+    if (fanTokenType && fanTokenName && !tokenNotFound) {
       formData.append(
         "fanTokenSymbolAndAmount",
-        fanTokenType + ":" + fanTokenName + ";" + fanTokenAmount
+        fanTokenType +
+          ":" +
+          fanTokenName +
+          ";" +
+          (fanTokenAmount && parseFloat(fanTokenAmount) > 0
+            ? fanTokenAmount
+            : "0")
       );
     }
     try {
@@ -262,6 +267,10 @@ export default function NewWaitlist() {
   // This function is used to check if the token exists and it's debounced to avoid making too many requests
   const debouncedCheckToken = useRef(
     _.debounce(async (fanTokenName, fanTokenType) => {
+      if (!fanTokenType || !fanTokenName) {
+        setTokenNotFound(false);
+        return;
+      }
       const data = await getFanTokenBalances(fanTokenType + ":" + fanTokenName);
       if (!data) {
         setTokenNotFound(true);
@@ -272,9 +281,7 @@ export default function NewWaitlist() {
   ).current;
 
   useEffect(() => {
-    if (fanTokenType && fanTokenName) {
-      debouncedCheckToken(fanTokenName, fanTokenType);
-    }
+    debouncedCheckToken(fanTokenName, fanTokenType);
   }, [fanTokenType, fanTokenName, debouncedCheckToken]);
 
   const selectedTierDetails = tiers.find((tier) => tier.type === selectedTier);
@@ -295,7 +302,6 @@ export default function NewWaitlist() {
     selectedFileLanding &&
     selectedFileSuccess &&
     selectedFileNotEligible &&
-    !tokenNotFound &&
     selectedFileClosed;
 
   const isDisabled = !isWaitlistFormValid || !isTierAvailable;
@@ -642,7 +648,10 @@ export default function NewWaitlist() {
                     className="w-[60%]"
                     defaultSelectedKeys="1"
                     onChange={(e) => {
-                      setFanTokenType(e.target.value === "1" ? "cid" : "fid");
+                      const newValue = e.target.value;
+                      setFanTokenType(
+                        newValue === "1" ? "cid" : newValue === "2" ? "fid" : ""
+                      );
                     }}
                     isDisabled={selectedTier === WaitlistTier.FREE}
                   >
@@ -662,6 +671,7 @@ export default function NewWaitlist() {
                   <Input
                     className="w-[80%]"
                     type="Number"
+                    min={0}
                     variant={"bordered"}
                     value={fanTokenAmount}
                     onValueChange={(e) => {
