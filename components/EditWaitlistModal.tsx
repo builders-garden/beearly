@@ -62,7 +62,7 @@ export const EditWaitlistModal = ({
     )
     ?.value.split(";");
 
-  const type = fanTokenSymbolAndAmount?.[0]?.split(":")[0] ?? "";
+  const type = fanTokenSymbolAndAmount?.[0]?.split(":")[0] ?? "cid";
   const tokenName = fanTokenSymbolAndAmount?.[0]?.split(":")[1] ?? "";
   const amount = fanTokenSymbolAndAmount?.[1] ?? "";
 
