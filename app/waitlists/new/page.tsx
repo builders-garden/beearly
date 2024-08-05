@@ -665,7 +665,13 @@ export default function NewWaitlist() {
                     onValueChange={async (e) => {
                       setFanTokenName(e);
                     }}
-                    placeholder="Channel Name, User FID"
+                    placeholder={
+                      fanTokenType === "cid"
+                        ? "Channel ID (e.g. farcaster)"
+                        : fanTokenType === "fid"
+                          ? "User FID (e.g. 3)"
+                          : "User FID or Channel ID"
+                    }
                     isDisabled={selectedTier === WaitlistTier.FREE}
                   />
                   <Input
