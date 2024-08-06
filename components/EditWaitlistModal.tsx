@@ -9,9 +9,11 @@ import {
   DatePicker,
   Checkbox,
   Link,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { Info } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import slugify from "slugify";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import { FrameImage, onSelectedImageFile } from "./FrameImage";
@@ -21,6 +23,8 @@ import { WaitlistRequirementType } from "@prisma/client";
 import { BeearlyButton } from "./BeearlyButton";
 import { WaitlistWithRequirements } from "./WaitlistDetail";
 import PremiumRequired from "./PremiumRequired";
+import { getFanTokenBalances } from "../lib/graphql";
+import _ from "lodash";
 
 export const EditWaitlistModal = ({
   waitlist,
@@ -51,6 +55,23 @@ export const EditWaitlistModal = ({
       (r) => r.type === WaitlistRequirementType.TALENT_BUILDER_SCORE
     )?.value === "15"
   );
+
+  const fanTokenSymbolAndAmount: string[] | undefined = waitlist
+    .waitlistRequirements!.find(
+      (r) => r.type === WaitlistRequirementType.FAN_TOKEN_BALANCE
+    )
+    ?.value.split(";");
+
+  const type = fanTokenSymbolAndAmount?.[0]?.split(":")[0] ?? "cid";
+  const tokenName = fanTokenSymbolAndAmount?.[0]?.split(":")[1] ?? "";
+  const amount = fanTokenSymbolAndAmount?.[1] ?? "";
+
+  const [fanTokenType, setFanTokenType] = useState<string>(type);
+  const [fanTokenName, setFanTokenName] = useState<string>(tokenName);
+  const [fanTokenAmount, setFanTokenAmount] = useState<string>(amount);
+
+  const [tokenNotFound, setTokenNotFound] = useState<boolean>(false);
+
   const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>(
     waitlist.waitlistRequirements!.find(
       (r) => r.type === WaitlistRequirementType.POWER_BADGE
@@ -148,6 +169,18 @@ export const EditWaitlistModal = ({
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
     }
+    if (fanTokenType && fanTokenName && !tokenNotFound) {
+      formData.append(
+        "fanTokenSymbolAndAmount",
+        fanTokenType +
+          ":" +
+          fanTokenName +
+          ";" +
+          (fanTokenAmount && parseFloat(fanTokenAmount) > 0
+            ? fanTokenAmount
+            : "0")
+      );
+    }
 
     const res = await fetch(`/api/waitlists/${waitlist.id}`, {
       method: "PUT",
@@ -166,6 +199,26 @@ export const EditWaitlistModal = ({
     }
     setLoading(false);
   };
+
+  // This function is used to check if the token exists and it's debounced to avoid making too many requests
+  const debouncedCheckToken = useRef(
+    _.debounce(async (fanTokenName, fanTokenType) => {
+      if (!fanTokenType || !fanTokenName) {
+        setTokenNotFound(false);
+        return;
+      }
+      const data = await getFanTokenBalances(fanTokenType + ":" + fanTokenName);
+      if (!data) {
+        setTokenNotFound(true);
+      } else {
+        setTokenNotFound(false);
+      }
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    debouncedCheckToken(fanTokenName, fanTokenType);
+  }, [fanTokenType, fanTokenName, debouncedCheckToken]);
 
   return (
     <Modal
@@ -411,6 +464,70 @@ export const EditWaitlistModal = ({
                         Comma separated list of usernames that the users must
                         follow to be eligible
                       </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex flex-row gap-1 items-center">
+                      <div className="text-sm text-gray-500">Fan Token</div>
+                      <PremiumRequired />
+                      {tokenNotFound ? (
+                        <div className="text-xs text-red-700 pl-4">
+                          Token not found
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-row gap-1">
+                      <Select
+                        aria-label="Fan Token"
+                        className="w-[60%]"
+                        defaultSelectedKeys={fanTokenType === "fid" ? "2" : "1"}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          setFanTokenType(
+                            newValue === "1"
+                              ? "cid"
+                              : newValue === "2"
+                                ? "fid"
+                                : ""
+                          );
+                        }}
+                        isDisabled={waitlist.tier === "FREE"}
+                      >
+                        <SelectItem key="1">Channel</SelectItem>
+                        <SelectItem key="2">User FID</SelectItem>
+                      </Select>
+                      <Input
+                        type="text"
+                        variant={"bordered"}
+                        value={fanTokenName}
+                        onValueChange={async (e) => {
+                          setFanTokenName(e);
+                        }}
+                        placeholder={
+                          fanTokenType === "cid"
+                            ? "Channel ID (e.g. farcaster)"
+                            : fanTokenType === "fid"
+                              ? "User FID (e.g. 3)"
+                              : "User FID or Channel ID"
+                        }
+                        isDisabled={waitlist.tier === "FREE"}
+                      />
+                      <Input
+                        className="w-[80%]"
+                        type="Number"
+                        min={0}
+                        variant={"bordered"}
+                        value={fanTokenAmount}
+                        onValueChange={(e) => {
+                          setFanTokenAmount(e);
+                        }}
+                        placeholder="amount"
+                        isDisabled={waitlist.tier === "FREE"}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      A channel or user fan token and the amount required to be
+                      eligible to join the waitlist
                     </div>
                   </div>
                   <div className="flex flex-row gap-2 w-full">

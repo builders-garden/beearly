@@ -317,6 +317,13 @@ export type DomainsOutput = {
   pageInfo: Maybe<PageInfo>;
 };
 
+export enum EarnerType {
+  ChannelFans = 'CHANNEL_FANS',
+  Creator = 'CREATOR',
+  CreatorFans = 'CREATOR_FANS',
+  Network = 'NETWORK'
+}
+
 export enum EveryBlockchain {
   All = 'ALL'
 }
@@ -332,6 +339,8 @@ export type FarcasterCast = {
   hash: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['String']['output']>;
   mentions: Maybe<Array<Mentions>>;
+  moxieEarningsSplit: Maybe<Array<Maybe<MoxieEarningsSplit>>>;
+  notaTokenEarned: Maybe<SocialCapitalValue>;
   numberOfLikes: Maybe<Scalars['Int']['output']>;
   numberOfRecasts: Maybe<Scalars['Int']['output']>;
   numberOfReplies: Maybe<Scalars['Int']['output']>;
@@ -568,7 +577,7 @@ export type FarcasterFanTokenAuctionsFilter = {
 export type FarcasterFanTokenAuctionsInput = {
   blockchain: EveryBlockchain;
   cursor: InputMaybe<Scalars['String']['input']>;
-  filter: InputMaybe<FarcasterFanTokenAuctionsFilter>;
+  filter: FarcasterFanTokenAuctionsFilter;
   limit: InputMaybe<Scalars['Int']['input']>;
   order: InputMaybe<Array<FarcasterFanTokenAuctionsOrderBy>>;
 };
@@ -613,6 +622,135 @@ export type FarcasterFrameMessageOutput = {
   messageByte: Maybe<Scalars['String']['output']>;
   messageRaw: Maybe<Scalars['Map']['output']>;
 };
+
+export type FarcasterMoxieEarningStat = {
+  allEarningsAmount: Maybe<Scalars['Float']['output']>;
+  allEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  castEarningsAmount: Maybe<Scalars['Float']['output']>;
+  castEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  channel: Maybe<FarcasterChannel>;
+  endTimestamp: Scalars['Time']['output'];
+  entityId: Scalars['String']['output'];
+  entityType: FarcasterMoxieEarningStatsEntityType;
+  frameDevEarningsAmount: Maybe<Scalars['Float']['output']>;
+  frameDevEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  otherEarningsAmount: Maybe<Scalars['Float']['output']>;
+  otherEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  socials: Maybe<Array<Maybe<Social>>>;
+  startTimestamp: Scalars['Time']['output'];
+  timeframe: FarcasterMoxieEarningStatsTimeframe;
+};
+
+
+export type FarcasterMoxieEarningStatSocialsArgs = {
+  input: InputMaybe<SocialsNestedInput>;
+};
+
+export enum FarcasterMoxieEarningStatsEntityType {
+  Channel = 'CHANNEL',
+  Network = 'NETWORK',
+  User = 'USER'
+}
+
+export type FarcasterMoxieEarningStatsEntityType_Comparator_Exp = {
+  _eq: InputMaybe<FarcasterMoxieEarningStatsEntityType>;
+  _in: InputMaybe<Array<FarcasterMoxieEarningStatsEntityType>>;
+};
+
+export type FarcasterMoxieEarningStatsFilter = {
+  entityId: InputMaybe<String_Eq_In_Comparator_Exp>;
+  entityType: FarcasterMoxieEarningStatsEntityType_Comparator_Exp;
+};
+
+export type FarcasterMoxieEarningStatsInput = {
+  blockchain: EveryBlockchain;
+  cursor: InputMaybe<Scalars['String']['input']>;
+  filter: FarcasterMoxieEarningStatsFilter;
+  limit: InputMaybe<Scalars['Int']['input']>;
+  order: InputMaybe<Array<FarcasterMoxieEarningStatsOrderBy>>;
+  timeframe: FarcasterMoxieEarningStatsTimeframe;
+};
+
+export type FarcasterMoxieEarningStatsOrderBy = {
+  allEarnings: InputMaybe<OrderBy>;
+  castEarnings: InputMaybe<OrderBy>;
+  frameDevEarnings: InputMaybe<OrderBy>;
+  otherEarnings: InputMaybe<OrderBy>;
+};
+
+export type FarcasterMoxieEarningStatsOutput = {
+  FarcasterMoxieEarningStat: Maybe<Array<FarcasterMoxieEarningStat>>;
+  pageInfo: Maybe<PageInfo>;
+};
+
+export enum FarcasterMoxieEarningStatsTimeframe {
+  Lifetime = 'LIFETIME',
+  Today = 'TODAY',
+  Weekly = 'WEEKLY'
+}
+
+export type FarcasterNotaEarningStat = {
+  allEarningsAmount: Maybe<Scalars['Float']['output']>;
+  allEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  castEarningsAmount: Maybe<Scalars['Float']['output']>;
+  castEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  channel: Maybe<FarcasterChannel>;
+  endTimestamp: Scalars['Time']['output'];
+  entityId: Scalars['String']['output'];
+  entityType: FarcasterFanTokenAuctionEntityType;
+  frameDevEarningsAmount: Maybe<Scalars['Float']['output']>;
+  frameDevEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  otherEarningsAmount: Maybe<Scalars['Float']['output']>;
+  otherEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  socials: Maybe<Array<Maybe<Social>>>;
+  startTimestamp: Scalars['Time']['output'];
+  timeframe: FarcasterNotaEarningStatsTimeframe;
+};
+
+
+export type FarcasterNotaEarningStatSocialsArgs = {
+  input: InputMaybe<SocialsNestedInput>;
+};
+
+export enum FarcasterNotaEarningStatsEntityType {
+  Channel = 'CHANNEL',
+  User = 'USER'
+}
+
+export type FarcasterNotaEarningStatsEntityType_Comparator_Exp = {
+  _eq: InputMaybe<FarcasterNotaEarningStatsEntityType>;
+  _in: InputMaybe<Array<FarcasterNotaEarningStatsEntityType>>;
+};
+
+export type FarcasterNotaEarningStatsFilter = {
+  entityId: InputMaybe<String_Eq_In_Comparator_Exp>;
+  entityType: FarcasterNotaEarningStatsEntityType_Comparator_Exp;
+};
+
+export type FarcasterNotaEarningStatsInput = {
+  blockchain: EveryBlockchain;
+  cursor: InputMaybe<Scalars['String']['input']>;
+  filter: FarcasterNotaEarningStatsFilter;
+  limit: InputMaybe<Scalars['Int']['input']>;
+  order: InputMaybe<Array<FarcasterNotaEarningStatsOrderBy>>;
+  timeframe: FarcasterNotaEarningStatsTimeframe;
+};
+
+export type FarcasterNotaEarningStatsOrderBy = {
+  allEarnings: InputMaybe<OrderBy>;
+  castEarnings: InputMaybe<OrderBy>;
+  frameDevEarnings: InputMaybe<OrderBy>;
+  otherEarnings: InputMaybe<OrderBy>;
+};
+
+export type FarcasterNotaEarningStatsOutput = {
+  FarcasterNotaEarningStat: Maybe<Array<FarcasterNotaEarningStat>>;
+  pageInfo: Maybe<PageInfo>;
+};
+
+export enum FarcasterNotaEarningStatsTimeframe {
+  Lifetime = 'LIFETIME'
+}
 
 export type FarcasterQuotedRecastsFilter = {
   parentCastedBy: InputMaybe<Identity_Comparator_Exp>;
@@ -803,6 +941,12 @@ export type Mentions = {
   fid: Maybe<Scalars['String']['output']>;
   position: Maybe<Scalars['Int']['output']>;
   profile: Maybe<Social>;
+};
+
+export type MoxieEarningsSplit = {
+  earnerType: EarnerType;
+  earningsAmount: Maybe<Scalars['Float']['output']>;
+  earningsAmountInWei: Maybe<Scalars['String']['output']>;
 };
 
 export type NativeBalance = {
@@ -1141,6 +1285,8 @@ export type Query = {
   FarcasterChannelParticipants: Maybe<FarcasterChannelParticipantsOutput>;
   FarcasterChannels: Maybe<FarcasterChannelsOutput>;
   FarcasterFanTokenAuctions: Maybe<FarcasterFanTokenAuctionsOutput>;
+  FarcasterMoxieEarningStats: Maybe<FarcasterMoxieEarningStatsOutput>;
+  FarcasterNotaEarningStats: Maybe<FarcasterNotaEarningStatsOutput>;
   FarcasterQuotedRecasts: Maybe<FarcasterQuotedRecastsOutput>;
   FarcasterReactions: Maybe<FarcasterReactionsOutput>;
   FarcasterReplies: Maybe<FarcasterRepliesOutput>;
@@ -1191,6 +1337,16 @@ export type QueryFarcasterChannelsArgs = {
 
 export type QueryFarcasterFanTokenAuctionsArgs = {
   input: FarcasterFanTokenAuctionsInput;
+};
+
+
+export type QueryFarcasterMoxieEarningStatsArgs = {
+  input: FarcasterMoxieEarningStatsInput;
+};
+
+
+export type QueryFarcasterNotaEarningStatsArgs = {
+  input: FarcasterNotaEarningStatsInput;
 };
 
 
@@ -2199,7 +2355,6 @@ export type TrendingTokensInput = {
   cursor: InputMaybe<Scalars['String']['input']>;
   filter: InputMaybe<TrendingTokensFilter>;
   limit: InputMaybe<Scalars['Int']['input']>;
-  swappable: InputMaybe<Boolean_Comparator_Exp>;
   timeFrame: TimeFrame;
   transferType: TrendingTokensTransferType;
 };

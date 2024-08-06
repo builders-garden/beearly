@@ -39,6 +39,7 @@ export const POST = async (req: NextRequest) => {
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
   const requiredBuilderScore = body.get("requiredBuilderScore");
+  const fanTokenSymbolAndAmount = body.get("fanTokenSymbolAndAmount");
   const tier = (body.get("tier") as WaitlistTier) || WaitlistTier.FREE;
 
   const address = req.headers.get("x-address");
@@ -76,7 +77,10 @@ export const POST = async (req: NextRequest) => {
     });
     if (!claimableCheckout) {
       return NextResponse.json(
-        { success: false, message: "To create" },
+        {
+          success: false,
+          message: "To create this waitlist you need to buy the required tier",
+        },
         { status: 400 }
       );
     }
@@ -182,6 +186,18 @@ export const POST = async (req: NextRequest) => {
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.TALENT_BUILDER_SCORE,
         value: String(requiredBuilderScore),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  if (fanTokenSymbolAndAmount) {
+    await createWaitlistRequirement({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.FAN_TOKEN_BALANCE,
+        value: String(fanTokenSymbolAndAmount),
         createdAt: new Date(),
         updatedAt: new Date(),
       },

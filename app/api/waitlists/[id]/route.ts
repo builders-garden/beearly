@@ -3,6 +3,7 @@ import prisma from "../../../../lib/prisma";
 import { uploadImage } from "../../../../lib/imagekit";
 import slugify from "slugify";
 import { WaitlistRequirementType } from "@prisma/client";
+import { createWaitlistRequirement } from "../../../../lib/db/waitlistRequirements";
 
 export const GET = async (
   req: NextRequest,
@@ -51,6 +52,7 @@ export const PUT = async (
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
   const requiredBuilderScore = body.get("requiredBuilderScore");
+  const fanTokenSymbolAndAmount = body.get("fanTokenSymbolAndAmount");
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
@@ -154,7 +156,7 @@ export const PUT = async (
   });
 
   if (isPowerBadgeRequired) {
-    await prisma.waitlistRequirement.create({
+    await createWaitlistRequirement({
       data: {
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.POWER_BADGE,
@@ -172,7 +174,7 @@ export const PUT = async (
       .map((c) => c?.trim()?.toLowerCase());
     await Promise.all(
       channels!.map((channel) =>
-        prisma.waitlistRequirement.create({
+        createWaitlistRequirement({
           data: {
             waitlistId: waitlist.id,
             type: WaitlistRequirementType.CHANNEL_FOLLOW,
@@ -192,7 +194,7 @@ export const PUT = async (
       .map((u) => u?.trim()?.toLowerCase());
     await Promise.all(
       users!.map((user) =>
-        prisma.waitlistRequirement.create({
+        createWaitlistRequirement({
           data: {
             waitlistId: waitlist.id,
             type: WaitlistRequirementType.USER_FOLLOW,
@@ -206,11 +208,23 @@ export const PUT = async (
   }
 
   if (requiredBuilderScore) {
-    await prisma.waitlistRequirement.create({
+    await createWaitlistRequirement({
       data: {
         waitlistId: waitlist.id,
         type: WaitlistRequirementType.TALENT_BUILDER_SCORE,
         value: String(requiredBuilderScore),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  if (fanTokenSymbolAndAmount) {
+    await createWaitlistRequirement({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.FAN_TOKEN_BALANCE,
+        value: String(fanTokenSymbolAndAmount),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
