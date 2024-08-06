@@ -634,7 +634,36 @@ export default function NewWaitlist() {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex flex-row gap-1 items-center">
-                  <div className="text-sm text-gray-500">Fan Token</div>
+                  <div className="text-sm text-gray-500">Follow users</div>
+                  <PremiumRequired />
+                </div>
+                <Input
+                  type="text"
+                  variant={"bordered"}
+                  value={requiredUsersFollow}
+                  onValueChange={setRequiredUsersFollow}
+                  placeholder="dwr.eth,v,horsefacts"
+                  isDisabled={selectedTier === WaitlistTier.FREE}
+                />
+                <div className="text-xs text-gray-500">
+                  Comma separated list of usernames that the users must follow
+                  to be eligible
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">
+                    Fan Token by{" "}
+                    <span className="underline">
+                      <Link
+                        href="https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens"
+                        target="_blank"
+                        className="underline"
+                      >
+                        Moxie
+                      </Link>
+                    </span>
+                  </div>
                   <PremiumRequired />
                   {tokenNotFound ? (
                     <div className="text-xs text-red-700 pl-4">
@@ -690,24 +719,6 @@ export default function NewWaitlist() {
                 <div className="text-xs text-gray-500">
                   A channel or user fan token and the amount required to be
                   eligible to join the waitlist
-                </div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex flex-row gap-1 items-center">
-                  <div className="text-sm text-gray-500">Follow users</div>
-                  <PremiumRequired />
-                </div>
-                <Input
-                  type="text"
-                  variant={"bordered"}
-                  value={requiredUsersFollow}
-                  onValueChange={setRequiredUsersFollow}
-                  placeholder="dwr.eth,v,horsefacts"
-                  isDisabled={selectedTier === WaitlistTier.FREE}
-                />
-                <div className="text-xs text-gray-500">
-                  Comma separated list of usernames that the users must follow
-                  to be eligible
                 </div>
               </div>
             </div>

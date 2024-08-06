@@ -468,7 +468,18 @@ export const EditWaitlistModal = ({
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex flex-row gap-1 items-center">
-                      <div className="text-sm text-gray-500">Fan Token</div>
+                      <div className="text-sm text-gray-500">
+                        Fan Token by{" "}
+                        <span className="underline">
+                          <Link
+                            href="https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens"
+                            target="_blank"
+                            className="underline"
+                          >
+                            Moxie
+                          </Link>
+                        </span>
+                      </div>
                       <PremiumRequired />
                       {tokenNotFound ? (
                         <div className="text-xs text-red-700 pl-4">
