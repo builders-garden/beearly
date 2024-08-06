@@ -466,53 +466,6 @@ export const EditWaitlistModal = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row gap-2 w-full">
-                    <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="flex flex-row gap-1 items-center">
-                        <div className="text-sm text-gray-500">
-                          Proof of Humanity with{" "}
-                          <span className="underline">
-                            <Link
-                              href="https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741"
-                              target="_blank"
-                              className="underline"
-                            >
-                              Builder Score
-                            </Link>
-                          </span>
-                        </div>
-                        <PremiumRequired />
-                      </div>
-                      <Checkbox
-                        isSelected={isBuilderScoreRequired}
-                        onValueChange={setIsBuilderScoreRequired}
-                        isDisabled={waitlist.tier === "FREE"}
-                      >
-                        Proof of Humanity required
-                      </Checkbox>
-                      <div className="text-xs text-gray-500">
-                        Eligibility requires a minimum Builder Score of 15,
-                        demonstrating humanity
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="flex flex-row gap-1 items-center">
-                        <div className="text-sm text-gray-500">Power Badge</div>
-                        <PremiumRequired />
-                      </div>
-                      <Checkbox
-                        isSelected={isPowerBadgeRequired}
-                        onValueChange={setIsPowerBadgeRequired}
-                        isDisabled={waitlist.tier === "FREE"}
-                      >
-                        Power Badge required
-                      </Checkbox>
-
-                      <div className="text-xs text-gray-500">
-                        Users must have a Warpcast power badge to be eligible
-                      </div>
-                    </div>
-                  </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex flex-row gap-1 items-center">
                       <div className="text-sm text-gray-500">Fan Token</div>
@@ -575,6 +528,53 @@ export const EditWaitlistModal = ({
                     <div className="text-xs text-gray-500">
                       A channel or user fan token and the amount required to be
                       eligible to join the waitlist
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-2 w-full">
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">
+                          Proof of Humanity with{" "}
+                          <span className="underline">
+                            <Link
+                              href="https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741"
+                              target="_blank"
+                              className="underline"
+                            >
+                              Builder Score
+                            </Link>
+                          </span>
+                        </div>
+                        <PremiumRequired />
+                      </div>
+                      <Checkbox
+                        isSelected={isBuilderScoreRequired}
+                        onValueChange={setIsBuilderScoreRequired}
+                        isDisabled={waitlist.tier === "FREE"}
+                      >
+                        Proof of Humanity required
+                      </Checkbox>
+                      <div className="text-xs text-gray-500">
+                        Eligibility requires a minimum Builder Score of 15,
+                        demonstrating humanity
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 w-[50%]">
+                      <div className="flex flex-row gap-1 items-center">
+                        <div className="text-sm text-gray-500">Power Badge</div>
+                        <PremiumRequired />
+                      </div>
+                      <Checkbox
+                        isSelected={isPowerBadgeRequired}
+                        onValueChange={setIsPowerBadgeRequired}
+                        isDisabled={waitlist.tier === "FREE"}
+                      >
+                        Power Badge required
+                      </Checkbox>
+
+                      <div className="text-xs text-gray-500">
+                        Users must have a Warpcast power badge to be eligible
+                      </div>
                     </div>
                   </div>
                 </div>
