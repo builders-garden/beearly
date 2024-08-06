@@ -19,6 +19,7 @@ The requirements you cat set are:
 - Follow specific Farcaster channels
 - Follow specific Farcaster users
 - Have a minimum [Builder Score](https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741) (powered by Talent Protocol)
+- Possess a minimum number of [Moxie fan tokens](https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens") of a specific Farcaster channel or user
 - Have a Farcaster Power Badge
 
 ## 🛠️ Waitlist management
@@ -61,5 +62,6 @@ The tiers and their benefits are listed in the table below:
 | User follow requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Power Badge requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Proof of Humanity with Talent's Builder Score | ❌                                          | ✔️                                        | ✔️                                        |
+| Moxie Fan Tokens requirement                  | ❌                                          | ✔️                                        | ✔️                                        |
 | Spam protection Captcha                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Join button custom text                       | ❌                                          | ✔️                                        | ✔️                                        |
