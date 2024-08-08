@@ -23,7 +23,7 @@ import { WaitlistRequirementType } from "@prisma/client";
 import { BeearlyButton } from "./BeearlyButton";
 import { WaitlistWithRequirements } from "./WaitlistDetail";
 import PremiumRequired from "./PremiumRequired";
-import { getFanTokenBalances } from "../lib/graphql";
+import { getTokenAddressFromSymbolQuery } from "../lib/graphql";
 import _ from "lodash";
 
 export const EditWaitlistModal = ({
@@ -207,13 +207,15 @@ export const EditWaitlistModal = ({
         setTokenNotFound(false);
         return;
       }
-      const data = await getFanTokenBalances(fanTokenType + ":" + fanTokenName);
+      const data = await getTokenAddressFromSymbolQuery(
+        fanTokenType + ":" + fanTokenName
+      );
       if (!data) {
         setTokenNotFound(true);
       } else {
         setTokenNotFound(false);
       }
-    }, 500)
+    }, 300)
   ).current;
 
   useEffect(() => {
