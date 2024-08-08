@@ -10,6 +10,12 @@ export const BEEARLY_WALLET_ADDRESS =
     ? "0x1358155a15930f89eBc787a34Eb4ccfd9720bC62"
     : "0x65De452f106bdea2a438C9ba48bD2a0A2A7B825e";
 
+// MOXIE GRAPHQL CLIENTS URLS
+export const MOXIE_STATS_GRAPHQL_URL =
+  "https://api.studio.thegraph.com/query/23537/moxie_protocol_stats_mainnet/version/latest";
+export const MOXIE_VESTING_GRAPHQL_URL =
+  "https://api.studio.thegraph.com/query/23537/moxie_vesting_mainnet/version/latest";
+
 export const BASE_USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 export const TIERS = {

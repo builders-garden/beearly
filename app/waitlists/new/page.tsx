@@ -35,7 +35,7 @@ import { BeearlyButton } from "../../../components/BeearlyButton";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import _ from "lodash";
-import { getFanTokenBalances } from "../../../lib/graphql";
+import { getTokenAddressFromSymbolQuery } from "../../../lib/graphql";
 import { parseUnits } from "viem";
 import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
 
@@ -271,13 +271,15 @@ export default function NewWaitlist() {
         setTokenNotFound(false);
         return;
       }
-      const data = await getFanTokenBalances(fanTokenType + ":" + fanTokenName);
+      const data = await getTokenAddressFromSymbolQuery(
+        fanTokenType + ":" + fanTokenName
+      );
       if (!data) {
         setTokenNotFound(true);
       } else {
         setTokenNotFound(false);
       }
-    }, 500)
+    }, 300)
   ).current;
 
   useEffect(() => {

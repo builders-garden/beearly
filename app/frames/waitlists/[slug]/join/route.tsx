@@ -20,7 +20,10 @@ import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 import { validateReferrer } from "../../../../../lib/db/utils";
 import { publishToQstash } from "../../../../../lib/qstash";
-import { getFanTokenBalances } from "../../../../../lib/graphql";
+import {
+  getUserTotalBalance,
+  getUserVestingAddresses,
+} from "../../../../../lib/graphql";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -450,16 +453,21 @@ const frameHandler = frames(async (ctx) => {
         if (!symbol || !requiredAmount || isNaN(parseInt(requiredAmount))) {
           throw new Error("Invalid fan token balance requirement format");
         }
-        const data = await getFanTokenBalances(symbol);
-        if (!data) {
-          throw new Error("Failed to fetch fan token balances");
-        }
-        const userBalance = data.subjectTokens[0]?.portfolio.find((portfolio) =>
-          portfolio.user.id.includes(userToAdd.address)
+        const userAddresses =
+          ctx.clientProtocol?.id === "xmtp"
+            ? ctx.message.verifiedWalletAddress
+              ? [ctx.message.verifiedWalletAddress]
+              : []
+            : ctx.message.requesterVerifiedAddresses;
+        const userVestingAddresses =
+          await getUserVestingAddresses(userAddresses);
+        const totalUserFanTokenBalance = await getUserTotalBalance(
+          [...userAddresses, ...userVestingAddresses],
+          symbol
         );
         if (
-          !userBalance ||
-          parseInt(userBalance.balance) < parseInt(requiredAmount) * 10 ** 18
+          !totalUserFanTokenBalance ||
+          totalUserFanTokenBalance < parseFloat(requiredAmount) * 10 ** 18
         ) {
           throw new Error(
             "User does not meet the fan token balance requirement"
