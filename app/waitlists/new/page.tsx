@@ -124,6 +124,7 @@ export default function NewWaitlist() {
   const [fanTokenType, setFanTokenType] = useState<string>("cid");
   const [fanTokenName, setFanTokenName] = useState<string>("");
   const [fanTokenAmount, setFanTokenAmount] = useState<string>("");
+  const [isFanTokenLauncher, setIsFanTokenLauncher] = useState<boolean>();
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(false);
   const [requiresEmail, setRequiresEmail] = useState<boolean>(false);
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
@@ -220,7 +221,7 @@ export default function NewWaitlist() {
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
     }
-    if (isPowerBadgeRequired?.toString()) {
+    if (isPowerBadgeRequired) {
       formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
     }
     if (requiredChannels) {
@@ -228,6 +229,9 @@ export default function NewWaitlist() {
     }
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
+    }
+    if (isFanTokenLauncher) {
+      formData.append("isFanTokenLauncher", isFanTokenLauncher.toString());
     }
     if (fanTokenType && fanTokenName && !tokenNotFound) {
       formData.append(
@@ -357,6 +361,7 @@ export default function NewWaitlist() {
                       onClick={() => {
                         if (tier.type === WaitlistTier.FREE) {
                           setIsPowerBadgeRequired(false);
+                          setIsFanTokenLauncher(false);
                           setHasCaptcha(false);
                           setRequiresEmail(false);
                           setIsBuilderScoreRequired(false);
@@ -768,6 +773,34 @@ export default function NewWaitlist() {
 
                 <div className="text-xs text-gray-500">
                   Users must have a Warpcast power badge to be eligible
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 w-[25%]">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">
+                    Launched a Fan Token with{" "}
+                    <span className="underline">
+                      <Link
+                        href="https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens"
+                        target="_blank"
+                        className="underline"
+                      >
+                        Moxie
+                      </Link>
+                    </span>
+                  </div>
+                  <PremiumRequired />
+                </div>
+                <Checkbox
+                  isSelected={isFanTokenLauncher}
+                  onValueChange={setIsFanTokenLauncher}
+                  isDisabled={selectedTier === WaitlistTier.FREE}
+                >
+                  Must be a fan token launcher
+                </Checkbox>
+
+                <div className="text-xs text-gray-500">
+                  Users must have launched his own fan token to be eligible
                 </div>
               </div>
             </div>
