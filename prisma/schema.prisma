@@ -89,6 +89,7 @@ enum WaitlistRequirementType {
   POWER_BADGE
   TALENT_BUILDER_SCORE
   FAN_TOKEN_BALANCE
+  FAN_TOKEN_LAUNCHER
 }
 
 model WaitlistRequirement {
