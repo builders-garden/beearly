@@ -29,7 +29,6 @@ export default function BroadcastDCModal({
 }) {
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string | null>();
-  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const jwt = getAuthToken();
   const canSend = text.length > 0;
@@ -40,7 +39,6 @@ export default function BroadcastDCModal({
       method: "POST",
       body: JSON.stringify({
         fids: ["all"],
-        powerBadge: isPowerBadgeOnly,
         message: text,
       }),
       headers: {
@@ -137,12 +135,6 @@ export default function BroadcastDCModal({
                     radius="sm"
                   />
                 </div>
-                <Checkbox
-                  isSelected={isPowerBadgeOnly}
-                  onValueChange={setIsPowerBadgeOnly}
-                >
-                  Send only to Power Badge users (recommended)
-                </Checkbox>
               </div>
             </ModalBody>
             <ModalFooter>

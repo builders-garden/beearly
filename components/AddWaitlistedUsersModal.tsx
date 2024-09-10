@@ -178,16 +178,6 @@ export const AddWaitlistedUsersModal = ({
                               <span className="text-small">
                                 {item.profileDisplayName}
                               </span>
-                              {item.isFarcasterPowerUser ? (
-                                <Image
-                                  src="/power-badge.png"
-                                  className="h-3 w-3"
-                                  radius="full"
-                                  alt="power-badge"
-                                />
-                              ) : (
-                                ""
-                              )}
                             </div>
                             <span className="text-tiny text-default-400">
                               @{item.profileName} • #{item.userId}
@@ -226,16 +216,6 @@ export const AddWaitlistedUsersModal = ({
                             <span className="text-small">
                               {user.profileDisplayName}
                             </span>
-                            {user.isFarcasterPowerUser ? (
-                              <Image
-                                src="/power-badge.png"
-                                className="h-3 w-3"
-                                radius="full"
-                                alt="power-badge"
-                              />
-                            ) : (
-                              ""
-                            )}
                           </div>
                           <span className="text-tiny text-default-400">
                             @{user.profileName} • #{user.userId}

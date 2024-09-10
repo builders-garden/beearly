@@ -35,7 +35,6 @@ export const POST = async (req: NextRequest) => {
   const requiresEmail = body.get("requiresEmail");
   const externalUrl = body.get("externalUrl");
   const joinButtonText = body.get("joinButtonText");
-  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
   const isFanTokenLauncher = body.get("isFanTokenLauncher");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
@@ -136,18 +135,6 @@ export const POST = async (req: NextRequest) => {
       updatedAt: new Date(),
     },
   });
-
-  if (isPowerBadgeRequired) {
-    await createWaitlistRequirement({
-      data: {
-        waitlistId: waitlist.id,
-        type: WaitlistRequirementType.POWER_BADGE,
-        value: (isPowerBadgeRequired === "true").toString(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-  }
 
   if (isFanTokenLauncher) {
     await createWaitlistRequirement({

@@ -72,11 +72,6 @@ export const EditWaitlistModal = ({
 
   const [tokenNotFound, setTokenNotFound] = useState<boolean>(false);
 
-  const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>(
-    waitlist.waitlistRequirements!.find(
-      (r) => r.type === WaitlistRequirementType.POWER_BADGE
-    )?.value === "true"
-  );
   const [isFanTokenLauncher, setIsFanTokenLauncher] = useState<boolean>(
     waitlist.waitlistRequirements!.find(
       (r) => r.type === WaitlistRequirementType.FAN_TOKEN_LAUNCHER
@@ -164,9 +159,6 @@ export const EditWaitlistModal = ({
     }
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
-    }
-    if (isPowerBadgeRequired) {
-      formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
     }
     if (isFanTokenLauncher) {
       formData.append("isFanTokenLauncher", isFanTokenLauncher.toString());
@@ -580,25 +572,6 @@ export const EditWaitlistModal = ({
                         demonstrating humanity
                       </div>
                     </div>
-                    <div className="flex flex-col gap-1 w-[50%]">
-                      <div className="flex flex-row gap-1 items-center">
-                        <div className="text-sm text-gray-500">Power Badge</div>
-                        <PremiumRequired />
-                      </div>
-                      <Checkbox
-                        isSelected={isPowerBadgeRequired}
-                        onValueChange={setIsPowerBadgeRequired}
-                        isDisabled={waitlist.tier === "FREE"}
-                      >
-                        Power Badge required
-                      </Checkbox>
-
-                      <div className="text-xs text-gray-500">
-                        Users must have a Warpcast power badge to be eligible
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-2 w-full">
                     <div className="flex flex-col gap-1 w-[50%]">
                       <div className="flex flex-row gap-1 items-center">
                         <div className="text-sm text-gray-500">

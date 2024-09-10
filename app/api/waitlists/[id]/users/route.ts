@@ -22,7 +22,6 @@ export const GET = async (
   const page = searchParams.get("page") || "0";
   const orderBy = searchParams.get("orderBy") || "waitlistedAt";
   const orderDirection = searchParams.get("orderDirection") || "desc";
-  const powerBadge = searchParams.get("powerBadge") || "";
 
   const waitlist = await prisma.waitlist.findUnique({
     where: {
@@ -42,25 +41,15 @@ export const GET = async (
     );
   }
 
-  const [totalCount, powerBadgeCount] = await Promise.all([
-    prisma.waitlistedUser.count({
-      where: {
-        waitlistId: parseInt(id),
-      },
-    }),
-    prisma.waitlistedUser.count({
-      where: {
-        waitlistId: parseInt(id),
-        powerBadge: true,
-      },
-    }),
-  ]);
+  const totalCount = await prisma.waitlistedUser.count({
+    where: {
+      waitlistId: parseInt(id),
+    },
+  });
+
   const waitlistedUsers = await prisma.waitlistedUser.findMany({
     where: {
       waitlistId: parseInt(id),
-      ...(powerBadge.toString().length > 0 && {
-        powerBadge: powerBadge === "true",
-      }),
     },
     take: parseInt(limit),
     skip: parseInt(page) * parseInt(limit),
@@ -83,13 +72,10 @@ export const GET = async (
     },
   });
 
-  const finalCount = powerBadge === "true" ? powerBadgeCount : totalCount;
-
   return NextResponse.json({
     results: waitlistedUsers,
-    pages: Math.ceil(finalCount / parseInt(limit)),
-    count: finalCount,
-    powerBadgeUsersCount: powerBadgeCount,
+    pages: Math.ceil(totalCount / parseInt(limit)),
+    count: totalCount,
   });
 };
 

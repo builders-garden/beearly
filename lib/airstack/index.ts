@@ -25,7 +25,6 @@ const profileQuery = /* GraphQL */ `
         profileName
         profileDisplayName
         profileImage
-        isFarcasterPowerUser
         userAddress
         connectedAddresses {
           address
@@ -115,7 +114,7 @@ export const fetchFarcasterChannels = async (
 
 const farcasterFollowQuery = /* GraphQL */ `
   query isFollowing($fid: Identity!, $followedNames: [Identity!]) {
-    Wallet(input: { identity: $fid, blockchain: ethereum }) {
+    Wallet(input: { identity: $fid }) {
       socialFollowers(
         input: {
           filter: {
@@ -179,7 +178,6 @@ const profilesQuery = /* GraphQL */ `
         profileName
         profileDisplayName
         profileImage
-        isFarcasterPowerUser
         userAddress
         connectedAddresses {
           address
@@ -212,7 +210,6 @@ export interface UserProfile {
   profileName: string | null;
   profileDisplayName: string | null;
   profileImage: string | null;
-  isFarcasterPowerUser: boolean | null;
   userAddress: any | null;
   connectedAddresses:
     | {
@@ -272,7 +269,6 @@ query FarcasterUsers($profileName: String, $limit: Int) {
       profileName
       profileDisplayName
       profileImage
-      isFarcasterPowerUser
       userAddress
       connectedAddresses {
         address

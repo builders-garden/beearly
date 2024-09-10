@@ -9,7 +9,7 @@ export const POST = async (
 ) => {
   // Get the payload from the request and extract the offset
   const body = await req.json();
-  const { fids, powerBadge, message } = body;
+  const { fids, message } = body;
   const waitlist = await prisma.waitlist.findUnique({
     where: {
       id: parseInt(id),
@@ -61,9 +61,6 @@ export const POST = async (
     usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
-        ...(powerBadge && {
-          powerBadge: true,
-        }),
       },
       select: {
         fid: true,
@@ -75,9 +72,6 @@ export const POST = async (
     usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
-        ...(powerBadge && {
-          powerBadge: true,
-        }),
         fid: {
           in: fidsToNotify,
         },

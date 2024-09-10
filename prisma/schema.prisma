@@ -64,7 +64,6 @@ model WaitlistedUser {
   username           String           @db.VarChar
   avatarUrl          String?          @map("avatar_url")
   email              String?          @db.VarChar
-  powerBadge         Boolean?         @default(false) @map("power_badge")
   socialCapitalRank  Int              @default(0) @map("social_capital_rank")
   socialCapitalScore Float            @default(0.00) @map("social_capital_score")
   followerCount      Int              @default(0) @map("follower_count")
@@ -86,7 +85,6 @@ model WaitlistedUser {
 enum WaitlistRequirementType {
   CHANNEL_FOLLOW
   USER_FOLLOW
-  POWER_BADGE
   TALENT_BUILDER_SCORE
   FAN_TOKEN_BALANCE
   FAN_TOKEN_LAUNCHER

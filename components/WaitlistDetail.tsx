@@ -62,10 +62,6 @@ export const WaitlistDetail = ({
       ?.map((r) => r.value)
       ?.join(",") || "";
 
-  const isPowerBadgeRequired =
-    waitlist.waitlistRequirements?.find(
-      (r) => r.type === WaitlistRequirementType.POWER_BADGE
-    )?.value || false;
   return (
     <div className="flex flex-col border-2 border-gray-200 rounded-xl h-lvh">
       <div className="flex flex-col px-4 py-2 gap-2">
@@ -226,21 +222,6 @@ export const WaitlistDetail = ({
                 <div className="text-xs text-gray-500">
                   Comma separated list of usernames that the users must follow
                   to be eligible
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-row gap-4 w-full">
-              <div className="flex flex-col gap-1 w-[50%]">
-                <div className="text-sm text-gray-500">Power Badge</div>
-                <Checkbox
-                  isSelected={isPowerBadgeRequired === "true"}
-                  isDisabled
-                >
-                  Power Badge required
-                </Checkbox>
-
-                <div className="text-xs text-gray-500">
-                  Users must have a Warpcast power badge to be eligible
                 </div>
               </div>
             </div>
