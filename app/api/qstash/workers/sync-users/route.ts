@@ -85,7 +85,7 @@ async function handler(request: NextRequest) {
       jobState = "finished";
     }
   } catch (error) {
-    return new NextResponse(
+    return NextResponse.json(
       `Error while syncing batch #${(offset / batchSize + 1).toString()}`,
       {
         status: 400,
@@ -94,7 +94,7 @@ async function handler(request: NextRequest) {
   } finally {
     // If the cron job is finished, return a success message
     if (jobState === "finished") {
-      return new NextResponse("Successfully synced all users", {
+      return NextResponse.json("Successfully synced all users", {
         status: 200,
       });
     }
@@ -109,7 +109,7 @@ async function handler(request: NextRequest) {
       throw new Error("Error while publishing json to QStash");
     }
 
-    return new NextResponse(
+    return NextResponse.json(
       `Successfully sent batch #${(offset / batchSize + 2).toString()} to QStash`,
       {
         status: 200,
