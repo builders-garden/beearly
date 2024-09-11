@@ -6,6 +6,7 @@ import {
 import prisma from "../../../../../lib/prisma";
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
+import { WaitlistTier } from "@prisma/client";
 
 export const GET = async (
   req: NextRequest,
@@ -134,7 +135,10 @@ export const POST = async (
     const { fids }: { fids: string[] } = body;
     const parsedFids = fids.map((fid) => parseInt(fid));
 
-    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+    if (
+      waitlist.tier !== WaitlistTier.QUEEN &&
+      waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size
+    ) {
       return NextResponse.json(
         {
           message: "Waitlist is full, upgrade tier to add more users",
