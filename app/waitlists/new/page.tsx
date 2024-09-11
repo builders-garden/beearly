@@ -116,7 +116,6 @@ export default function NewWaitlist() {
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
   const [joinButtonText, setJoinButtonText] = useState<string>("");
-  const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>();
   const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>();
   const [requiredChannels, setRequiredChannels] = useState<string>();
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
@@ -220,9 +219,6 @@ export default function NewWaitlist() {
     }
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
-    }
-    if (isPowerBadgeRequired) {
-      formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
     }
     if (requiredChannels) {
       formData.append("requiredChannels", requiredChannels.toString());
@@ -360,7 +356,6 @@ export default function NewWaitlist() {
                       className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border border-gray-300 opacity-50 gap-1"
                       onClick={() => {
                         if (tier.type === WaitlistTier.FREE) {
-                          setIsPowerBadgeRequired(false);
                           setIsFanTokenLauncher(false);
                           setHasCaptcha(false);
                           setRequiresEmail(false);
@@ -756,23 +751,6 @@ export default function NewWaitlist() {
                 <div className="text-xs text-gray-500">
                   Eligibility requires a minimum Builder Score of 15,
                   demonstrating humanity
-                </div>
-              </div>
-              <div className="flex flex-col gap-1 w-[25%]">
-                <div className="flex flex-row gap-1 items-center">
-                  <div className="text-sm text-gray-500">Power Badge</div>
-                  <PremiumRequired />
-                </div>
-                <Checkbox
-                  isSelected={isPowerBadgeRequired}
-                  onValueChange={setIsPowerBadgeRequired}
-                  isDisabled={selectedTier === WaitlistTier.FREE}
-                >
-                  Power Badge required
-                </Checkbox>
-
-                <div className="text-xs text-gray-500">
-                  Users must have a Warpcast power badge to be eligible
                 </div>
               </div>
               <div className="flex flex-col gap-1 w-[25%]">

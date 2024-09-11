@@ -276,9 +276,6 @@ const frameHandler = frames(async (ctx) => {
 
   // Check if there are waitlist requirements and if the user meets those requirements
   if (waitlist.waitlistRequirements.length > 0) {
-    const powerBadgeRequirement = waitlist.waitlistRequirements.find(
-      (r) => r.type === WaitlistRequirementType.POWER_BADGE
-    );
     const fanTokenLauncherRequirement = waitlist.waitlistRequirements.find(
       (r) => r.type === WaitlistRequirementType.FAN_TOKEN_LAUNCHER
     );
@@ -294,36 +291,6 @@ const frameHandler = frames(async (ctx) => {
     const requiredFanTokenBalance = waitlist.waitlistRequirements.find(
       (r) => r.type === WaitlistRequirementType.FAN_TOKEN_BALANCE
     );
-    if (powerBadgeRequirement?.value === "true") {
-      if (!userToAdd?.powerBadge) {
-        return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
-          buttons: [
-            <Button
-              action="post"
-              key="1"
-              target={{
-                pathname: waitlist.hasCaptcha
-                  ? `/captcha/${slug}`
-                  : `/waitlists/${slug}/join`,
-                search:
-                  `${email ? `email=${email}` : ""}` +
-                  `${ref ? `&ref=${ref}` : ""}` +
-                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
-              }}
-            >
-              Try again
-            </Button>,
-            <Button action="link" key="2" target={waitlist.externalUrl}>
-              Learn more
-            </Button>,
-          ],
-        };
-      }
-    }
     if (fanTokenLauncherRequirement?.value === "true") {
       if (!(await getTokenAddressFromSymbolQuery("fid:" + fid))) {
         return {

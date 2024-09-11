@@ -20,11 +20,10 @@ The requirements you cat set are:
 - Follow specific Farcaster users
 - Have a minimum [Builder Score](https://talentprotocol.notion.site/Builder-Score-FAQ-4e07c8df13514ce79661ed0d776d4741) (powered by Talent Protocol)
 - Possess a minimum number of [Moxie fan tokens](https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens) of a specific Farcaster channel or user
-- Have a Farcaster Power Badge
 
 ## 🛠️ Waitlist management
 
-Through the Beearly web app you can manage every waitlist you created and check users that already joined them, having a simple and useful overview of their information like: their followers, if they have a Farcaster Power Badge or not, their [Airstack social score](https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital) and more!
+Through the Beearly web app you can manage every waitlist you created and check users that already joined them, having a simple and useful overview of their information like: their followers, their social rank and score, their [Airstack social score](https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital) and more!
 
 From the management page you can also:
 
@@ -60,7 +59,6 @@ The tiers and their benefits are listed in the table below:
 | Export Users                                  | ❌                                          | ✔️                                        | ✔️                                        |
 | Channel follow requirement                    | ✔️                                          | ✔️                                        | ✔️                                        |
 | User follow requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
-| Power Badge requirement                       | ❌                                          | ✔️                                        | ✔️                                        |
 | Proof of Humanity with Talent's Builder Score | ❌                                          | ✔️                                        | ✔️                                        |
 | Moxie Fan Tokens requirement                  | ❌                                          | ✔️                                        | ✔️                                        |
 | Spam protection Captcha                       | ❌                                          | ✔️                                        | ✔️                                        |

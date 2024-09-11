@@ -21,7 +21,6 @@ export default function Pricing() {
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: false },
-            { name: "Power Badge", available: false },
             { name: "Proof of Humanity", available: false },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: false }]}
@@ -44,7 +43,6 @@ export default function Pricing() {
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
-            { name: "Power Badge", available: true },
             { name: "Proof of Humanity", available: true },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: true }]}
@@ -68,7 +66,6 @@ export default function Pricing() {
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
-            { name: "Power Badge", available: true },
             { name: "Proof of Humanity", available: true },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: true }]}
