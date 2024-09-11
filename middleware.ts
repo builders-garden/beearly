@@ -8,8 +8,8 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  if (req.url.includes("/api/public") || req.url.includes("/api/external")) {
-    // If the request is for a public or external endpoint, continue processing the request
+  if (req.url.includes("/api/public")) {
+    // If the request is for a public endpoint, continue processing the request
     return NextResponse.next();
   }
 
