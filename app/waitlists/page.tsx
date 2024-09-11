@@ -1,5 +1,5 @@
 "use client";
-import { Button, Image, Spinner, Tooltip } from "@nextui-org/react";
+import { Image, Spinner } from "@nextui-org/react";
 import WaitlistTable from "../../components/WaitlistTable";
 import {
   WaitlistDetail,
@@ -9,8 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { useAccount } from "wagmi";
 import { BeearlyButton } from "../../components/BeearlyButton";
-import { ExternalLink, PlusSquare } from "lucide-react";
-import Link from "next/link";
+import { PlusSquare } from "lucide-react";
 
 const Waitlists = () => {
   const [waitlists, setWaitlists] = useState<WaitlistWithRequirements[]>([]);
