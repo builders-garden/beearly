@@ -39,6 +39,7 @@ export const formatAirstackUserData = (user: UserProfile) => {
     | "waitlistedAt"
     | "email"
     | "updatedAt"
+    | "powerBadge" // TODO: remove this line after the powerBadge field is removed from the database
   > = {
     fid: parseInt(user.userId!),
     address: userAddress,
