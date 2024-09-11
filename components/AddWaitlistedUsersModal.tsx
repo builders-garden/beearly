@@ -14,7 +14,6 @@ import { useCallback, useEffect, useState } from "react";
 import { BeearlyButton } from "./BeearlyButton";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import _ from "lodash";
-import { Image } from "@nextui-org/react";
 
 export const AddWaitlistedUsersModal = ({
   waitlistId,
