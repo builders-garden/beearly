@@ -161,20 +161,23 @@ export const UsersTable = ({
             isDisabled={TIERS[waitlistTier].allowExportUsers}
             content="This feature is only available for Honey tier and above."
           >
-            <Button
-              color="primary"
-              variant="flat"
-              onPress={() => {
-                if (!TIERS[waitlistTier].allowExportUsers) {
-                  return;
-                }
-                exportUsers();
-              }}
-              isDisabled={waitlistTier === WaitlistTier.FREE}
-            >
-              <Download size={16} />
-              Export users
-            </Button>
+            {/* This div is needed to prevent the tooltip from breaking if button is disabled */}
+            <div>
+              <Button
+                color="primary"
+                variant="flat"
+                onPress={() => {
+                  if (!TIERS[waitlistTier].allowExportUsers) {
+                    return;
+                  }
+                  exportUsers();
+                }}
+                isDisabled={waitlistTier === WaitlistTier.FREE}
+              >
+                <Download size={16} />
+                Export users
+              </Button>
+            </div>
           </Tooltip>
         </div>
       </div>
