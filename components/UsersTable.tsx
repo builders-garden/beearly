@@ -17,7 +17,11 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import { WaitlistTier, WaitlistedUser } from "@prisma/client";
+import {
+  WaitlistTier,
+  WaitlistedUser,
+  WaitlistedUserStatus,
+} from "@prisma/client";
 import {
   ChevronDown,
   ChevronUp,
@@ -258,7 +262,8 @@ export const UsersTable = ({
                 content={
                   <div>
                     Social Capital Scores (SCS) area measure of each Farcaster{" "}
-                    <br></br>user&apos;s influence in the network.{" "}
+                    <br />
+                    user&apos;s influence in the network.{" "}
                     <Link
                       href={
                         "https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital"
@@ -336,6 +341,24 @@ export const UsersTable = ({
             </div>
           </TableColumn>
           <TableColumn>
+            <div className="cursor-pointer flex flex-row gap-1 items-center">
+              <div>APPROVED</div>
+              <Tooltip
+                radius="sm"
+                size="sm"
+                content={
+                  <div>
+                    If you have a valid Beearly Api Key you can check the <br />
+                    user status with an API call. <br />
+                    Contact us for more information.
+                  </div>
+                }
+              >
+                <InfoIcon size={14} />
+              </Tooltip>
+            </div>
+          </TableColumn>
+          <TableColumn>
             <div></div>
           </TableColumn>
         </TableHeader>
@@ -373,6 +396,34 @@ export const UsersTable = ({
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.waitlistedAt).toDateString()}
+              </TableCell>
+              <TableCell>
+                <Checkbox
+                  defaultSelected={
+                    user.status === WaitlistedUserStatus.APPROVED
+                  }
+                  onChange={async () => {
+                    // Change user status in the database with a PUT request
+                    await fetch(
+                      `/api/waitlists/${waitlistId}/users/${user.fid}/status`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${jwt}`,
+                        },
+                        body: JSON.stringify({
+                          status:
+                            user.status === WaitlistedUserStatus.APPROVED
+                              ? WaitlistedUserStatus.WAITLISTED
+                              : WaitlistedUserStatus.APPROVED,
+                          userFid: user.fid,
+                        }),
+                      }
+                    );
+                  }}
+                  disabled
+                />
               </TableCell>
               <TableCell>
                 <Link
