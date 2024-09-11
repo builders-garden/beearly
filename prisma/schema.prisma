@@ -20,6 +20,11 @@ enum WaitlistTier {
   QUEEN
 }
 
+enum WaitlistedUserStatus {
+  WAITLISTED
+  APPROVED
+}
+
 model Waitlist {
   id                   Int                   @unique @default(autoincrement())
   name                 String                @db.VarChar
@@ -56,28 +61,29 @@ model CaptchaChallenge {
 }
 
 model WaitlistedUser {
-  id                 Int              @default(autoincrement())
-  waitlistId         Int              @map("waitlist_id")
+  id                 Int                    @default(autoincrement())
+  waitlistId         Int                    @map("waitlist_id")
   fid                Int
   address            String
-  displayName        String           @map("display_name") @db.VarChar
-  username           String           @db.VarChar
-  avatarUrl          String?          @map("avatar_url")
-  email              String?          @db.VarChar
-  powerBadge         Boolean?         @default(false) @map("power_badge")
-  socialCapitalRank  Int              @default(0) @map("social_capital_rank")
-  socialCapitalScore Float            @default(0.00) @map("social_capital_score")
-  followerCount      Int              @default(0) @map("follower_count")
-  followingCount     Int              @default(0) @map("following_count")
-  location           String?          @default("")
-  profileBio         String?          @default("") @map("profile_bio")
-  referrerFid        Int?             @map("referrer_fid")
+  displayName        String                 @map("display_name") @db.VarChar
+  username           String                 @db.VarChar
+  avatarUrl          String?                @map("avatar_url")
+  email              String?                @db.VarChar
+  status             WaitlistedUserStatus   @default(WAITLISTED)
+  powerBadge         Boolean?               @default(false) @map("power_badge")
+  socialCapitalRank  Int                    @default(0) @map("social_capital_rank")
+  socialCapitalScore Float                  @default(0.00) @map("social_capital_score")
+  followerCount      Int                    @default(0) @map("follower_count")
+  followingCount     Int                    @default(0) @map("following_count")
+  location           String?                @default("")
+  profileBio         String?                @default("") @map("profile_bio")
+  referrerFid        Int?                   @map("referrer_fid")
   waitlistedAt       DateTime
-  createdAt          DateTime         @map("created_at")
-  updatedAt          DateTime         @map("updated_at")
-  waitlist           Waitlist         @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  referrer           WaitlistedUser?  @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
-  referrals          WaitlistedUser[] @relation("Referrals")
+  createdAt          DateTime               @map("created_at")
+  updatedAt          DateTime               @map("updated_at")
+  waitlist           Waitlist               @relation(fields: [waitlistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  referrer           WaitlistedUser?        @relation("Referrals", fields: [waitlistId, referrerFid], references: [waitlistId, fid])
+  referrals          WaitlistedUser[]       @relation("Referrals")
 
   @@unique([waitlistId, fid], name: "waitlistId_fid")
   @@index([waitlistId, fid], name: "waitlistId_fid")
@@ -131,3 +137,22 @@ model Checkout {
 
   @@unique([address, requestId])
 }
+
+model ApiKey {
+  id          Int      @unique @default(autoincrement())
+  waitlist_id Int
+  mode        String
+  key         String   @unique
+  ApiRequest  ApiRequest[]
+
+  @@unique([waitlist_id, key], name: "waitlist_id_key")
+}
+
+model ApiRequest {
+  id          Int      @unique @default(autoincrement())
+  api_key_id  Int      @map("api_key_id")
+  path        String
+  method      String
+  createdAt   DateTime @map("created_at")
+  apiKey      ApiKey   @relation(fields: [api_key_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+} 
