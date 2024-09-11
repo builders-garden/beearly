@@ -40,6 +40,16 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
+    // Create an API request log in the database
+    await prisma.apiRequest.create({
+      data: {
+        api_key_id: key.id,
+        path: req.url.replace(`${process.env.BASE_URL}`, ""),
+        method: "POST",
+        createdAt: new Date(),
+      },
+    });
+
     // get the x-waitlist-id from the headers that surely exists because of the middleware
     const waitlistId = key.waitlist_id;
 

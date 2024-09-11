@@ -43,6 +43,16 @@ export const GET = async (
       );
     }
 
+    // Create an API request log in the database
+    await prisma.apiRequest.create({
+      data: {
+        api_key_id: key.id,
+        path: req.url.replace(`${process.env.BASE_URL}`, ""),
+        method: "GET",
+        createdAt: new Date(),
+      },
+    });
+
     // Get the waitlist id from the API key
     const waitlistId = key.waitlist_id;
 
