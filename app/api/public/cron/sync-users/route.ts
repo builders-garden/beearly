@@ -6,9 +6,14 @@ export const GET = async (req: NextRequest) => {
 
   // Check if the request is authorized to run the cron job
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new NextResponse("Unauthorized", {
-      status: 401,
-    });
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      {
+        status: 401,
+      }
+    );
   }
 
   // Send the first payload to QStash to start sync users

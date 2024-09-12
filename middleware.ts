@@ -8,12 +8,12 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  if (req.url.includes("/api/public/")) {
+  if (req.url.includes("/api/public")) {
     // If the request is for a public endpoint, continue processing the request
     return NextResponse.next();
   }
 
-  if (req.url.includes("/api/qstash/")) {
+  if (req.url.includes("/api/qstash")) {
     // If the request is for a QStash endpoint, check the signature
     const receiver = new Receiver({
       currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,

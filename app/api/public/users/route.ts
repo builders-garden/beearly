@@ -1,109 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  fetchFarcasterProfiles,
-  UserProfile,
-} from "../../../../../lib/airstack";
-import prisma from "../../../../../lib/prisma";
-import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
-import { TIERS } from "../../../../../lib/constants";
+import prisma from "../../../../lib/prisma";
+import { TIERS } from "../../../../lib/constants";
+import { fetchFarcasterProfiles, UserProfile } from "../../../../lib/airstack";
+import { formatAirstackUserData } from "../../../../lib/airstack/utils";
 import { WaitlistTier } from "@prisma/client";
+import { validateApiKey } from "../../../../lib/api-key";
 
-export const GET = async (
-  req: NextRequest,
-  {
-    params: { id },
-  }: {
-    params: { id: string };
-  }
-) => {
-  const address = req.headers.get("x-address")!;
-
-  const { searchParams } = new URL(req.url);
-  const limit = searchParams.get("limit") || "10";
-  const page = searchParams.get("page") || "0";
-  const orderBy = searchParams.get("orderBy") || "waitlistedAt";
-  const orderDirection = searchParams.get("orderDirection") || "desc";
-
-  const waitlist = await prisma.waitlist.findUnique({
-    where: {
-      id: parseInt(id),
-      userAddress: address,
-    },
-  });
-
-  if (!waitlist) {
-    return NextResponse.json(
-      {
-        message: "Waitlist not found",
-      },
-      {
-        status: 404,
-      }
-    );
-  }
-
-  const totalCount = await prisma.waitlistedUser.count({
-    where: {
-      waitlistId: parseInt(id),
-    },
-  });
-
-  const waitlistedUsers = await prisma.waitlistedUser.findMany({
-    where: {
-      waitlistId: parseInt(id),
-    },
-    take: parseInt(limit),
-    skip: parseInt(page) * parseInt(limit),
-    orderBy: {
-      ...(orderBy === "referrals"
-        ? {
-            referrals: {
-              _count: orderDirection as "asc" | "desc",
-            },
-          }
-        : { [orderBy]: orderDirection }),
-    },
-    include: {
-      referrals: true,
-      _count: {
-        select: {
-          referrals: true,
-        },
-      },
-    },
-  });
-
-  return NextResponse.json({
-    results: waitlistedUsers,
-    pages: Math.ceil(totalCount / parseInt(limit)),
-    count: totalCount,
-  });
-};
-
-export const POST = async (
-  req: NextRequest,
-  {
-    params: { id },
-  }: {
-    params: { id: string };
-  }
-) => {
+export const POST = async (req: NextRequest) => {
   try {
-    // Get the address from the request headers
-    const address = req.headers.get("x-address")!;
+    // Validate and get the API key
+    const { apiKey: key, valid } = await validateApiKey(req);
 
-    // Find the waitlist associated with the id and the address
+    // If the API key is invalid, return a 401
+    if (!valid || !key) {
+      return NextResponse.json(
+        {
+          message: "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    // Get the waitlist id from the API key
+    const waitlistId = key.waitlist_id;
+
+    // Find the waitlist associated with the id
     const waitlist = await prisma.waitlist.findUnique({
       where: {
-        id: parseInt(id),
-        userAddress: address,
-      },
-      include: {
-        _count: {
-          select: {
-            waitlistedUsers: true,
-          },
-        },
+        id: waitlistId,
       },
     });
 
@@ -135,27 +61,13 @@ export const POST = async (
     const { fids }: { fids: string[] } = body;
     const parsedFids = fids.map((fid) => parseInt(fid));
 
-    if (
-      waitlist.tier !== WaitlistTier.QUEEN &&
-      waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size
-    ) {
-      return NextResponse.json(
-        {
-          message: "Waitlist is full, upgrade tier to add more users",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
     // Query the database for existing WaitlistedUser entries with the provided fids inside the waitlist
     const usersInWaitlist = await prisma.waitlistedUser.findMany({
       where: {
         fid: {
           in: parsedFids,
         },
-        waitlistId: parseInt(id),
+        waitlistId: waitlistId,
       },
       select: {
         fid: true,
@@ -208,7 +120,7 @@ export const POST = async (
     const allUsersToAdd = [
       ...usersFound.map((user) => ({
         ...formatAirstackUserData(user),
-        waitlistId: parseInt(id),
+        waitlistId: waitlistId,
         waitlistedAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -216,7 +128,7 @@ export const POST = async (
       ...usersInDatabase.map((user) => ({
         ...user,
         id: undefined,
-        waitlistId: parseInt(id),
+        waitlistId: waitlistId,
       })),
     ];
 
