@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../../lib/prisma";
+import { validateApiKey } from "../../../../../../lib/api-key";
 
 export const GET = async (
   req: NextRequest,
@@ -10,10 +11,11 @@ export const GET = async (
   }
 ) => {
   try {
-    // Get the API key from the headers
-    const apiKey = req.headers.get("x-api-key");
+    // Validate and get the API key
+    const { apiKey: key, valid } = await validateApiKey(req);
 
-    if (!apiKey) {
+    // If the API key is invalid, return a 401
+    if (!valid || !key) {
       return NextResponse.json(
         {
           message: "Unauthorized",
@@ -23,35 +25,6 @@ export const GET = async (
         }
       );
     }
-
-    // Check if the API key exists in the database
-    const key = await prisma.apiKey.findUnique({
-      where: {
-        key: apiKey,
-      },
-    });
-
-    // If the API key doesn't exist, return a 404
-    if (!key || key.mode === "w") {
-      return NextResponse.json(
-        {
-          message: "Unauthorized",
-        },
-        {
-          status: 401,
-        }
-      );
-    }
-
-    // Create an API request log in the database
-    await prisma.apiRequest.create({
-      data: {
-        api_key_id: key.id,
-        path: req.url.replace(`${process.env.BASE_URL}`, ""),
-        method: "GET",
-        createdAt: new Date(),
-      },
-    });
 
     // Get the waitlist id from the API key
     const waitlistId = key.waitlist_id;
