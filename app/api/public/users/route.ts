@@ -31,13 +31,6 @@ export const POST = async (req: NextRequest) => {
       where: {
         id: waitlistId,
       },
-      include: {
-        _count: {
-          select: {
-            waitlistedUsers: true,
-          },
-        },
-      },
     });
 
     // If the waitlist doesn't exist, return a 404
@@ -67,20 +60,6 @@ export const POST = async (req: NextRequest) => {
     }
     const { fids }: { fids: string[] } = body;
     const parsedFids = fids.map((fid) => parseInt(fid));
-
-    if (
-      waitlist.tier !== WaitlistTier.QUEEN &&
-      waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size
-    ) {
-      return NextResponse.json(
-        {
-          message: "Waitlist is full, upgrade tier to add more users",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
 
     // Query the database for existing WaitlistedUser entries with the provided fids inside the waitlist
     const usersInWaitlist = await prisma.waitlistedUser.findMany({
