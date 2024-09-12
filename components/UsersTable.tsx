@@ -124,6 +124,9 @@ export const UsersTable = ({
   // A function to handle the change of the checkbox
   // It changes user status in the database with a PUT request
   const handleCheckboxChange = async (user: WaitlistedUser) => {
+    if (waitlistTier !== WaitlistTier.QUEEN) {
+      return;
+    }
     await fetch(`/api/waitlists/${waitlistId}/users/${user.fid}/status`, {
       method: "PUT",
       headers: {
@@ -370,7 +373,14 @@ export const UsersTable = ({
                   <div>
                     If you have a valid Beearly Api Key you can check the <br />
                     user status with an API call. <br />
-                    Contact us for more information.
+                    <span className="font-bold">
+                      Contact us for more information.
+                    </span>
+                    {waitlistTier !== WaitlistTier.QUEEN && (
+                      <div className="mt-3">
+                        This feature is only available for Queen tier waitlists.
+                      </div>
+                    )}
                   </div>
                 }
               >
@@ -423,7 +433,7 @@ export const UsersTable = ({
                     user.status === WaitlistedUserStatus.APPROVED
                   }
                   onChange={() => handleCheckboxChange(user)}
-                  disabled
+                  isDisabled={waitlistTier !== WaitlistTier.QUEEN}
                 />
               </TableCell>
               <TableCell>
