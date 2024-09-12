@@ -1,5 +1,3 @@
-import { BASE_FRAME_URL } from "./constants";
-
 interface ChannelFollow {
   following: boolean;
   followedAt?: number;
