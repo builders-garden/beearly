@@ -120,6 +120,26 @@ export const UsersTable = ({
     setOrderBy(mode);
     setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
   };
+
+  // A function to handle the change of the checkbox
+  // It changes user status in the database with a PUT request
+  const handleCheckboxChange = async (user: WaitlistedUser) => {
+    await fetch(`/api/waitlists/${waitlistId}/users/${user.fid}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        status:
+          user.status === WaitlistedUserStatus.APPROVED
+            ? WaitlistedUserStatus.WAITLISTED
+            : WaitlistedUserStatus.APPROVED,
+        userFid: user.fid,
+      }),
+    });
+  };
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between items-center px-4 ">
@@ -402,26 +422,7 @@ export const UsersTable = ({
                   defaultSelected={
                     user.status === WaitlistedUserStatus.APPROVED
                   }
-                  onChange={async () => {
-                    // Change user status in the database with a PUT request
-                    await fetch(
-                      `/api/waitlists/${waitlistId}/users/${user.fid}/status`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${jwt}`,
-                        },
-                        body: JSON.stringify({
-                          status:
-                            user.status === WaitlistedUserStatus.APPROVED
-                              ? WaitlistedUserStatus.WAITLISTED
-                              : WaitlistedUserStatus.APPROVED,
-                          userFid: user.fid,
-                        }),
-                      }
-                    );
-                  }}
+                  onChange={() => handleCheckboxChange(user)}
                   disabled
                 />
               </TableCell>
