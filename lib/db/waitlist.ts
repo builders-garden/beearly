@@ -47,6 +47,33 @@ export const getWaitlistBySlug = async (slug: string) => {
 };
 
 /**
+ * @param idOrSlug - The id or slug of the waitlist.
+ * @returns the found waitlist with the given id or slug or null if not found.
+ */
+export const getWaitlistByIdOrSlug = async (
+  idOrSlug: string
+): Promise<Waitlist | null> => {
+  // Find the waitlist associated with the id or slug based on the type
+  let waitlist;
+  if (isNaN(parseInt(idOrSlug))) {
+    // Find the waitlist associated with the slug
+    waitlist = await prisma.waitlist.findUnique({
+      where: {
+        slug: idOrSlug,
+      },
+    });
+  } else {
+    // Find the waitlist associated with the id
+    waitlist = await prisma.waitlist.findUnique({
+      where: {
+        id: parseInt(idOrSlug),
+      },
+    });
+  }
+  return waitlist;
+};
+
+/**
  * Create a Waitlist.
  * @param {WaitlistCreateArgs} payload - Payload to create a Waitlist.
  * @example
