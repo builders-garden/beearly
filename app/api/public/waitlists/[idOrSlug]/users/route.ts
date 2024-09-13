@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../../lib/prisma";
-import { TIERS } from "../../../../lib/constants";
-import { fetchFarcasterProfiles, UserProfile } from "../../../../lib/airstack";
-import { formatAirstackUserData } from "../../../../lib/airstack/utils";
-import { WaitlistTier } from "@prisma/client";
-import { validateApiKey } from "../../../../lib/api-key";
+import prisma from "../../../../../../lib/prisma";
+import {
+  fetchFarcasterProfiles,
+  UserProfile,
+} from "../../../../../../lib/airstack";
+import { formatAirstackUserData } from "../../../../../../lib/airstack/utils";
+import { validateApiKey } from "../../../../../../lib/api-key";
+import { getWaitlistByIdOrSlug } from "../../../../../../lib/db/waitlist";
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (
+  req: NextRequest,
+  {
+    params: { idOrSlug },
+  }: {
+    params: { idOrSlug: string };
+  }
+) => {
   try {
     // Validate and get the API key
     const { apiKey: key, valid } = await validateApiKey(req);
@@ -23,15 +32,8 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    // Get the waitlist id from the API key
-    const waitlistId = key.waitlist_id;
-
-    // Find the waitlist associated with the id
-    const waitlist = await prisma.waitlist.findUnique({
-      where: {
-        id: waitlistId,
-      },
-    });
+    // Find the waitlist associated with the id or slug based on the type
+    const waitlist = await getWaitlistByIdOrSlug(idOrSlug);
 
     // If the waitlist doesn't exist, return a 404
     if (!waitlist) {
@@ -41,6 +43,18 @@ export const POST = async (req: NextRequest) => {
         },
         {
           status: 404,
+        }
+      );
+    }
+
+    // If the key's waitlist ID doesn't match the user's waitlist ID, return a 401
+    if (key.waitlist_id !== waitlist.id) {
+      return NextResponse.json(
+        {
+          message: "Unauthorized",
+        },
+        {
+          status: 401,
         }
       );
     }
@@ -67,7 +81,7 @@ export const POST = async (req: NextRequest) => {
         fid: {
           in: parsedFids,
         },
-        waitlistId: waitlistId,
+        waitlistId: waitlist.id,
       },
       select: {
         fid: true,
@@ -120,7 +134,7 @@ export const POST = async (req: NextRequest) => {
     const allUsersToAdd = [
       ...usersFound.map((user) => ({
         ...formatAirstackUserData(user),
-        waitlistId: waitlistId,
+        waitlistId: waitlist.id,
         waitlistedAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -128,7 +142,7 @@ export const POST = async (req: NextRequest) => {
       ...usersInDatabase.map((user) => ({
         ...user,
         id: undefined,
-        waitlistId: waitlistId,
+        waitlistId: waitlist.id,
       })),
     ];
 

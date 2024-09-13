@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../../../../lib/prisma";
-import { validateApiKey } from "../../../../../../lib/api-key";
+import { validateApiKey } from "../../../../../../../../lib/api-key";
+import prisma from "../../../../../../../../lib/prisma";
+import { getWaitlistByIdOrSlug } from "../../../../../../../../lib/db/waitlist";
 
 export const GET = async (
   req: NextRequest,
   {
-    params: { fid },
+    params: { fid, idOrSlug },
   }: {
-    params: { fid: string };
+    params: { fid: string; idOrSlug: string };
   }
 ) => {
   try {
@@ -26,15 +27,8 @@ export const GET = async (
       );
     }
 
-    // Get the waitlist id from the API key
-    const waitlistId = key.waitlist_id;
-
-    // Find the waitlist associated with the id
-    const waitlist = await prisma.waitlist.findUnique({
-      where: {
-        id: key.waitlist_id,
-      },
-    });
+    // Find the waitlist associated with the id or slug based on the type
+    const waitlist = await getWaitlistByIdOrSlug(idOrSlug);
 
     // If the waitlist doesn't exist, return a 404
     if (!waitlist) {
@@ -48,13 +42,25 @@ export const GET = async (
       );
     }
 
+    // If the key's waitlist ID doesn't match the user's waitlist ID, return a 401
+    if (key.waitlist_id !== waitlist.id) {
+      return NextResponse.json(
+        {
+          message: "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
     // Check the status of the user
     const parsedFid = parseInt(fid);
     const user = await prisma.waitlistedUser.findUnique({
       where: {
         fid: parsedFid,
-        waitlistId: waitlistId,
-        waitlistId_fid: { waitlistId: waitlistId, fid: parsedFid },
+        waitlistId: waitlist.id,
+        waitlistId_fid: { waitlistId: waitlist.id, fid: parsedFid },
       },
     });
 
