@@ -47,14 +47,14 @@ export const POST = async (
       );
     }
 
-    // If the key's waitlist ID doesn't match the user's waitlist ID, return a 403
+    // If the key's waitlist ID doesn't match the user's waitlist ID, return a 401
     if (key.waitlist_id !== waitlist.id) {
       return NextResponse.json(
         {
           message: "Unauthorized",
         },
         {
-          status: 403,
+          status: 401,
         }
       );
     }
