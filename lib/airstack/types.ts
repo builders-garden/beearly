@@ -588,6 +588,7 @@ export type FarcasterMoxieEarningStat = {
   otherEarningsAmount: Maybe<Scalars['Float']['output']>;
   otherEarningsAmountInWei: Maybe<Scalars['String']['output']>;
   socials: Maybe<Array<Maybe<Social>>>;
+  splitDetails: Maybe<Array<FarcasterMoxieEarningStatSplitDetails>>;
   startTimestamp: Scalars['Time']['output'];
   timeframe: FarcasterMoxieEarningStatsTimeframe;
 };
@@ -595,6 +596,16 @@ export type FarcasterMoxieEarningStat = {
 
 export type FarcasterMoxieEarningStatSocialsArgs = {
   input: InputMaybe<SocialsNestedInput>;
+};
+
+export type FarcasterMoxieEarningStatSplitDetails = {
+  castEarningsAmount: Maybe<Scalars['Float']['output']>;
+  castEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  entityType: Scalars['String']['output'];
+  frameDevEarningsAmount: Maybe<Scalars['Float']['output']>;
+  frameDevEarningsAmountInWei: Maybe<Scalars['String']['output']>;
+  otherEarningsAmount: Maybe<Scalars['Float']['output']>;
+  otherEarningsAmountInWei: Maybe<Scalars['String']['output']>;
 };
 
 export enum FarcasterMoxieEarningStatsEntityType {
