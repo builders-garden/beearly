@@ -217,6 +217,8 @@ export const POST = async (
         ...user,
         id: undefined,
         waitlistId: parseInt(id),
+        referrerFid: null,
+        waitlistedAt: new Date(),
       })),
     ];
 
