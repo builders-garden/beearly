@@ -71,7 +71,11 @@ export default async function WaitlistShortPage({
   return (
     <div className="flex flex-col justify-center items-center gap-2">
       <Image
-        src={waitlist.imageLanding ?? waitlist.logo ?? ""}
+        src={
+          waitlist?.imagesMode === WaitlistImagesMode.ADVANCED
+            ? waitlist?.imageLanding!
+            : waitlist?.logo!
+        }
         alt="waitlist"
       />
       <BeearlyButton
