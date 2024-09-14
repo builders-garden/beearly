@@ -1,6 +1,6 @@
 import { Button } from "frames.js/next";
 import { generateCaptchaChallenge } from "../../../../lib/captcha";
-import { frames } from "../../frames";
+import { defaultImageOptions, frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 import { appURL } from "../../../utils";
 import { fetchFidFromAddress } from "../../../../lib/airstack";
@@ -53,7 +53,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/email/invalid.png`}
+              alt="invalid-email"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -70,6 +74,7 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
+        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -81,15 +86,16 @@ const frameHandler = frames(async (ctx) => {
   return {
     image: (
       <div tw="relative flex items-center justify-center">
-        <img src={`${appURL()}/captcha/challenge.png`} tw="absolute" />
+        <img
+          src={`${appURL()}/captcha/challenge.png`}
+          alt="captcha-challenge"
+          tw="absolute"
+        />
         <div tw="relative flex items-center justify-center text-8xl pt-40 text-black font-bold">
           {numA} + {numB} = ?
         </div>
       </div>
     ),
-    imageOptions: {
-      aspectRatio: "1.91:1",
-    },
     textInput: "Enter the result",
     buttons: [
       <Button
@@ -107,6 +113,7 @@ const frameHandler = frames(async (ctx) => {
         🔢 Submit captcha
       </Button>,
     ],
+    imageOptions: defaultImageOptions,
   };
 });
 
