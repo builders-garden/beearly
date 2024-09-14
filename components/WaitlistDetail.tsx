@@ -127,6 +127,7 @@ export const WaitlistDetail = ({
                   <div className="text-gray-500 text-sm">Landing image</div>
                 </div>
                 <Image
+                  // TODO: add text to the default images
                   src={
                     waitlist.imageLanding ??
                     `${process.env.BASE_URL}/default-frame-images/cover.png`
