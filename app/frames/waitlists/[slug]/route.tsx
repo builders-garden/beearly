@@ -1,6 +1,5 @@
-/* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
-import { frames } from "../../frames";
+import { defaultImageOptions, frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 import { WaitlistImagesMode } from "@prisma/client";
 
@@ -31,18 +30,26 @@ const frameHandler = frames(async (ctx) => {
       waitlist.imagesMode === WaitlistImagesMode.ADVANCED ? (
         waitlist.imageLanding!
       ) : (
-        <div
-          tw="flex w-[1910px] h-[1000px]"
-          style={{
-            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/cover.png")`,
-          }}
-        >
-          <div tw="flex text-white px-18 py-32">{waitlist.textLanding}</div>
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/cover.png`}
+            alt="cover"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textLanding}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
         </div>
       ),
-    imageOptions: {
-      aspectRatio: "1.91:1",
-    },
+    imageOptions: defaultImageOptions,
     textInput: waitlist.requiresEmail ? "Enter your email address" : undefined,
     buttons: [
       <Button
