@@ -11,6 +11,8 @@ import {
   Link,
   Select,
   SelectItem,
+  Tabs,
+  Tab,
 } from "@nextui-org/react";
 import { Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +21,7 @@ import { parseAbsoluteToLocal } from "@internationalized/date";
 import { FrameImage, onSelectedImageFile } from "./FrameImage";
 import { getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { BASE_FRAME_URL } from "../lib/constants";
-import { WaitlistRequirementType } from "@prisma/client";
+import { WaitlistImagesMode, WaitlistRequirementType } from "@prisma/client";
 import { BeearlyButton } from "./BeearlyButton";
 import { WaitlistWithRequirements } from "./WaitlistDetail";
 import PremiumRequired from "./PremiumRequired";
@@ -93,37 +95,60 @@ export const EditWaitlistModal = ({
       ?.map((c) => c.value)
       .join(",")
   );
+
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
   );
-
-  const [uploadedLandingImage, setUploadedLandingImage] = useState<string>(
-    waitlist.imageLanding
-  );
+  const [uploadedLandingImage, setUploadedLandingImage] = useState<
+    string | null
+  >(waitlist.imageLanding);
   const [selectedFileSuccess, setSelectedFileSuccess] = useState<File | null>(
     null
   );
-  const [uploadedSuccessImage, setUploadedSuccessImage] = useState<string>(
-    waitlist.imageSuccess
-  );
+  const [uploadedSuccessImage, setUploadedSuccessImage] = useState<
+    string | null
+  >(waitlist.imageSuccess);
   const [selectedFileNotEligible, setSelectedFileNotEligible] =
     useState<File | null>(null);
-  const [uploadedNotEligibleImage, setUploadedNotEligibleImage] =
-    useState<string>(waitlist.imageNotEligible);
+  const [uploadedNotEligibleImage, setUploadedNotEligibleImage] = useState<
+    string | null
+  >(waitlist.imageNotEligible);
   const [selectedFileClosed, setSelectedFileClosed] = useState<File | null>(
     null
   );
-  const [uploadedClosedImage, setUploadedClosedImage] = useState<string>(
+  const [uploadedClosedImage, setUploadedClosedImage] = useState<string | null>(
     waitlist.imageError
   );
+
+  const [imagesMode, setImagesMode] = useState<WaitlistImagesMode>(
+    waitlist.imagesMode
+  );
+  const [selectedFileLogo, setSelectedFileLogo] = useState<File | null>(null);
+  const [uploadedLogo, setUploadedLogo] = useState<string | null>(
+    waitlist.logo
+  );
+  const [imageTexts, setImageTexts] = useState({
+    landing: waitlist.textLanding,
+    success: waitlist.textSuccess,
+    notEligible: waitlist.textNotEligible,
+    closed: waitlist.textError,
+  });
+
   const isDisabled =
     !name ||
     !endDate ||
     !externalUrl ||
-    (!selectedFileLanding && !uploadedLandingImage) ||
-    (!selectedFileSuccess && !uploadedSuccessImage) ||
-    (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
-    (!selectedFileClosed && !uploadedClosedImage);
+    (imagesMode === WaitlistImagesMode.ADVANCED &&
+      ((!selectedFileLanding && !uploadedLandingImage) ||
+        (!selectedFileSuccess && !uploadedSuccessImage) ||
+        (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
+        (!selectedFileClosed && !uploadedClosedImage))) ||
+    (imagesMode === WaitlistImagesMode.SIMPLE &&
+      ((!selectedFileLogo && !uploadedLogo) ||
+        !imageTexts.landing ||
+        !imageTexts.success ||
+        !imageTexts.notEligible ||
+        !imageTexts.closed));
 
   const [error, setError] = useState<string>();
   const updateWaitlist = async () => {
@@ -132,10 +157,17 @@ export const EditWaitlistModal = ({
       !name ||
       !endDate ||
       !externalUrl ||
-      (!selectedFileLanding && !uploadedLandingImage) ||
-      (!selectedFileSuccess && !uploadedSuccessImage) ||
-      (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
-      (!selectedFileClosed && !uploadedClosedImage)
+      (imagesMode === WaitlistImagesMode.ADVANCED &&
+        ((!selectedFileLanding && !uploadedLandingImage) ||
+          (!selectedFileSuccess && !uploadedSuccessImage) ||
+          (!selectedFileNotEligible && !uploadedNotEligibleImage) ||
+          (!selectedFileClosed && !uploadedClosedImage))) ||
+      (imagesMode === WaitlistImagesMode.SIMPLE &&
+        ((!selectedFileLogo && !uploadedLogo) ||
+          !imageTexts.landing ||
+          !imageTexts.success ||
+          !imageTexts.notEligible ||
+          !imageTexts.closed))
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -146,11 +178,19 @@ export const EditWaitlistModal = ({
     formData.append("endDate", endDate.toAbsoluteString());
     formData.append("externalUrl", externalUrl);
     if (joinButtonText) formData.append("joinButtonText", joinButtonText);
-    if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
-    if (selectedFileSuccess) formData.append("files[1]", selectedFileSuccess);
-    if (selectedFileNotEligible)
-      formData.append("files[2]", selectedFileNotEligible);
-    if (selectedFileClosed) formData.append("files[3]", selectedFileClosed);
+    formData.append("imagesMode", imagesMode);
+
+    if (imagesMode === WaitlistImagesMode.ADVANCED) {
+      if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
+      if (selectedFileSuccess) formData.append("files[1]", selectedFileSuccess);
+      if (selectedFileNotEligible)
+        formData.append("files[2]", selectedFileNotEligible);
+      if (selectedFileClosed) formData.append("files[3]", selectedFileClosed);
+    } else {
+      if (selectedFileLogo) formData.append("logoFile", selectedFileLogo);
+      formData.append("imageTexts", JSON.stringify(imageTexts));
+    }
+
     if (hasCaptcha) {
       formData.append("hasCaptcha", hasCaptcha.toString());
     }
@@ -370,61 +410,170 @@ export const EditWaitlistModal = ({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <div className="flex flex-row justify-between">
-                    <div className="font-semibold text-lg">Add images</div>
-                    <div className="text-xs flex flex-row  text-gray-600 p-1 items-center rounded-md gap-1">
-                      <Info size={12} className="text-gray-600" />
-                      Recommended 955x500px - max 1MB (.jpg, .png, .gif)
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-1">
-                    <div className="w-[50%]">
-                      <FrameImage
-                        selectedFile={selectedFileLanding!}
-                        uploadedImage={uploadedLandingImage}
-                        onSelectedFile={onSelectedImageFile(
-                          setUploadedLandingImage,
-                          setSelectedFileLanding
-                        )}
-                        label="Cover"
-                      />
-                    </div>
-                    <div className="w-[50%]">
-                      <FrameImage
-                        selectedFile={selectedFileSuccess!}
-                        uploadedImage={uploadedSuccessImage}
-                        onSelectedFile={onSelectedImageFile(
-                          setUploadedSuccessImage,
-                          setSelectedFileSuccess
-                        )}
-                        label="Success"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-1">
-                    <div className="w-[50%]">
-                      <FrameImage
-                        selectedFile={selectedFileNotEligible!}
-                        uploadedImage={uploadedNotEligibleImage}
-                        onSelectedFile={onSelectedImageFile(
-                          setUploadedNotEligibleImage,
-                          setSelectedFileNotEligible
-                        )}
-                        label="Not Eligible"
-                      />
-                    </div>
-                    <div className="w-[50%]">
-                      <FrameImage
-                        selectedFile={selectedFileClosed!}
-                        uploadedImage={uploadedClosedImage}
-                        onSelectedFile={onSelectedImageFile(
-                          setUploadedClosedImage,
-                          setSelectedFileClosed
-                        )}
-                        label="Closed (deadline or size limit)"
-                      />
-                    </div>
-                  </div>
+                  <div className="font-semibold text-lg">Add images</div>
+                  <Tabs
+                    aria-label="Image upload options"
+                    selectedKey={imagesMode}
+                    onSelectionChange={(key) =>
+                      setImagesMode(key as WaitlistImagesMode)
+                    }
+                  >
+                    <Tab key={WaitlistImagesMode.SIMPLE} title="Simple Mode">
+                      <div className="text-xs flex flex-row text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
+                        <Info size={12} className="text-gray-600" />
+                        Recommended 300x300px - max 1MB (.jpg, .png, .gif)
+                      </div>
+                      <div className="flex flex-row gap-1 -mb-3">
+                        <div className="w-[27%]">
+                          <FrameImage
+                            selectedFile={selectedFileLogo!}
+                            uploadedImage={uploadedLogo ?? ""}
+                            onSelectedFile={onSelectedImageFile(
+                              setUploadedLogo,
+                              setSelectedFileLogo
+                            )}
+                            label="Logo"
+                            aspectRatio="1:1"
+                          />
+                        </div>
+                        <div className="flex flex-row flex-grow items-center ml-10 gap-4">
+                          <div className="flex flex-col flex-grow gap-3">
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-500 font-bold">
+                                Cover Image Text
+                              </div>
+                              <Input
+                                type="text"
+                                variant={"bordered"}
+                                value={imageTexts.landing ?? ""}
+                                onValueChange={(value) =>
+                                  setImageTexts((prev) => ({
+                                    ...prev,
+                                    landing: value,
+                                  }))
+                                }
+                                placeholder="Click the button to join!"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-500 font-bold">
+                                Success Image Text
+                              </div>
+                              <Input
+                                type="text"
+                                variant={"bordered"}
+                                value={imageTexts.success ?? ""}
+                                onValueChange={(value) =>
+                                  setImageTexts((prev) => ({
+                                    ...prev,
+                                    success: value,
+                                  }))
+                                }
+                                placeholder="Great, you're in!"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex flex-col flex-grow gap-3">
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-500 font-bold">
+                                Not Eligible Image Text
+                              </div>
+                              <Input
+                                type="text"
+                                variant={"bordered"}
+                                value={imageTexts.notEligible ?? ""}
+                                onValueChange={(value) =>
+                                  setImageTexts((prev) => ({
+                                    ...prev,
+                                    notEligible: value,
+                                  }))
+                                }
+                                placeholder="You're not eligible."
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm text-gray-500 font-bold">
+                                Closed Image Text
+                              </div>
+                              <Input
+                                type="text"
+                                variant={"bordered"}
+                                value={imageTexts.closed ?? ""}
+                                onValueChange={(value) =>
+                                  setImageTexts((prev) => ({
+                                    ...prev,
+                                    closed: value,
+                                  }))
+                                }
+                                placeholder="The waitlist is closed."
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Tab>
+                    <Tab
+                      key={WaitlistImagesMode.ADVANCED}
+                      title="Advanced Mode"
+                    >
+                      <div className="text-xs flex flex-row  text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
+                        <Info size={12} className="text-gray-600" />
+                        Recommended 955x500px - max 1MB (.jpg, .png, .gif)
+                      </div>
+                      <div className="flex flex-row gap-1">
+                        <div className="w-[50%]">
+                          <FrameImage
+                            selectedFile={selectedFileLanding!}
+                            uploadedImage={uploadedLandingImage ?? ""}
+                            onSelectedFile={onSelectedImageFile(
+                              setUploadedLandingImage,
+                              setSelectedFileLanding
+                            )}
+                            label="Cover"
+                            aspectRatio="1.91:1"
+                          />
+                        </div>
+                        <div className="w-[50%]">
+                          <FrameImage
+                            selectedFile={selectedFileSuccess!}
+                            uploadedImage={uploadedSuccessImage ?? ""}
+                            onSelectedFile={onSelectedImageFile(
+                              setUploadedSuccessImage,
+                              setSelectedFileSuccess
+                            )}
+                            label="Success"
+                            aspectRatio="1.91:1"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-row gap-1">
+                        <div className="w-[50%]">
+                          <FrameImage
+                            selectedFile={selectedFileNotEligible!}
+                            uploadedImage={uploadedNotEligibleImage ?? ""}
+                            onSelectedFile={onSelectedImageFile(
+                              setUploadedNotEligibleImage,
+                              setSelectedFileNotEligible
+                            )}
+                            label="Not Eligible"
+                            aspectRatio="1.91:1"
+                          />
+                        </div>
+                        <div className="w-[50%]">
+                          <FrameImage
+                            selectedFile={selectedFileClosed!}
+                            uploadedImage={uploadedClosedImage ?? ""}
+                            onSelectedFile={onSelectedImageFile(
+                              setUploadedClosedImage,
+                              setSelectedFileClosed
+                            )}
+                            label="Closed (deadline or size limit)"
+                            aspectRatio="1.91:1"
+                          />
+                        </div>
+                      </div>
+                    </Tab>
+                  </Tabs>
                 </div>
                 <div className="flex flex-col gap-2">
                   <div className="font-semibold text-lg">
