@@ -127,7 +127,10 @@ export const WaitlistDetail = ({
                   <div className="text-gray-500 text-sm">Landing image</div>
                 </div>
                 <Image
-                  src={waitlist.imageLanding}
+                  src={
+                    waitlist.imageLanding ??
+                    `${process.env.BASE_URL}/default-frame-images/cover.png`
+                  }
                   alt="waitlist-img"
                   className="w-[287px] h-[150px] rounded-lg"
                 />
@@ -142,7 +145,10 @@ export const WaitlistDetail = ({
                   <div className="text-gray-500 text-sm">Success image</div>
                 </div>
                 <Image
-                  src={waitlist.imageSuccess}
+                  src={
+                    waitlist.imageSuccess ??
+                    `${process.env.BASE_URL}/default-frame-images/success.png`
+                  }
                   alt="waitlist-img"
                   className="w-[287px] h-[150px] rounded-lg"
                 />
@@ -163,7 +169,10 @@ export const WaitlistDetail = ({
                   </div>
                 </div>
                 <Image
-                  src={waitlist.imageNotEligible}
+                  src={
+                    waitlist.imageNotEligible ??
+                    `${process.env.BASE_URL}/default-frame-images/not-eligible.png`
+                  }
                   alt="waitlist-img"
                   className="w-[287px] h-[150px] rounded-lg"
                 />
@@ -181,7 +190,10 @@ export const WaitlistDetail = ({
                   <div className="text-gray-500 text-sm">Closed image</div>
                 </div>
                 <Image
-                  src={waitlist.imageError}
+                  src={
+                    waitlist.imageError ??
+                    `${process.env.BASE_URL}/default-frame-images/closed.png`
+                  }
                   alt="waitlist-img"
                   className="w-[287px] h-[150px] rounded-lg"
                 />
