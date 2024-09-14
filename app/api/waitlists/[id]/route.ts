@@ -68,12 +68,26 @@ export const PUT = async (
     notEligible: string;
     closed: string;
   } = JSON.parse(body.get("imageTexts") as string);
+  const textsLengthError: {
+    landing: boolean;
+    success: boolean;
+    notEligible: boolean;
+    closed: boolean;
+  } = JSON.parse(body.get("textsLengthError") as string);
 
   // Create two constants to store if the images mode is simple or advanced
   const isSimpleMode = imagesMode === WaitlistImagesMode.SIMPLE;
   const isAdvancedMode = imagesMode === WaitlistImagesMode.ADVANCED;
 
-  if (!name || !endDate || !externalUrl) {
+  if (
+    !name ||
+    !endDate ||
+    !externalUrl ||
+    textsLengthError.landing ||
+    textsLengthError.success ||
+    textsLengthError.notEligible ||
+    textsLengthError.closed
+  ) {
     return NextResponse.json(
       { message: "Missing required fields" },
       { status: 400 }
