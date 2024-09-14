@@ -58,6 +58,12 @@ export const POST = async (req: NextRequest) => {
     notEligible: string;
     closed: string;
   } = JSON.parse(body.get("imageTexts") as string);
+  const textsLengthError: {
+    landing: boolean;
+    success: boolean;
+    notEligible: boolean;
+    closed: boolean;
+  } = JSON.parse(body.get("textsLengthError") as string);
 
   // Create two constants to store if the images mode is simple or advanced
   const isSimpleMode = imagesMode === WaitlistImagesMode.SIMPLE;
@@ -75,7 +81,11 @@ export const POST = async (req: NextRequest) => {
         !imageTexts.landing ||
         !imageTexts.success ||
         !imageTexts.notEligible ||
-        !imageTexts.closed))
+        !imageTexts.closed)) ||
+    textsLengthError.landing ||
+    textsLengthError.success ||
+    textsLengthError.notEligible ||
+    textsLengthError.closed
   ) {
     return NextResponse.json(
       { success: false, message: "Missing required fields" },
