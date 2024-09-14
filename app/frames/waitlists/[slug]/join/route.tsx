@@ -1,6 +1,5 @@
-/* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
-import { frames } from "../../../frames";
+import { defaultImageOptions, frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
 import {
   fetchFarcasterProfile,
@@ -29,6 +28,7 @@ import {
   getUserTotalBalance,
   getUserVestingAddresses,
 } from "../../../../../lib/graphql";
+import { interBoldFontData } from "../../../../../lib/fonts";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -74,23 +74,31 @@ const frameHandler = frames(async (ctx) => {
         image: isAdvancedMode ? (
           waitlist.imageError!
         ) : (
-          <div
-            tw="flex w-full h-full"
-            style={{
-              backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/closed.png")`,
-            }}
-          >
-            <div tw="flex text-white px-18 py-32">{waitlist.textError}</div>
+          <div tw="flex h-full w-full">
+            <img
+              src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+              alt="closed"
+            />
+            <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+              {waitlist.textError}
+            </div>
+            <div tw="absolute bottom-44 w-full flex justify-center items-center">
+              <img
+                tw="rounded-2xl"
+                src={waitlist.logo!}
+                alt="waitlist-logo"
+                width={250}
+                height={250}
+              />
+            </div>
           </div>
         ),
-        imageOptions: {
-          aspectRatio: "1.91:1",
-        },
         buttons: [
           <Button action="link" key="1" target={waitlist.externalUrl}>
             Learn more
           </Button>,
         ],
+        imageOptions: defaultImageOptions,
       };
     }
     // If the waitlist is at 80% capacity, send a notification to the waitlist owner
@@ -140,7 +148,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/captcha/incorrect.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/captcha/incorrect.png`}
+              alt="incorrect-captcha"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -158,6 +170,7 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
+        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -170,7 +183,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/email/invalid.png`}
+              alt="invalid-email"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -187,6 +204,7 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
+        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -217,18 +235,25 @@ const frameHandler = frames(async (ctx) => {
       image: isAdvancedMode ? (
         waitlist.imageSuccess!
       ) : (
-        <div
-          tw="flex w-[1910px] h-[1000px]"
-          style={{
-            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/success.png")`,
-          }}
-        >
-          <div tw="flex text-white px-18 py-32">{waitlist.textSuccess}</div>
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+            alt="success"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textSuccess}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
         </div>
       ),
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
@@ -248,6 +273,7 @@ const frameHandler = frames(async (ctx) => {
           Follow @beearlybot for updates
         </Button>,
       ],
+      imageOptions: defaultImageOptions,
     };
   }
 
@@ -257,23 +283,31 @@ const frameHandler = frames(async (ctx) => {
       image: isAdvancedMode ? (
         waitlist.imageError!
       ) : (
-        <div
-          tw="flex w-full h-full"
-          style={{
-            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/closed.png")`,
-          }}
-        >
-          <div tw="flex text-white px-18 py-32">{waitlist.textError}</div>
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+            alt="closed"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textError}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
         </div>
       ),
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
         </Button>,
       ],
+      imageOptions: defaultImageOptions,
     };
   }
 
@@ -337,20 +371,25 @@ const frameHandler = frames(async (ctx) => {
           image: isAdvancedMode ? (
             waitlist.imageNotEligible!
           ) : (
-            <div
-              tw="flex w-full h-full"
-              style={{
-                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
-              }}
-            >
-              <div tw="flex text-white px-18 py-32">
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
                 {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
               </div>
             </div>
           ),
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
           buttons: [
             <Button
               action="post"
@@ -371,6 +410,7 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
+          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -385,20 +425,25 @@ const frameHandler = frames(async (ctx) => {
           image: isAdvancedMode ? (
             waitlist.imageNotEligible!
           ) : (
-            <div
-              tw="flex w-full h-full"
-              style={{
-                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
-              }}
-            >
-              <div tw="flex text-white px-18 py-32">
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
                 {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
               </div>
             </div>
           ),
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
           buttons: [
             <Button
               action="post"
@@ -439,6 +484,7 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
+          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -452,20 +498,25 @@ const frameHandler = frames(async (ctx) => {
           image: isAdvancedMode ? (
             waitlist.imageNotEligible!
           ) : (
-            <div
-              tw="flex w-full h-full"
-              style={{
-                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
-              }}
-            >
-              <div tw="flex text-white px-18 py-32">
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
                 {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
               </div>
             </div>
           ),
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
           buttons: [
             <Button
               action="post"
@@ -486,6 +537,7 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
+          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -503,20 +555,25 @@ const frameHandler = frames(async (ctx) => {
           image: isAdvancedMode ? (
             waitlist.imageNotEligible!
           ) : (
-            <div
-              tw="flex w-full h-full"
-              style={{
-                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
-              }}
-            >
-              <div tw="flex text-white px-18 py-32">
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
                 {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
               </div>
             </div>
           ),
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
           buttons: [
             <Button
               action="post"
@@ -537,6 +594,7 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
+          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -573,20 +631,25 @@ const frameHandler = frames(async (ctx) => {
           image: isAdvancedMode ? (
             waitlist.imageNotEligible!
           ) : (
-            <div
-              tw="flex w-full h-full"
-              style={{
-                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
-              }}
-            >
-              <div tw="flex text-white px-18 py-32">
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
                 {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
               </div>
             </div>
           ),
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
           buttons: [
             <Button
               action="post"
@@ -607,6 +670,7 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
+          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -634,18 +698,25 @@ const frameHandler = frames(async (ctx) => {
     image: isAdvancedMode ? (
       waitlist.imageSuccess!
     ) : (
-      <div
-        tw="flex w-full h-full"
-        style={{
-          backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/success.png")`,
-        }}
-      >
-        <div tw="flex text-white px-18 py-32">{waitlist.textSuccess}</div>
+      <div tw="flex h-full w-full">
+        <img
+          src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+          alt="success"
+        />
+        <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+          {waitlist.textSuccess}
+        </div>
+        <div tw="absolute bottom-44 w-full flex justify-center items-center">
+          <img
+            tw="rounded-2xl"
+            src={waitlist.logo!}
+            alt="waitlist-logo"
+            width={250}
+            height={250}
+          />
+        </div>
       </div>
     ),
-    imageOptions: {
-      aspectRatio: "1.91:1",
-    },
     buttons: [
       <Button action="link" key="1" target={waitlist.externalUrl}>
         Learn more
@@ -661,6 +732,7 @@ const frameHandler = frames(async (ctx) => {
         Follow @beearlybot for updates
       </Button>,
     ],
+    imageOptions: defaultImageOptions,
   };
 });
 
