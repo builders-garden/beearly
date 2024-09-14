@@ -164,6 +164,12 @@ export default function NewWaitlist() {
     notEligible: "",
     closed: "",
   });
+  const [textsLengthError, setTextsLengthError] = useState({
+    landing: false,
+    success: false,
+    notEligible: false,
+    closed: false,
+  });
 
   const fetchCheckouts = useCallback(async () => {
     try {
@@ -219,9 +225,13 @@ export default function NewWaitlist() {
           !imageTexts.landing ||
           !imageTexts.success ||
           !imageTexts.notEligible ||
-          !imageTexts.closed))
+          !imageTexts.closed)) ||
+      textsLengthError.landing ||
+      textsLengthError.success ||
+      textsLengthError.notEligible ||
+      textsLengthError.closed
     ) {
-      setError("Please fill all the required fields");
+      setError("Please correctly fill all the required fields");
       setLoading(false);
       return;
     }
@@ -231,6 +241,7 @@ export default function NewWaitlist() {
     formData.append("externalUrl", externalUrl);
     formData.append("tier", selectedTier);
     formData.append("imagesMode", imagesMode);
+    formData.append("textsLengthError", JSON.stringify(textsLengthError));
 
     if (imagesMode === WaitlistImagesMode.ADVANCED) {
       formData.append("files[0]", selectedFileLanding!);
@@ -345,7 +356,11 @@ export default function NewWaitlist() {
         imageTexts.landing &&
         imageTexts.success &&
         imageTexts.notEligible &&
-        imageTexts.closed));
+        imageTexts.closed)) &&
+    !textsLengthError.landing &&
+    !textsLengthError.success &&
+    !textsLengthError.notEligible &&
+    !textsLengthError.closed;
 
   const isDisabled = !isWaitlistFormValid || !isTierAvailable;
 
@@ -613,7 +628,7 @@ export default function NewWaitlist() {
                 <Tab key={WaitlistImagesMode.SIMPLE} title="Simple Mode">
                   <div className="text-xs flex flex-row text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
                     <Info size={12} className="text-gray-600" />
-                    Recommended 300x300px - max 1MB (.jpg, .png, .gif)
+                    Recommended 250x250px - max 1MB (.jpg, .png, .gif)
                   </div>
                   <div className="flex flex-row gap-1 -mb-3">
                     <div className="w-[22%]">
@@ -638,16 +653,27 @@ export default function NewWaitlist() {
                             type="text"
                             variant={"bordered"}
                             value={imageTexts.landing}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
                               setImageTexts((prev) => ({
                                 ...prev,
                                 landing: value,
-                              }))
-                            }
+                              }));
+                              setTextsLengthError((prev) => ({
+                                ...prev,
+                                landing: value.length > 120,
+                              }));
+                            }}
                             placeholder="Click on the button to join the waitlist!"
                           />
-                          <div className="text-xs text-gray-500">
-                            The text that will appear on the cover image
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>
+                              The text that will appear on the cover image
+                            </span>
+                            {textsLengthError.landing && (
+                              <span className="text-red-500 pr-1">
+                                Max 120 characters
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1">
@@ -658,16 +684,27 @@ export default function NewWaitlist() {
                             type="text"
                             variant={"bordered"}
                             value={imageTexts.success}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
                               setImageTexts((prev) => ({
                                 ...prev,
                                 success: value,
-                              }))
-                            }
+                              }));
+                              setTextsLengthError((prev) => ({
+                                ...prev,
+                                success: value.length > 120,
+                              }));
+                            }}
                             placeholder="You're in! You're now part of the waitlist!"
                           />
-                          <div className="text-xs text-gray-500">
-                            The text that will appear on the success image
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>
+                              The text that will appear on the success image
+                            </span>
+                            {textsLengthError.success && (
+                              <span className="text-red-500 pr-1">
+                                Max 120 characters
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -680,16 +717,28 @@ export default function NewWaitlist() {
                             type="text"
                             variant={"bordered"}
                             value={imageTexts.notEligible}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
                               setImageTexts((prev) => ({
                                 ...prev,
                                 notEligible: value,
-                              }))
-                            }
+                              }));
+                              setTextsLengthError((prev) => ({
+                                ...prev,
+                                notEligible: value.length > 120,
+                              }));
+                            }}
                             placeholder="You're not eligible to join this waitlist."
                           />
-                          <div className="text-xs text-gray-500">
-                            The text that will appear on the not eligible image
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>
+                              The text that will appear on the not eligible
+                              image
+                            </span>
+                            {textsLengthError.notEligible && (
+                              <span className="text-red-500 pr-1">
+                                Max 120 characters
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1">
@@ -700,16 +749,27 @@ export default function NewWaitlist() {
                             type="text"
                             variant={"bordered"}
                             value={imageTexts.closed}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
                               setImageTexts((prev) => ({
                                 ...prev,
                                 closed: value,
-                              }))
-                            }
+                              }));
+                              setTextsLengthError((prev) => ({
+                                ...prev,
+                                closed: value.length > 120,
+                              }));
+                            }}
                             placeholder="The waitlist is now closed."
                           />
-                          <div className="text-xs text-gray-500">
-                            The text that will appear on the closed image
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>
+                              The text that will appear on the closed image
+                            </span>
+                            {textsLengthError.closed && (
+                              <span className="text-red-500 pr-1">
+                                Max 120 characters
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
