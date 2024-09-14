@@ -133,6 +133,14 @@ export const EditWaitlistModal = ({
     notEligible: waitlist.textNotEligible,
     closed: waitlist.textError,
   });
+  const [textsLengthError, setTextsLengthError] = useState({
+    landing: waitlist.textLanding ? waitlist.textLanding?.length > 120 : false,
+    success: waitlist.textSuccess ? waitlist.textSuccess?.length > 120 : false,
+    notEligible: waitlist.textNotEligible
+      ? waitlist.textNotEligible?.length > 120
+      : false,
+    closed: waitlist.textError ? waitlist.textError?.length > 120 : false,
+  });
 
   const isDisabled =
     !name ||
@@ -148,7 +156,11 @@ export const EditWaitlistModal = ({
         !imageTexts.landing ||
         !imageTexts.success ||
         !imageTexts.notEligible ||
-        !imageTexts.closed));
+        !imageTexts.closed)) ||
+    textsLengthError.landing ||
+    textsLengthError.success ||
+    textsLengthError.notEligible ||
+    textsLengthError.closed;
 
   const [error, setError] = useState<string>();
   const updateWaitlist = async () => {
@@ -167,7 +179,11 @@ export const EditWaitlistModal = ({
           !imageTexts.landing ||
           !imageTexts.success ||
           !imageTexts.notEligible ||
-          !imageTexts.closed))
+          !imageTexts.closed)) ||
+      textsLengthError.landing ||
+      textsLengthError.success ||
+      textsLengthError.notEligible ||
+      textsLengthError.closed
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -179,6 +195,7 @@ export const EditWaitlistModal = ({
     formData.append("externalUrl", externalUrl);
     if (joinButtonText) formData.append("joinButtonText", joinButtonText);
     formData.append("imagesMode", imagesMode);
+    formData.append("textsLengthError", JSON.stringify(textsLengthError));
 
     if (imagesMode === WaitlistImagesMode.ADVANCED) {
       if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
@@ -421,7 +438,7 @@ export const EditWaitlistModal = ({
                     <Tab key={WaitlistImagesMode.SIMPLE} title="Simple Mode">
                       <div className="text-xs flex flex-row text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
                         <Info size={12} className="text-gray-600" />
-                        Recommended 300x300px - max 1MB (.jpg, .png, .gif)
+                        Recommended 250x250px - max 1MB (.jpg, .png, .gif)
                       </div>
                       <div className="flex flex-row gap-1 -mb-3">
                         <div className="w-[27%]">
@@ -436,75 +453,111 @@ export const EditWaitlistModal = ({
                             aspectRatio="1:1"
                           />
                         </div>
-                        <div className="flex flex-row flex-grow items-center ml-10 gap-4">
+                        <div className="flex flex-row flex-grow items-center ml-6 gap-4">
                           <div className="flex flex-col flex-grow gap-3">
                             <div className="flex flex-col gap-1">
-                              <div className="text-sm text-gray-500 font-bold">
-                                Cover Image Text
+                              <div className="flex justify-between items-center text-xs text-gray-500 font-bold">
+                                <span>Cover Image Text</span>
+                                {textsLengthError.landing && (
+                                  <span className="text-red-500 text-[11px] font-normal">
+                                    Max 120 char.
+                                  </span>
+                                )}
                               </div>
                               <Input
                                 type="text"
                                 variant={"bordered"}
                                 value={imageTexts.landing ?? ""}
-                                onValueChange={(value) =>
+                                onValueChange={(value) => {
                                   setImageTexts((prev) => ({
                                     ...prev,
                                     landing: value,
-                                  }))
-                                }
+                                  }));
+                                  setTextsLengthError((prev) => ({
+                                    ...prev,
+                                    landing: value.length > 120,
+                                  }));
+                                }}
                                 placeholder="Click the button to join!"
                               />
                             </div>
                             <div className="flex flex-col gap-1">
-                              <div className="text-sm text-gray-500 font-bold">
-                                Success Image Text
+                              <div className="flex justify-between items-center text-xs text-gray-500 font-bold">
+                                <span>Success Image Text</span>
+                                {textsLengthError.success && (
+                                  <span className="text-red-500 text-[11px] font-normal">
+                                    Max 120 char.
+                                  </span>
+                                )}
                               </div>
                               <Input
                                 type="text"
                                 variant={"bordered"}
                                 value={imageTexts.success ?? ""}
-                                onValueChange={(value) =>
+                                onValueChange={(value) => {
                                   setImageTexts((prev) => ({
                                     ...prev,
                                     success: value,
-                                  }))
-                                }
+                                  }));
+                                  setTextsLengthError((prev) => ({
+                                    ...prev,
+                                    success: value.length > 120,
+                                  }));
+                                }}
                                 placeholder="Great, you're in!"
                               />
                             </div>
                           </div>
                           <div className="flex flex-col flex-grow gap-3">
                             <div className="flex flex-col gap-1">
-                              <div className="text-sm text-gray-500 font-bold">
-                                Not Eligible Image Text
+                              <div className="flex justify-between items-center text-xs text-gray-500 font-bold">
+                                <span>Not Eligible Image Text</span>
+                                {textsLengthError.notEligible && (
+                                  <span className="text-red-500 text-[11px] font-normal">
+                                    Max 120 char.
+                                  </span>
+                                )}
                               </div>
                               <Input
                                 type="text"
                                 variant={"bordered"}
                                 value={imageTexts.notEligible ?? ""}
-                                onValueChange={(value) =>
+                                onValueChange={(value) => {
                                   setImageTexts((prev) => ({
                                     ...prev,
                                     notEligible: value,
-                                  }))
-                                }
+                                  }));
+                                  setTextsLengthError((prev) => ({
+                                    ...prev,
+                                    notEligible: value.length > 120,
+                                  }));
+                                }}
                                 placeholder="You're not eligible."
                               />
                             </div>
                             <div className="flex flex-col gap-1">
-                              <div className="text-sm text-gray-500 font-bold">
-                                Closed Image Text
+                              <div className="flex justify-between items-center text-xs text-gray-500 font-bold">
+                                <span>Closed Image Text</span>
+                                {textsLengthError.closed && (
+                                  <span className="text-red-500 text-[11px] font-normal">
+                                    Max 120 char.
+                                  </span>
+                                )}
                               </div>
                               <Input
                                 type="text"
                                 variant={"bordered"}
                                 value={imageTexts.closed ?? ""}
-                                onValueChange={(value) =>
+                                onValueChange={(value) => {
                                   setImageTexts((prev) => ({
                                     ...prev,
                                     closed: value,
-                                  }))
-                                }
+                                  }));
+                                  setTextsLengthError((prev) => ({
+                                    ...prev,
+                                    closed: value.length > 120,
+                                  }));
+                                }}
                                 placeholder="The waitlist is closed."
                               />
                             </div>
