@@ -8,7 +8,11 @@ import {
   isUserFollowingUsers,
   UserProfile,
 } from "../../../../../lib/airstack";
-import { WaitlistRequirementType, WaitlistTier } from "@prisma/client";
+import {
+  WaitlistImagesMode,
+  WaitlistRequirementType,
+  WaitlistTier,
+} from "@prisma/client";
 import {
   createCastIntent,
   isUserFollowingChannels,
@@ -54,6 +58,9 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  // Create constant to store if the images mode is the simple one
+  const isAdvancedMode = waitlist.imagesMode === WaitlistImagesMode.ADVANCED;
+
   // If the waitlist is not in the QUEEN tier
   // 1. Check if the waitlist is full before going further
   // 2. Send a notification to the waitlist owner if the waitlist is exactly at 80% capacity
@@ -64,7 +71,18 @@ const frameHandler = frames(async (ctx) => {
     // If the waitlist is full, show the error frame
     if (currentWaitlistSize >= tierLimitSize) {
       return {
-        image: waitlist.imageError,
+        image: isAdvancedMode ? (
+          waitlist.imageError!
+        ) : (
+          <div
+            tw="flex w-full h-full"
+            style={{
+              backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/closed.png")`,
+            }}
+          >
+            <div tw="flex text-white px-18 py-32">{waitlist.textError}</div>
+          </div>
+        ),
         imageOptions: {
           aspectRatio: "1.91:1",
         },
@@ -196,7 +214,18 @@ const frameHandler = frames(async (ctx) => {
   });
   if (waitlistedUser) {
     return {
-      image: waitlist.imageSuccess,
+      image: isAdvancedMode ? (
+        waitlist.imageSuccess!
+      ) : (
+        <div
+          tw="flex w-[1910px] h-[1000px]"
+          style={{
+            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/success.png")`,
+          }}
+        >
+          <div tw="flex text-white px-18 py-32">{waitlist.textSuccess}</div>
+        </div>
+      ),
       imageOptions: {
         aspectRatio: "1.91:1",
       },
@@ -225,7 +254,18 @@ const frameHandler = frames(async (ctx) => {
   // If the waitlist has ended, show the error frame
   if (Date.now() > waitlist.endDate.getTime()) {
     return {
-      image: waitlist.imageError,
+      image: isAdvancedMode ? (
+        waitlist.imageError!
+      ) : (
+        <div
+          tw="flex w-full h-full"
+          style={{
+            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/closed.png")`,
+          }}
+        >
+          <div tw="flex text-white px-18 py-32">{waitlist.textError}</div>
+        </div>
+      ),
       imageOptions: {
         aspectRatio: "1.91:1",
       },
@@ -294,7 +334,20 @@ const frameHandler = frames(async (ctx) => {
     if (fanTokenLauncherRequirement?.value === "true") {
       if (!(await getTokenAddressFromSymbolQuery("fid:" + fid))) {
         return {
-          image: waitlist.imageNotEligible,
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div
+              tw="flex w-full h-full"
+              style={{
+                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
+              }}
+            >
+              <div tw="flex text-white px-18 py-32">
+                {waitlist.textNotEligible}
+              </div>
+            </div>
+          ),
           imageOptions: {
             aspectRatio: "1.91:1",
           },
@@ -329,7 +382,20 @@ const frameHandler = frames(async (ctx) => {
       );
       if (!isUserFollowingRequiredChannels) {
         return {
-          image: waitlist.imageNotEligible,
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div
+              tw="flex w-full h-full"
+              style={{
+                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
+              }}
+            >
+              <div tw="flex text-white px-18 py-32">
+                {waitlist.textNotEligible}
+              </div>
+            </div>
+          ),
           imageOptions: {
             aspectRatio: "1.91:1",
           },
@@ -383,7 +449,20 @@ const frameHandler = frames(async (ctx) => {
       );
       if (isUserFollowingRequiredUsers.length < requiredUsersFollow.length) {
         return {
-          image: waitlist.imageNotEligible,
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div
+              tw="flex w-full h-full"
+              style={{
+                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
+              }}
+            >
+              <div tw="flex text-white px-18 py-32">
+                {waitlist.textNotEligible}
+              </div>
+            </div>
+          ),
           imageOptions: {
             aspectRatio: "1.91:1",
           },
@@ -421,7 +500,20 @@ const frameHandler = frames(async (ctx) => {
           parseInt(requiredBuilderScore.value)
       ) {
         return {
-          image: waitlist.imageNotEligible,
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div
+              tw="flex w-full h-full"
+              style={{
+                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
+              }}
+            >
+              <div tw="flex text-white px-18 py-32">
+                {waitlist.textNotEligible}
+              </div>
+            </div>
+          ),
           imageOptions: {
             aspectRatio: "1.91:1",
           },
@@ -478,7 +570,20 @@ const frameHandler = frames(async (ctx) => {
       } catch (e: any) {
         console.error("Not eligible: ", e.message);
         return {
-          image: waitlist.imageNotEligible,
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div
+              tw="flex w-full h-full"
+              style={{
+                backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/not-eligible.png")`,
+              }}
+            >
+              <div tw="flex text-white px-18 py-32">
+                {waitlist.textNotEligible}
+              </div>
+            </div>
+          ),
           imageOptions: {
             aspectRatio: "1.91:1",
           },
@@ -526,7 +631,18 @@ const frameHandler = frames(async (ctx) => {
   }
 
   return {
-    image: waitlist.imageSuccess,
+    image: isAdvancedMode ? (
+      waitlist.imageSuccess!
+    ) : (
+      <div
+        tw="flex w-full h-full"
+        style={{
+          backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/success.png")`,
+        }}
+      >
+        <div tw="flex text-white px-18 py-32">{waitlist.textSuccess}</div>
+      </div>
+    ),
     imageOptions: {
       aspectRatio: "1.91:1",
     },
