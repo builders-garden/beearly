@@ -187,7 +187,7 @@ export default function NewWaitlist() {
   const confirmCheckout = async () => {
     const amount = selectedTier === WaitlistTier.HONEY ? 25 : 30;
     const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
-    await createAndPayRequest({
+    createAndPayRequest({
       tier: selectedTier,
       amount,
       setButtonLoadingMessage,
