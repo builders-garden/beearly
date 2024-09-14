@@ -51,7 +51,7 @@ export const POST = async (req: NextRequest) => {
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
 
-  const logoFile: File | null = body.get("logo") as unknown as File;
+  const logoFile: File | null = body.get("logoFile") as unknown as File;
   const imageTexts: {
     landing: string;
     success: string;
