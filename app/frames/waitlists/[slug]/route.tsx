@@ -2,6 +2,7 @@
 import { Button } from "frames.js/next";
 import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
+import { WaitlistImagesMode } from "@prisma/client";
 
 const frameHandler = frames(async (ctx) => {
   const ref = ctx.url.searchParams.get("ref");
@@ -26,7 +27,19 @@ const frameHandler = frames(async (ctx) => {
   const joinButtonText = waitlist.joinButtonText || "Join Waitlist";
 
   return {
-    image: waitlist.imageLanding,
+    image:
+      waitlist.imagesMode === WaitlistImagesMode.ADVANCED ? (
+        waitlist.imageLanding!
+      ) : (
+        <div
+          tw="flex w-[1910px] h-[1000px]"
+          style={{
+            backgroundImage: `url("${process.env.BASE_URL}/default-frame-images/cover.png")`,
+          }}
+        >
+          <div tw="flex text-white px-18 py-32">{waitlist.textLanding}</div>
+        </div>
+      ),
     imageOptions: {
       aspectRatio: "1.91:1",
     },
