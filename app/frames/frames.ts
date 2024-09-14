@@ -2,6 +2,33 @@ import { farcasterHubContext, openframes } from "frames.js/middleware";
 import { createFrames } from "frames.js/next";
 import { getXmtpFrameMessage, isXmtpFrameActionPayload } from "frames.js/xmtp";
 import { FRAMES_BASE_PATH, appURL } from "../utils";
+import { interBoldFontData } from "../../lib/fonts";
+
+interface ImageOptions {
+  aspectRatio: "1.91:1" | "1:1";
+  height: number;
+  width: number;
+  fonts: {
+    data: Buffer | ArrayBuffer;
+    name: string;
+    weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+    style?: "normal" | "italic";
+    lang?: string;
+  }[];
+}
+
+export const defaultImageOptions: ImageOptions = {
+  aspectRatio: "1.91:1",
+  height: 1000,
+  width: 1910,
+  fonts: [
+    {
+      name: "Inter",
+      data: interBoldFontData,
+      weight: 700,
+    },
+  ],
+};
 
 export const frames = createFrames({
   basePath: FRAMES_BASE_PATH,
