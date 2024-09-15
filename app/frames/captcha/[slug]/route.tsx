@@ -1,6 +1,6 @@
 import { Button } from "frames.js/next";
 import { generateCaptchaChallenge } from "../../../../lib/captcha";
-import { defaultImageOptions, frames } from "../../frames";
+import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 import { appURL } from "../../../utils";
 import { fetchFidFromAddress } from "../../../../lib/airstack";
@@ -74,7 +74,6 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
-        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -113,7 +112,6 @@ const frameHandler = frames(async (ctx) => {
         🔢 Submit captcha
       </Button>,
     ],
-    imageOptions: defaultImageOptions,
   };
 });
 
