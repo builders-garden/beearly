@@ -81,11 +81,11 @@ export const POST = async (req: NextRequest) => {
         !imageTexts.landing ||
         !imageTexts.success ||
         !imageTexts.notEligible ||
-        !imageTexts.closed)) ||
-    textsLengthError.landing ||
-    textsLengthError.success ||
-    textsLengthError.notEligible ||
-    textsLengthError.closed
+        !imageTexts.closed ||
+        textsLengthError.landing ||
+        textsLengthError.success ||
+        textsLengthError.notEligible ||
+        textsLengthError.closed))
   ) {
     return NextResponse.json(
       { success: false, message: "Missing required fields" },
@@ -168,10 +168,10 @@ export const POST = async (req: NextRequest) => {
       imageNotEligible: notEligible?.url ?? null,
       imageError: error?.url ?? null,
       logo: logo?.url ?? null,
-      textLanding: isAdvancedMode ? null : imageTexts.landing,
-      textSuccess: isAdvancedMode ? null : imageTexts.success,
-      textNotEligible: isAdvancedMode ? null : imageTexts.notEligible,
-      textError: isAdvancedMode ? null : imageTexts.closed,
+      textLanding: imageTexts?.landing ?? null,
+      textSuccess: imageTexts?.success ?? null,
+      textNotEligible: imageTexts?.notEligible ?? null,
+      textError: imageTexts?.closed ?? null,
       tier: tier || WaitlistTier.FREE,
       createdAt: new Date(),
       updatedAt: new Date(),
