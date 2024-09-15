@@ -83,10 +83,11 @@ export const PUT = async (
     !name ||
     !endDate ||
     !externalUrl ||
-    textsLengthError.landing ||
-    textsLengthError.success ||
-    textsLengthError.notEligible ||
-    textsLengthError.closed
+    (isSimpleMode &&
+      (textsLengthError.landing ||
+        textsLengthError.success ||
+        textsLengthError.notEligible ||
+        textsLengthError.closed))
   ) {
     return NextResponse.json(
       { message: "Missing required fields" },
@@ -182,18 +183,12 @@ export const PUT = async (
       ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
       ...(error.url ? { imageError: error.url } : {}),
       ...(logo.url ? { logo: logo.url } : {}),
-      ...(isSimpleMode && imageTexts.landing
-        ? { textLanding: imageTexts.landing }
-        : {}),
-      ...(isSimpleMode && imageTexts.success
-        ? { textSuccess: imageTexts.success }
-        : {}),
-      ...(isSimpleMode && imageTexts.notEligible
+      ...(imageTexts?.landing ? { textLanding: imageTexts.landing } : {}),
+      ...(imageTexts?.success ? { textSuccess: imageTexts.success } : {}),
+      ...(imageTexts?.notEligible
         ? { textNotEligible: imageTexts.notEligible }
         : {}),
-      ...(isSimpleMode && imageTexts.closed
-        ? { textError: imageTexts.closed }
-        : {}),
+      ...(imageTexts?.closed ? { textError: imageTexts.closed } : {}),
       updatedAt: new Date(),
     },
   });
