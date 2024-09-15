@@ -1,5 +1,5 @@
 import { Button } from "frames.js/next";
-import { defaultImageOptions, frames } from "../../../frames";
+import { frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
 import {
   fetchFarcasterProfile,
@@ -28,7 +28,6 @@ import {
   getUserTotalBalance,
   getUserVestingAddresses,
 } from "../../../../../lib/graphql";
-import { interBoldFontData } from "../../../../../lib/fonts";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -98,7 +97,6 @@ const frameHandler = frames(async (ctx) => {
             Learn more
           </Button>,
         ],
-        imageOptions: defaultImageOptions,
       };
     }
     // If the waitlist is at 80% capacity, send a notification to the waitlist owner
@@ -170,7 +168,6 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
-        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -204,7 +201,6 @@ const frameHandler = frames(async (ctx) => {
             🔄 Try again
           </Button>,
         ],
-        imageOptions: defaultImageOptions,
       };
     }
   }
@@ -273,7 +269,6 @@ const frameHandler = frames(async (ctx) => {
           Follow @beearlybot for updates
         </Button>,
       ],
-      imageOptions: defaultImageOptions,
     };
   }
 
@@ -307,7 +302,6 @@ const frameHandler = frames(async (ctx) => {
           Learn more
         </Button>,
       ],
-      imageOptions: defaultImageOptions,
     };
   }
 
@@ -410,7 +404,6 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
-          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -484,7 +477,6 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
-          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -537,7 +529,6 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
-          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -594,7 +585,6 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
-          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -670,7 +660,6 @@ const frameHandler = frames(async (ctx) => {
               Learn more
             </Button>,
           ],
-          imageOptions: defaultImageOptions,
         };
       }
     }
@@ -732,7 +721,6 @@ const frameHandler = frames(async (ctx) => {
         Follow @beearlybot for updates
       </Button>,
     ],
-    imageOptions: defaultImageOptions,
   };
 });
 

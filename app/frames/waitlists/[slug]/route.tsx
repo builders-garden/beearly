@@ -1,5 +1,5 @@
 import { Button } from "frames.js/next";
-import { defaultImageOptions, frames } from "../../frames";
+import { frames } from "../../frames";
 import prisma from "../../../../lib/prisma";
 import { WaitlistImagesMode } from "@prisma/client";
 
@@ -49,7 +49,6 @@ const frameHandler = frames(async (ctx) => {
           </div>
         </div>
       ),
-    imageOptions: defaultImageOptions,
     textInput: waitlist.requiresEmail ? "Enter your email address" : undefined,
     buttons: [
       <Button
