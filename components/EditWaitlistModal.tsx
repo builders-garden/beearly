@@ -156,11 +156,11 @@ export const EditWaitlistModal = ({
         !imageTexts.landing ||
         !imageTexts.success ||
         !imageTexts.notEligible ||
-        !imageTexts.closed)) ||
-    textsLengthError.landing ||
-    textsLengthError.success ||
-    textsLengthError.notEligible ||
-    textsLengthError.closed;
+        !imageTexts.closed ||
+        textsLengthError.landing ||
+        textsLengthError.success ||
+        textsLengthError.notEligible ||
+        textsLengthError.closed));
 
   const [error, setError] = useState<string>();
   const updateWaitlist = async () => {
@@ -179,11 +179,11 @@ export const EditWaitlistModal = ({
           !imageTexts.landing ||
           !imageTexts.success ||
           !imageTexts.notEligible ||
-          !imageTexts.closed)) ||
-      textsLengthError.landing ||
-      textsLengthError.success ||
-      textsLengthError.notEligible ||
-      textsLengthError.closed
+          !imageTexts.closed ||
+          textsLengthError.landing ||
+          textsLengthError.success ||
+          textsLengthError.notEligible ||
+          textsLengthError.closed))
     ) {
       setError("Please fill all the fields");
       setLoading(false);
@@ -195,7 +195,6 @@ export const EditWaitlistModal = ({
     formData.append("externalUrl", externalUrl);
     if (joinButtonText) formData.append("joinButtonText", joinButtonText);
     formData.append("imagesMode", imagesMode);
-    formData.append("textsLengthError", JSON.stringify(textsLengthError));
 
     if (imagesMode === WaitlistImagesMode.ADVANCED) {
       if (selectedFileLanding) formData.append("files[0]", selectedFileLanding);
@@ -206,6 +205,7 @@ export const EditWaitlistModal = ({
     } else {
       if (selectedFileLogo) formData.append("logoFile", selectedFileLogo);
       formData.append("imageTexts", JSON.stringify(imageTexts));
+      formData.append("textsLengthError", JSON.stringify(textsLengthError));
     }
 
     if (hasCaptcha) {
