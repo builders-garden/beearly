@@ -220,16 +220,16 @@ export default function NewWaitlist() {
           !selectedFileSuccess ||
           !selectedFileNotEligible ||
           !selectedFileClosed)) ||
-      (imagesMode === WaitlistImagesMode.ADVANCED &&
+      (imagesMode === WaitlistImagesMode.SIMPLE &&
         (!selectedFileLogo ||
           !imageTexts.landing ||
           !imageTexts.success ||
           !imageTexts.notEligible ||
-          !imageTexts.closed)) ||
-      textsLengthError.landing ||
-      textsLengthError.success ||
-      textsLengthError.notEligible ||
-      textsLengthError.closed
+          !imageTexts.closed ||
+          textsLengthError.landing ||
+          textsLengthError.success ||
+          textsLengthError.notEligible ||
+          textsLengthError.closed))
     ) {
       setError("Please correctly fill all the required fields");
       setLoading(false);
@@ -241,7 +241,6 @@ export default function NewWaitlist() {
     formData.append("externalUrl", externalUrl);
     formData.append("tier", selectedTier);
     formData.append("imagesMode", imagesMode);
-    formData.append("textsLengthError", JSON.stringify(textsLengthError));
 
     if (imagesMode === WaitlistImagesMode.ADVANCED) {
       formData.append("files[0]", selectedFileLanding!);
@@ -251,6 +250,7 @@ export default function NewWaitlist() {
     } else {
       formData.append("logoFile", selectedFileLogo!);
       formData.append("imageTexts", JSON.stringify(imageTexts));
+      formData.append("textsLengthError", JSON.stringify(textsLengthError));
     }
 
     if (joinButtonText) {
@@ -356,11 +356,11 @@ export default function NewWaitlist() {
         imageTexts.landing &&
         imageTexts.success &&
         imageTexts.notEligible &&
-        imageTexts.closed)) &&
-    !textsLengthError.landing &&
-    !textsLengthError.success &&
-    !textsLengthError.notEligible &&
-    !textsLengthError.closed;
+        imageTexts.closed &&
+        !textsLengthError.landing &&
+        !textsLengthError.success &&
+        !textsLengthError.notEligible &&
+        !textsLengthError.closed));
 
   const isDisabled = !isWaitlistFormValid || !isTierAvailable;
 
