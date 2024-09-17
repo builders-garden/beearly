@@ -26,7 +26,6 @@ import {
 } from "@prisma/client";
 import { BASE_FRAME_URL, BASE_URL } from "../lib/constants";
 import { UsersTable } from "./UsersTable";
-import { EditWaitlistModal } from "./EditWaitlistModal";
 
 export type WaitlistWithRequirements = Waitlist & {
   waitlistRequirements: WaitlistRequirement[];
