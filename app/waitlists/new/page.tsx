@@ -126,8 +126,8 @@ export default function NewWaitlist() {
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
   const [joinButtonText, setJoinButtonText] = useState<string>("");
-  const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>();
-  const [requiredChannels, setRequiredChannels] = useState<string>();
+  const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>("");
+  const [requiredChannels, setRequiredChannels] = useState<string>("");
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
     useState<boolean>();
   const [fanTokenType, setFanTokenType] = useState<string>("cid");
@@ -897,7 +897,7 @@ export default function NewWaitlist() {
                   <div className="text-sm text-gray-500">Follow users</div>
                   <PremiumRequired />
                 </div>
-                <div className="flex flex-row gap-1">
+                <div className="flex flex-row items-center gap-1">
                   <Input
                     type="text"
                     variant={"bordered"}
@@ -906,18 +906,37 @@ export default function NewWaitlist() {
                     placeholder="dwr.eth,v,horsefacts"
                     isDisabled={selectedTier === WaitlistTier.FREE}
                   />
-                  <Tooltip content="Click me to add @beearlybot to the follow list!">
-                    <button
-                      className="text-xl"
-                      onClick={() =>
-                        setRequiredUsersFollow((prev) => {
-                          if (prev === "") return "beearlybot";
-                          return prev + ",beearlybot";
-                        })
-                      }
-                    >
-                      🐝
-                    </button>
+                  <Tooltip
+                    content={
+                      <div>
+                        Click me to add{" "}
+                        <span className="font-bold">@beearlybot</span> to the
+                        follow list!
+                        {selectedTier === WaitlistTier.FREE && (
+                          <div>
+                            This feature is only available with Honey Bee or
+                            Queen Bee tier.
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    {/* This div is needed to prevent the tooltip from breaking if button is disabled */}
+                    <div>
+                      <button
+                        className={`text-xl ${selectedTier === WaitlistTier.FREE ? "opacity-50 cursor-default" : ""}`}
+                        onClick={() =>
+                          setRequiredUsersFollow((prev) => {
+                            if (prev.includes("beearlybot")) return prev;
+                            if (prev === "") return "beearlybot";
+                            return prev + ",beearlybot";
+                          })
+                        }
+                        disabled={selectedTier === WaitlistTier.FREE}
+                      >
+                        🐝
+                      </button>
+                    </div>
                   </Tooltip>
                 </div>
                 <div className="text-xs text-gray-500">
