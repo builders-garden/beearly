@@ -1,28 +1,17 @@
 "use client";
+import { Button, Image, Input, Link, Tab, Tabs } from "@nextui-org/react";
 import {
-  Button,
-  Checkbox,
-  Image,
-  Input,
-  Link,
-  Tab,
-  Tabs,
-  Tooltip,
-} from "@nextui-org/react";
-import {
-  CheckCircleIcon,
   CopyCheck,
   CopyIcon,
   Edit,
   ExternalLink,
   ImageIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Waitlist,
   WaitlistRequirement,
   WaitlistRequirementType,
-  WaitlistedUser,
 } from "@prisma/client";
 import { BASE_FRAME_URL, BASE_URL } from "../lib/constants";
 import { UsersTable } from "./UsersTable";
