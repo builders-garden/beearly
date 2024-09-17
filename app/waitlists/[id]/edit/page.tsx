@@ -801,7 +801,12 @@ export default function EditWaitlist({
                               setRequiredUsersFollow((prev) => {
                                 if (prev.includes("beearlybot")) return prev;
                                 if (prev === "") return "beearlybot";
-                                return prev + ",beearlybot";
+                                return (
+                                  prev +
+                                  (prev.endsWith(",")
+                                    ? "beearlybot"
+                                    : ",beearlybot")
+                                );
                               })
                             }
                             disabled={waitlist.tier === WaitlistTier.FREE}
@@ -892,7 +897,7 @@ export default function EditWaitlist({
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-row w-full">
+                <div className="flex flex-row gap-8 w-full">
                   <div className="flex flex-col gap-1 w-[25%]">
                     <div className="flex flex-row gap-1 items-center">
                       <div className="text-sm text-gray-500">
@@ -973,7 +978,7 @@ export default function EditWaitlist({
                   <div className="flex flex-row gap-4">
                     <Link href={`/waitlists/${waitlist.id}`}>
                       <Button variant="light" color="primary">
-                        Cancel
+                        Go back
                       </Button>
                     </Link>
                     <BeearlyButton

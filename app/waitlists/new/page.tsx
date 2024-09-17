@@ -929,7 +929,12 @@ export default function NewWaitlist() {
                           setRequiredUsersFollow((prev) => {
                             if (prev.includes("beearlybot")) return prev;
                             if (prev === "") return "beearlybot";
-                            return prev + ",beearlybot";
+                            return (
+                              prev +
+                              (prev.endsWith(",")
+                                ? "beearlybot"
+                                : ",beearlybot")
+                            );
                           })
                         }
                         disabled={selectedTier === WaitlistTier.FREE}
@@ -1016,7 +1021,7 @@ export default function NewWaitlist() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row w-full">
+            <div className="flex flex-row gap-8 w-full">
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">
