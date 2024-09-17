@@ -1,7 +1,7 @@
 "use client";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
 import { Button, Image, Spinner } from "@nextui-org/react";
-import { Waitlist, WaitlistRequirement } from "@prisma/client";
+import { Waitlist } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { UsersTable } from "../../../components/UsersTable";
@@ -14,11 +14,10 @@ import {
   ExternalLinkIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { EditWaitlistModal } from "../../../components/EditWaitlistModal";
+import { useRouter } from "next/navigation";
 
 const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-
+  const router = useRouter();
   const [waitlist, setWaitlist] = useState<Waitlist | null>();
   const [isWaitlistLoading, setWaitlistLoading] = useState(true);
   const [isFrameUrlCopied, setIsFrameUrlCopied] = useState(false);
@@ -33,7 +32,11 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setWaitlist(data);
+        if (data.message === "Waitlist not found") {
+          setWaitlist(null);
+        } else {
+          setWaitlist(data);
+        }
       })
       .finally(() => {
         setWaitlistLoading(false);
@@ -94,7 +97,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
             <Button
               variant="light"
               className="text-gray-500"
-              onPress={() => setIsEditModalOpen(true)}
+              onPress={() => router.push(`/waitlists/${waitlist.id}/edit`)}
             >
               <Edit />
               Edit
@@ -156,16 +159,6 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
           {waitlist && !isWaitlistLoading && (
             <UsersTable waitlistId={waitlist.id} waitlistTier={waitlist.tier} />
           )}
-          <EditWaitlistModal
-            isOpen={isEditModalOpen}
-            waitlist={
-              waitlist as Waitlist & {
-                waitlistRequirements: WaitlistRequirement[];
-              }
-            }
-            onOpenChange={setIsEditModalOpen}
-            refetchWaitlist={fetchWaitlist}
-          />
         </div>
       )}
     </div>
