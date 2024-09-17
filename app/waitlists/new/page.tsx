@@ -11,6 +11,7 @@ import {
   Tabs,
   Tab,
   Switch,
+  Tooltip,
 } from "@nextui-org/react";
 import {
   AlertCircle,
@@ -896,14 +897,29 @@ export default function NewWaitlist() {
                   <div className="text-sm text-gray-500">Follow users</div>
                   <PremiumRequired />
                 </div>
-                <Input
-                  type="text"
-                  variant={"bordered"}
-                  value={requiredUsersFollow}
-                  onValueChange={setRequiredUsersFollow}
-                  placeholder="dwr.eth,v,horsefacts"
-                  isDisabled={selectedTier === WaitlistTier.FREE}
-                />
+                <div className="flex flex-row gap-1">
+                  <Input
+                    type="text"
+                    variant={"bordered"}
+                    value={requiredUsersFollow}
+                    onValueChange={setRequiredUsersFollow}
+                    placeholder="dwr.eth,v,horsefacts"
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                  <Tooltip content="Click me to add @beearlybot to the follow list!">
+                    <button
+                      className="text-xl"
+                      onClick={() =>
+                        setRequiredUsersFollow((prev) => {
+                          if (prev === "") return "beearlybot";
+                          return prev + ",beearlybot";
+                        })
+                      }
+                    >
+                      🐝
+                    </button>
+                  </Tooltip>
+                </div>
                 <div className="text-xs text-gray-500">
                   Comma separated list of usernames that the users must follow
                   to be eligible
