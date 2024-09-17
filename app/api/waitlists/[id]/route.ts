@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 import { uploadImage } from "../../../../lib/imagekit";
 import slugify from "slugify";
-import { WaitlistRequirementType } from "@prisma/client";
+import { WaitlistImagesMode, WaitlistRequirementType } from "@prisma/client";
 import { createWaitlistRequirement } from "../../../../lib/db/waitlistRequirements";
 
 export const GET = async (
@@ -54,12 +54,41 @@ export const PUT = async (
   const requiredBuilderScore = body.get("requiredBuilderScore");
   const fanTokenSymbolAndAmount = body.get("fanTokenSymbolAndAmount");
 
+  const imagesMode = body.get("imagesMode") as WaitlistImagesMode;
+
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
 
-  if (!name || !endDate || !externalUrl) {
+  const logoFile: File | null = body.get("logoFile") as unknown as File;
+  const imageTexts: {
+    landing: string;
+    success: string;
+    notEligible: string;
+    closed: string;
+  } = JSON.parse(body.get("imageTexts") as string);
+  const textsLengthError: {
+    landing: boolean;
+    success: boolean;
+    notEligible: boolean;
+    closed: boolean;
+  } = JSON.parse(body.get("textsLengthError") as string);
+
+  // Create two constants to store if the images mode is simple or advanced
+  const isSimpleMode = imagesMode === WaitlistImagesMode.SIMPLE;
+  const isAdvancedMode = imagesMode === WaitlistImagesMode.ADVANCED;
+
+  if (
+    !name ||
+    !endDate ||
+    !externalUrl ||
+    (isSimpleMode &&
+      (textsLengthError.landing ||
+        textsLengthError.success ||
+        textsLengthError.notEligible ||
+        textsLengthError.closed))
+  ) {
     return NextResponse.json(
       { message: "Missing required fields" },
       { status: 400 }
@@ -71,6 +100,7 @@ export const PUT = async (
     trim: true,
     replacement: "-",
   });
+
   const existingWaitlist = await prisma.waitlist.findFirst({
     where: {
       id: {
@@ -87,45 +117,51 @@ export const PUT = async (
     );
   }
 
-  let landing: { url: string } = { url: "" };
-  if (landingImage) {
-    const landingBytes = await landingImage!.arrayBuffer();
-    const landingBuffer = Buffer.from(landingBytes);
-    const landingUpload = await uploadImage(
-      landingBuffer,
-      `${name}-landing.png`
-    );
-    landing = { url: landingUpload.url };
-  }
+  let landing: { url: string } = { url: "" },
+    success: { url: string } = { url: "" },
+    notEligible: { url: string } = { url: "" },
+    error: { url: string } = { url: "" },
+    logo: { url: string } = { url: "" };
 
-  let success: { url: string } = { url: "" };
-  if (successImage) {
-    const successBytes = await successImage!.arrayBuffer();
-    const successBuffer = Buffer.from(successBytes);
-    const successUpload = await uploadImage(
-      successBuffer,
-      `${name}-success.png`
-    );
-    success = { url: successUpload.url };
-  }
-
-  let notEligible: { url: string } = { url: "" };
-  if (notEligibleImage) {
-    const notEligibleBytes = await notEligibleImage!.arrayBuffer();
-    const notEligibleBuffer = Buffer.from(notEligibleBytes);
-    const notEligibleUpload = await uploadImage(
-      notEligibleBuffer,
-      `${name}-not-eligible.png`
-    );
-    notEligible = { url: notEligibleUpload.url };
-  }
-
-  let error: { url: string } = { url: "" };
-  if (errorImage) {
-    const errorBytes = await errorImage!.arrayBuffer();
-    const errorBuffer = Buffer.from(errorBytes);
-    const errorUpload = await uploadImage(errorBuffer, `${name}-error.png`);
-    error = { url: errorUpload.url };
+  if (isAdvancedMode) {
+    if (landingImage) {
+      const landingBytes = await landingImage!.arrayBuffer();
+      const landingBuffer = Buffer.from(landingBytes);
+      const landingUpload = await uploadImage(
+        landingBuffer,
+        `${name}-landing.png`
+      );
+      landing = { url: landingUpload.url };
+    }
+    if (successImage) {
+      const successBytes = await successImage!.arrayBuffer();
+      const successBuffer = Buffer.from(successBytes);
+      const successUpload = await uploadImage(
+        successBuffer,
+        `${name}-success.png`
+      );
+      success = { url: successUpload.url };
+    }
+    if (notEligibleImage) {
+      const notEligibleBytes = await notEligibleImage!.arrayBuffer();
+      const notEligibleBuffer = Buffer.from(notEligibleBytes);
+      const notEligibleUpload = await uploadImage(
+        notEligibleBuffer,
+        `${name}-not-eligible.png`
+      );
+      notEligible = { url: notEligibleUpload.url };
+    }
+    if (errorImage) {
+      const errorBytes = await errorImage!.arrayBuffer();
+      const errorBuffer = Buffer.from(errorBytes);
+      const errorUpload = await uploadImage(errorBuffer, `${name}-error.png`);
+      error = { url: errorUpload.url };
+    }
+  } else if (isSimpleMode && logoFile) {
+    const logoBytes = await logoFile!.arrayBuffer();
+    const logoBuffer = Buffer.from(logoBytes);
+    const logoUpload = await uploadImage(logoBuffer, `${name}-logo.png`);
+    logo = { url: logoUpload.url };
   }
 
   const waitlist = await prisma.waitlist.update({
@@ -141,10 +177,18 @@ export const PUT = async (
       endDate: new Date(endDate as string),
       externalUrl: externalUrl as string,
       joinButtonText: joinButtonText as string,
+      imagesMode: imagesMode,
       ...(landing.url ? { imageLanding: landing.url } : {}),
       ...(success.url ? { imageSuccess: success.url } : {}),
       ...(notEligible.url ? { imageNotEligible: notEligible.url } : {}),
       ...(error.url ? { imageError: error.url } : {}),
+      ...(logo.url ? { logo: logo.url } : {}),
+      ...(imageTexts?.landing ? { textLanding: imageTexts.landing } : {}),
+      ...(imageTexts?.success ? { textSuccess: imageTexts.success } : {}),
+      ...(imageTexts?.notEligible
+        ? { textNotEligible: imageTexts.notEligible }
+        : {}),
+      ...(imageTexts?.closed ? { textError: imageTexts.closed } : {}),
       updatedAt: new Date(),
     },
   });

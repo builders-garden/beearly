@@ -792,6 +792,7 @@ export type FarcasterScore = {
   farRank: Maybe<Scalars['Int']['output']>;
   farScore: Maybe<Scalars['Float']['output']>;
   farScoreRaw: Maybe<Scalars['String']['output']>;
+  liquidityBoost: Maybe<Scalars['Float']['output']>;
   tvl: Maybe<Scalars['String']['output']>;
   tvlBoost: Maybe<Scalars['Float']['output']>;
 };
@@ -1176,6 +1177,7 @@ export type SocialFollowingsArgs = {
 
 export type SocialCapital = {
   farBoost: Maybe<Scalars['Float']['output']>;
+  liquidityBoost: Maybe<Scalars['Float']['output']>;
   socialCapitalRank: Maybe<Scalars['Int']['output']>;
   socialCapitalScore: Maybe<Scalars['Float']['output']>;
   socialCapitalScoreRaw: Maybe<Scalars['String']['output']>;

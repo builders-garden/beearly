@@ -28,11 +28,13 @@ export const FrameImage = ({
   uploadedImage,
   onSelectedFile,
   label,
+  aspectRatio,
 }: {
   selectedFile: File;
   uploadedImage: string;
   onSelectedFile: (fileInputId: string) => (e: any) => void;
   label: string;
+  aspectRatio: "1:1" | "1.91:1";
 }) => {
   const fileInputId = `${label}-file-input`;
   return (
@@ -44,12 +46,14 @@ export const FrameImage = ({
         <div className="m-2">
           <Image
             src={uploadedImage}
-            className="object-cover w-[287px] h-[150px] hover:opacity-35"
-            alt="success-image"
+            className={`object-cover ${aspectRatio === "1.91:1" ? "w-[287px] h-[150px]" : "w-[150px] h-[150px]"} hover:opacity-35`}
+            alt="selected-image"
           />
         </div>
       ) : (
-        <div className="text-gray-400 w-[287px] bg-white my-2 h-[150px] rounded-md hover:border-primary hover:border-2 hover:border-dashed hover:text-primary ">
+        <div
+          className={`text-gray-400 bg-white my-2 ${aspectRatio === "1.91:1" ? "w-[287px] h-[150px]" : "w-[150px] h-[150px]"} rounded-md hover:border-primary hover:border-2 hover:border-dashed hover:text-primary `}
+        >
           <div className="flex flex-col gap-1 justify-center items-center h-full my-auto">
             <PlusSquare size={24} />
             <div className="text-lg">Add image</div>

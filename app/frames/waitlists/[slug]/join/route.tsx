@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
 import { frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
@@ -8,7 +7,11 @@ import {
   isUserFollowingUsers,
   UserProfile,
 } from "../../../../../lib/airstack";
-import { WaitlistRequirementType, WaitlistTier } from "@prisma/client";
+import {
+  WaitlistImagesMode,
+  WaitlistRequirementType,
+  WaitlistTier,
+} from "@prisma/client";
 import {
   createCastIntent,
   isUserFollowingChannels,
@@ -54,6 +57,9 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
+  // Create constant to store if the images mode is the simple one
+  const isAdvancedMode = waitlist.imagesMode === WaitlistImagesMode.ADVANCED;
+
   // If the waitlist is not in the QUEEN tier
   // 1. Check if the waitlist is full before going further
   // 2. Send a notification to the waitlist owner if the waitlist is exactly at 80% capacity
@@ -64,10 +70,28 @@ const frameHandler = frames(async (ctx) => {
     // If the waitlist is full, show the error frame
     if (currentWaitlistSize >= tierLimitSize) {
       return {
-        image: waitlist.imageError,
-        imageOptions: {
-          aspectRatio: "1.91:1",
-        },
+        image: isAdvancedMode ? (
+          waitlist.imageError!
+        ) : (
+          <div tw="flex h-full w-full">
+            <img
+              src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+              alt="closed"
+            />
+            <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+              {waitlist.textError}
+            </div>
+            <div tw="absolute bottom-44 w-full flex justify-center items-center">
+              <img
+                tw="rounded-2xl"
+                src={waitlist.logo!}
+                alt="waitlist-logo"
+                width={250}
+                height={250}
+              />
+            </div>
+          </div>
+        ),
         buttons: [
           <Button action="link" key="1" target={waitlist.externalUrl}>
             Learn more
@@ -122,7 +146,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/captcha/incorrect.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/captcha/incorrect.png`}
+              alt="incorrect-captcha"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -152,7 +180,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/email/invalid.png`}
+              alt="invalid-email"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -196,10 +228,28 @@ const frameHandler = frames(async (ctx) => {
   });
   if (waitlistedUser) {
     return {
-      image: waitlist.imageSuccess,
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
+      image: isAdvancedMode ? (
+        waitlist.imageSuccess!
+      ) : (
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+            alt="success"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textSuccess}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
+        </div>
+      ),
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
@@ -225,10 +275,28 @@ const frameHandler = frames(async (ctx) => {
   // If the waitlist has ended, show the error frame
   if (Date.now() > waitlist.endDate.getTime()) {
     return {
-      image: waitlist.imageError,
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
+      image: isAdvancedMode ? (
+        waitlist.imageError!
+      ) : (
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+            alt="closed"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textError}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
+        </div>
+      ),
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
@@ -294,10 +362,28 @@ const frameHandler = frames(async (ctx) => {
     if (fanTokenLauncherRequirement?.value === "true") {
       if (!(await getTokenAddressFromSymbolQuery("fid:" + fid))) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -329,10 +415,28 @@ const frameHandler = frames(async (ctx) => {
       );
       if (!isUserFollowingRequiredChannels) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -383,10 +487,28 @@ const frameHandler = frames(async (ctx) => {
       );
       if (isUserFollowingRequiredUsers.length < requiredUsersFollow.length) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -421,10 +543,28 @@ const frameHandler = frames(async (ctx) => {
           parseInt(requiredBuilderScore.value)
       ) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -478,10 +618,28 @@ const frameHandler = frames(async (ctx) => {
       } catch (e: any) {
         console.error("Not eligible: ", e.message);
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -526,10 +684,28 @@ const frameHandler = frames(async (ctx) => {
   }
 
   return {
-    image: waitlist.imageSuccess,
-    imageOptions: {
-      aspectRatio: "1.91:1",
-    },
+    image: isAdvancedMode ? (
+      waitlist.imageSuccess!
+    ) : (
+      <div tw="flex h-full w-full">
+        <img
+          src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+          alt="success"
+        />
+        <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+          {waitlist.textSuccess}
+        </div>
+        <div tw="absolute bottom-44 w-full flex justify-center items-center">
+          <img
+            tw="rounded-2xl"
+            src={waitlist.logo!}
+            alt="waitlist-logo"
+            width={250}
+            height={250}
+          />
+        </div>
+      </div>
+    ),
     buttons: [
       <Button action="link" key="1" target={waitlist.externalUrl}>
         Learn more

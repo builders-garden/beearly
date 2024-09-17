@@ -25,6 +25,11 @@ enum WaitlistedUserStatus {
   APPROVED
 }
 
+enum WaitlistImagesMode {
+  SIMPLE
+  ADVANCED
+}
+
 model Waitlist {
   id                   Int                   @unique @default(autoincrement())
   name                 String                @db.VarChar
@@ -35,10 +40,16 @@ model Waitlist {
   hasCaptcha           Boolean               @default(false) @map("has_captcha")
   requiresEmail        Boolean               @default(false) @map("requires_email")
   joinButtonText       String?               @map("join_button_text")
-  imageLanding         String                @map("image_landing")
-  imageSuccess         String                @map("image_success")
-  imageNotEligible     String                @map("image_not_eligible")
-  imageError           String                @map("image_error")
+  imagesMode           WaitlistImagesMode    @default(ADVANCED) @map("images_mode")
+  imageLanding         String?               @map("image_landing")
+  imageSuccess         String?               @map("image_success")
+  imageNotEligible     String?               @map("image_not_eligible")
+  imageError           String?               @map("image_error")
+  textLanding          String?               @map("text_landing")
+  textSuccess          String?               @map("text_success")
+  textNotEligible      String?               @map("text_not_eligible")
+  textError            String?               @map("text_error")
+  logo                 String?               @map("logo")
   userAddress          String                @map("user_address")
   createdAt            DateTime              @map("created_at")
   updatedAt            DateTime              @map("updated_at")
