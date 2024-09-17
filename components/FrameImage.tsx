@@ -47,7 +47,7 @@ export const FrameImage = ({
           <Image
             src={uploadedImage}
             className={`object-cover ${aspectRatio === "1.91:1" ? "w-[287px] h-[150px]" : "w-[150px] h-[150px]"} hover:opacity-35`}
-            alt="success-image"
+            alt="selected-image"
           />
         </div>
       ) : (

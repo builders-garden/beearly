@@ -33,7 +33,7 @@ export const FramePreview = ({
                   : "/default-frame-images/closed.png"
           }
           className="object-cover w-[287px] h-[150px] rounded-md"
-          alt="success-image"
+          alt={`${previewType}-image`}
         />
         <div className="z-10 absolute flex items-center justify-center top-6 px-3 w-full h-[61px] text-black font-semibold text-sm text-center leading-[17px]">
           {imageTexts[previewType]}
