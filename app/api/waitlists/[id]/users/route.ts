@@ -6,6 +6,7 @@ import {
 import prisma from "../../../../../lib/prisma";
 import { formatAirstackUserData } from "../../../../../lib/airstack/utils";
 import { TIERS } from "../../../../../lib/constants";
+import { WaitlistTier } from "@prisma/client";
 
 export const GET = async (
   req: NextRequest,
@@ -22,7 +23,6 @@ export const GET = async (
   const page = searchParams.get("page") || "0";
   const orderBy = searchParams.get("orderBy") || "waitlistedAt";
   const orderDirection = searchParams.get("orderDirection") || "desc";
-  const powerBadge = searchParams.get("powerBadge") || "";
 
   const waitlist = await prisma.waitlist.findUnique({
     where: {
@@ -42,25 +42,15 @@ export const GET = async (
     );
   }
 
-  const [totalCount, powerBadgeCount] = await Promise.all([
-    prisma.waitlistedUser.count({
-      where: {
-        waitlistId: parseInt(id),
-      },
-    }),
-    prisma.waitlistedUser.count({
-      where: {
-        waitlistId: parseInt(id),
-        powerBadge: true,
-      },
-    }),
-  ]);
+  const totalCount = await prisma.waitlistedUser.count({
+    where: {
+      waitlistId: parseInt(id),
+    },
+  });
+
   const waitlistedUsers = await prisma.waitlistedUser.findMany({
     where: {
       waitlistId: parseInt(id),
-      ...(powerBadge.toString().length > 0 && {
-        powerBadge: powerBadge === "true",
-      }),
     },
     take: parseInt(limit),
     skip: parseInt(page) * parseInt(limit),
@@ -83,13 +73,10 @@ export const GET = async (
     },
   });
 
-  const finalCount = powerBadge === "true" ? powerBadgeCount : totalCount;
-
   return NextResponse.json({
     results: waitlistedUsers,
-    pages: Math.ceil(finalCount / parseInt(limit)),
-    count: finalCount,
-    powerBadgeUsersCount: powerBadgeCount,
+    pages: Math.ceil(totalCount / parseInt(limit)),
+    count: totalCount,
   });
 };
 
@@ -148,7 +135,10 @@ export const POST = async (
     const { fids }: { fids: string[] } = body;
     const parsedFids = fids.map((fid) => parseInt(fid));
 
-    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+    if (
+      waitlist.tier !== WaitlistTier.QUEEN &&
+      waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size
+    ) {
       return NextResponse.json(
         {
           message: "Waitlist is full, upgrade tier to add more users",
@@ -227,6 +217,8 @@ export const POST = async (
         ...user,
         id: undefined,
         waitlistId: parseInt(id),
+        referrerFid: null,
+        waitlistedAt: new Date(),
       })),
     ];
 

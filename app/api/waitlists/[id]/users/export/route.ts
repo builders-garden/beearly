@@ -29,12 +29,11 @@ export const GET = async (
       fid: true,
       username: true,
       displayName: true,
-      powerBadge: true,
       address: true,
       email: true,
     },
   });
-  const csv = ["fid,username,displayName,email,address,powerBadge"]
+  const csv = ["fid,username,displayName,email,address"]
     .concat(
       users.map((user) => {
         return [
@@ -43,7 +42,6 @@ export const GET = async (
           user.displayName.trim().replace(/\r?\n|\r/g, ""),
           user.email ? user.email.trim().replace(/\r?\n|\r/g, "") : "",
           user.address,
-          user.powerBadge,
         ].join(",");
       })
     )

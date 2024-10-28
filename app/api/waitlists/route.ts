@@ -4,6 +4,7 @@ import slugify from "slugify";
 import {
   Checkout,
   CheckoutStatus,
+  WaitlistImagesMode,
   WaitlistRequirementType,
   WaitlistTier,
 } from "@prisma/client";
@@ -28,6 +29,7 @@ export const GET = async (req: NextRequest) => {
 
 export const POST = async (req: NextRequest) => {
   const body = await req.formData();
+  const address = req.headers.get("x-address");
 
   const name = body.get("name");
   const endDate = body.get("endDate");
@@ -35,28 +37,55 @@ export const POST = async (req: NextRequest) => {
   const requiresEmail = body.get("requiresEmail");
   const externalUrl = body.get("externalUrl");
   const joinButtonText = body.get("joinButtonText");
-  const isPowerBadgeRequired = body.get("isPowerBadgeRequired");
+  const isFanTokenLauncher = body.get("isFanTokenLauncher");
   const requiredChannels = body.get("requiredChannels");
   const requiredUsersFollow = body.get("requiredUsersFollow");
   const requiredBuilderScore = body.get("requiredBuilderScore");
+  const fanTokenSymbolAndAmount = body.get("fanTokenSymbolAndAmount");
   const tier = (body.get("tier") as WaitlistTier) || WaitlistTier.FREE;
 
-  const address = req.headers.get("x-address");
+  const imagesMode = body.get("imagesMode") as WaitlistImagesMode;
 
   const landingImage: File | null = body.get("files[0]") as unknown as File;
   const successImage: File | null = body.get("files[1]") as unknown as File;
   const notEligibleImage: File | null = body.get("files[2]") as unknown as File;
   const errorImage: File | null = body.get("files[3]") as unknown as File;
 
+  const logoFile: File | null = body.get("logoFile") as unknown as File;
+  const imageTexts: {
+    landing: string;
+    success: string;
+    notEligible: string;
+    closed: string;
+  } = JSON.parse(body.get("imageTexts") as string);
+  const textsLengthError: {
+    landing: boolean;
+    success: boolean;
+    notEligible: boolean;
+    closed: boolean;
+  } = JSON.parse(body.get("textsLengthError") as string);
+
+  // Create two constants to store if the images mode is simple or advanced
+  const isSimpleMode = imagesMode === WaitlistImagesMode.SIMPLE;
+  const isAdvancedMode = imagesMode === WaitlistImagesMode.ADVANCED;
+
   if (
     !name ||
     !endDate ||
     !externalUrl ||
     !address ||
-    !landingImage ||
-    !successImage ||
-    !notEligibleImage ||
-    !errorImage
+    (isAdvancedMode &&
+      (!landingImage || !successImage || !notEligibleImage || !errorImage)) ||
+    (isSimpleMode &&
+      (!logoFile ||
+        !imageTexts.landing ||
+        !imageTexts.success ||
+        !imageTexts.notEligible ||
+        !imageTexts.closed ||
+        textsLengthError.landing ||
+        textsLengthError.success ||
+        textsLengthError.notEligible ||
+        textsLengthError.closed))
   ) {
     return NextResponse.json(
       { success: false, message: "Missing required fields" },
@@ -76,7 +105,10 @@ export const POST = async (req: NextRequest) => {
     });
     if (!claimableCheckout) {
       return NextResponse.json(
-        { success: false, message: "To create" },
+        {
+          success: false,
+          message: "To create this waitlist you need to buy the required tier",
+        },
         { status: 400 }
       );
     }
@@ -97,20 +129,28 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  const landingBytes = await landingImage!.arrayBuffer();
-  const landingBuffer = Buffer.from(landingBytes);
-  const successBytes = await successImage!.arrayBuffer();
-  const successBuffer = Buffer.from(successBytes);
-  const notEligibleBytes = await notEligibleImage!.arrayBuffer();
-  const notEligibleBuffer = Buffer.from(notEligibleBytes);
-  const errorBytes = await errorImage!.arrayBuffer();
-  const errorBuffer = Buffer.from(errorBytes);
-  const [landing, success, notEligible, error] = await Promise.all([
-    uploadImage(landingBuffer, `${name}-landing.png`),
-    uploadImage(successBuffer, `${name}-success.png`),
-    uploadImage(notEligibleBuffer, `${name}-not-eligible.png`),
-    uploadImage(errorBuffer, `${name}-error.png`),
-  ]);
+  let landing, success, notEligible, error, logo;
+
+  if (isAdvancedMode) {
+    const landingBytes = await landingImage!.arrayBuffer();
+    const landingBuffer = Buffer.from(landingBytes);
+    const successBytes = await successImage!.arrayBuffer();
+    const successBuffer = Buffer.from(successBytes);
+    const notEligibleBytes = await notEligibleImage!.arrayBuffer();
+    const notEligibleBuffer = Buffer.from(notEligibleBytes);
+    const errorBytes = await errorImage!.arrayBuffer();
+    const errorBuffer = Buffer.from(errorBytes);
+    [landing, success, notEligible, error] = await Promise.all([
+      uploadImage(landingBuffer, `${name}-landing.png`),
+      uploadImage(successBuffer, `${name}-success.png`),
+      uploadImage(notEligibleBuffer, `${name}-not-eligible.png`),
+      uploadImage(errorBuffer, `${name}-error.png`),
+    ]);
+  } else {
+    const logoBytes = await logoFile!.arrayBuffer();
+    const logoBuffer = Buffer.from(logoBytes);
+    logo = await uploadImage(logoBuffer, `${name}-logo.png`);
+  }
 
   const waitlist = await createWaitlist({
     data: {
@@ -122,22 +162,28 @@ export const POST = async (req: NextRequest) => {
       externalUrl: externalUrl as string,
       joinButtonText: joinButtonText as string,
       userAddress: address!,
-      imageLanding: landing.url,
-      imageSuccess: success.url,
-      imageNotEligible: notEligible.url,
-      imageError: error.url,
+      imagesMode: imagesMode,
+      imageLanding: landing?.url ?? null,
+      imageSuccess: success?.url ?? null,
+      imageNotEligible: notEligible?.url ?? null,
+      imageError: error?.url ?? null,
+      logo: logo?.url ?? null,
+      textLanding: imageTexts?.landing ?? null,
+      textSuccess: imageTexts?.success ?? null,
+      textNotEligible: imageTexts?.notEligible ?? null,
+      textError: imageTexts?.closed ?? null,
       tier: tier || WaitlistTier.FREE,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
   });
 
-  if (isPowerBadgeRequired) {
+  if (isFanTokenLauncher) {
     await createWaitlistRequirement({
       data: {
         waitlistId: waitlist.id,
-        type: WaitlistRequirementType.POWER_BADGE,
-        value: (isPowerBadgeRequired === "true").toString(),
+        type: WaitlistRequirementType.FAN_TOKEN_LAUNCHER,
+        value: (isFanTokenLauncher === "true").toString(),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -188,6 +234,18 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
+  if (fanTokenSymbolAndAmount) {
+    await createWaitlistRequirement({
+      data: {
+        waitlistId: waitlist.id,
+        type: WaitlistRequirementType.FAN_TOKEN_BALANCE,
+        value: String(fanTokenSymbolAndAmount),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
   if (tier !== WaitlistTier.FREE) {
     await prisma.checkout.update({
       where: {
@@ -229,7 +287,7 @@ export const POST = async (req: NextRequest) => {
         embeds: [
           {
             image: {
-              url: landing.url,
+              url: landing?.url ?? logo?.url ?? "",
             },
             color: 16776960,
           },

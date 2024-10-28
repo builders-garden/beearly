@@ -12,7 +12,7 @@ export default function Pricing() {
         <div>*pricing is intended per waitlist</div>
       </div>
       <BeearlyButton link={"/waitlists/new"} text="Start now" />
-      <div className="w-full flex sm:flex-row flex-col gap-4 justify-center items-center p-4 sm:p-24">
+      <div className="w-full flex sm:flex-row flex-col gap-4 justify-center items-center p-4 sm:py-20 sm:px-24">
         <TierCard
           tierLogo="/bumble.svg"
           tierName="Bumble Bee"
@@ -21,8 +21,9 @@ export default function Pricing() {
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: false },
-            { name: "Power Badge", available: false },
             { name: "Proof of Humanity", available: false },
+            { name: "Fan Token holder", available: false },
+            { name: "Launched a Fan Token", available: false },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: false }]}
           features={[
@@ -33,6 +34,8 @@ export default function Pricing() {
             },
             { name: "Export users", available: false },
             { name: "Email collection", available: false },
+            { name: "Customizable Join Button", available: false },
+            { name: "Approve users to use your product", available: false },
           ]}
           actionLink="/waitlists/new"
         />
@@ -40,12 +43,13 @@ export default function Pricing() {
           tierLogo="/honey.svg"
           tierName="Honey Bee"
           description="More features and bigger audience."
-          price="25$"
+          price="25 USDC"
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
-            { name: "Power Badge", available: true },
             { name: "Proof of Humanity", available: true },
+            { name: "Fan Token holder", available: true },
+            { name: "Launched a Fan Token", available: true },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: true }]}
           features={[
@@ -56,6 +60,8 @@ export default function Pricing() {
             },
             { name: "Export users", available: true },
             { name: "Email collection", available: true },
+            { name: "Customizable Join Button", available: true },
+            { name: "Approve users to use your product", available: false },
           ]}
           actionLink="/waitlists/new"
         />
@@ -64,12 +70,13 @@ export default function Pricing() {
           tierLogo="/queen.svg"
           tierName="Queen Bee"
           description="Fully fledged waitlist with all the features you need."
-          price="30$"
+          price="30 USDC"
           requirementsOptions={[
             { name: "Channel follow", available: true },
             { name: "User follow", available: true },
-            { name: "Power Badge", available: true },
             { name: "Proof of Humanity", available: true },
+            { name: "Fan Token holder", available: true },
+            { name: "Launched a Fan Token", available: true },
           ]}
           spamProtectionOptions={[{ name: "Captcha", available: true }]}
           features={[
@@ -80,6 +87,8 @@ export default function Pricing() {
             },
             { name: "Export users", available: true },
             { name: "Email collection", available: true },
+            { name: "Customizable Join Button", available: true },
+            { name: "Approve users to use your product", available: true },
           ]}
           actionLink="/waitlists/new"
         />

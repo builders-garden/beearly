@@ -17,13 +17,15 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
-import { WaitlistTier, WaitlistedUser } from "@prisma/client";
-import { count } from "console";
+import {
+  WaitlistTier,
+  WaitlistedUser,
+  WaitlistedUserStatus,
+} from "@prisma/client";
 import {
   ChevronDown,
   ChevronUp,
   Download,
-  ExternalLink,
   InfoIcon,
   PlusCircle,
   Send,
@@ -55,7 +57,6 @@ export const UsersTable = ({
     useState<boolean>(false);
   const [isAddUsersModalOpen, setIsAddUsersModalOpen] =
     useState<boolean>(false);
-  const [isPowerBadgeOnly, setIsPowerBadgeOnly] = useState<boolean>(false);
   const [limit, setLimit] = useState(new Set(["10"]));
   const [orderBy, setOrderBy] = useState<string>("waitlistedAt");
   const [orderDirection, setOrderDirection] = useState<string>("desc");
@@ -63,7 +64,6 @@ export const UsersTable = ({
   const [users, setUsers] = useState<WaitlistedUser[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
-  const [powerBadgeUsersCount, setPowerBadgeUsersCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const jwt = getAuthToken();
   const { isConnected } = useAccount();
@@ -89,9 +89,6 @@ export const UsersTable = ({
   const fetchUsers = useCallback(() => {
     setUsersLoading(true);
     let url = `/api/waitlists/${waitlistId}/users?page=${page - 1}&orderBy=${orderBy}&orderDirection=${orderDirection}&limit=${selectedlimit}`;
-    if (isPowerBadgeOnly) {
-      url += "&powerBadge=true";
-    }
     fetch(url, {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -102,18 +99,9 @@ export const UsersTable = ({
         setUsers(data.results);
         setTotalPages(data.pages);
         setTotalCount(data.count);
-        setPowerBadgeUsersCount(data.powerBadgeUsersCount);
         setUsersLoading(false);
       });
-  }, [
-    waitlistId,
-    page,
-    orderBy,
-    orderDirection,
-    selectedlimit,
-    isPowerBadgeOnly,
-    jwt,
-  ]);
+  }, [waitlistId, page, orderBy, orderDirection, selectedlimit, jwt]);
   useEffect(() => {
     if (jwt && isConnected) {
       fetchUsers();
@@ -132,6 +120,29 @@ export const UsersTable = ({
     setOrderBy(mode);
     setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
   };
+
+  // A function to handle the change of the checkbox
+  // It changes user status in the database with a PUT request
+  const handleCheckboxChange = async (user: WaitlistedUser) => {
+    if (waitlistTier !== WaitlistTier.QUEEN) {
+      return;
+    }
+    await fetch(`/api/waitlists/${waitlistId}/users/${user.fid}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        status:
+          user.status === WaitlistedUserStatus.APPROVED
+            ? WaitlistedUserStatus.WAITLISTED
+            : WaitlistedUserStatus.APPROVED,
+        userFid: user.fid,
+      }),
+    });
+  };
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between items-center px-4 ">
@@ -154,13 +165,6 @@ export const UsersTable = ({
               <DropdownItem key="50">50</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <div>
-            <Checkbox
-              isSelected={isPowerBadgeOnly}
-              onChange={() => setIsPowerBadgeOnly(!isPowerBadgeOnly)}
-            />
-            Power Badge only ({powerBadgeUsersCount}/{totalCount})
-          </div>
         </div>
         <div className="flex flex-row gap-2 items-center">
           <Button
@@ -184,20 +188,23 @@ export const UsersTable = ({
             isDisabled={TIERS[waitlistTier].allowExportUsers}
             content="This feature is only available for Honey tier and above."
           >
-            <Button
-              color="primary"
-              variant="flat"
-              onPress={() => {
-                if (!TIERS[waitlistTier].allowExportUsers) {
-                  return;
-                }
-                exportUsers();
-              }}
-              // isDisabled={waitlistTier === WaitlistTier.FREE}
-            >
-              <Download size={16} />
-              Export users
-            </Button>
+            {/* This div is needed to prevent the tooltip from breaking if button is disabled */}
+            <div>
+              <Button
+                color="primary"
+                variant="flat"
+                onPress={() => {
+                  if (!TIERS[waitlistTier].allowExportUsers) {
+                    return;
+                  }
+                  exportUsers();
+                }}
+                isDisabled={waitlistTier === WaitlistTier.FREE}
+              >
+                <Download size={16} />
+                Export users
+              </Button>
+            </div>
           </Tooltip>
         </div>
       </div>
@@ -278,7 +285,8 @@ export const UsersTable = ({
                 content={
                   <div>
                     Social Capital Scores (SCS) area measure of each Farcaster{" "}
-                    <br></br>user&apos;s influence in the network.{" "}
+                    <br />
+                    user&apos;s influence in the network.{" "}
                     <Link
                       href={
                         "https://docs.airstack.xyz/airstack-docs-and-faqs/farcaster/farcaster/social-capital"
@@ -356,6 +364,31 @@ export const UsersTable = ({
             </div>
           </TableColumn>
           <TableColumn>
+            <div className="cursor-pointer flex flex-row gap-1 items-center">
+              <div>APPROVED</div>
+              <Tooltip
+                radius="sm"
+                size="sm"
+                content={
+                  <div>
+                    If you have a valid Beearly Api Key you can check the <br />
+                    user status with an API call. <br />
+                    <span className="font-bold">
+                      Contact us for more information.
+                    </span>
+                    {waitlistTier !== WaitlistTier.QUEEN && (
+                      <div className="mt-3">
+                        This feature is only available for Queen tier waitlists.
+                      </div>
+                    )}
+                  </div>
+                }
+              >
+                <InfoIcon size={14} />
+              </Tooltip>
+            </div>
+          </TableColumn>
+          <TableColumn>
             <div></div>
           </TableColumn>
         </TableHeader>
@@ -377,14 +410,6 @@ export const UsersTable = ({
                     <div className="flex flex-col">
                       <div className="flex flex-row items-center gap-1">
                         <div>{user.displayName}</div>
-                        {user.powerBadge && (
-                          <Image
-                            src="/power-badge.png"
-                            className="h-3 w-3"
-                            radius="full"
-                            alt="power-badge"
-                          />
-                        )}
                       </div>
                       <div className="text-xs text-gray-500">
                         @{user.username} • #{user.fid}
@@ -401,6 +426,15 @@ export const UsersTable = ({
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 {new Date(user.waitlistedAt).toDateString()}
+              </TableCell>
+              <TableCell>
+                <Checkbox
+                  defaultSelected={
+                    user.status === WaitlistedUserStatus.APPROVED
+                  }
+                  onChange={() => handleCheckboxChange(user)}
+                  isDisabled={waitlistTier !== WaitlistTier.QUEEN}
+                />
               </TableCell>
               <TableCell>
                 <Link

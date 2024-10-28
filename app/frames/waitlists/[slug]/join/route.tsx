@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
 import { frames } from "../../../frames";
 import prisma from "../../../../../lib/prisma";
@@ -8,7 +7,11 @@ import {
   isUserFollowingUsers,
   UserProfile,
 } from "../../../../../lib/airstack";
-import { WaitlistRequirementType, WaitlistTier } from "@prisma/client";
+import {
+  WaitlistImagesMode,
+  WaitlistRequirementType,
+  WaitlistTier,
+} from "@prisma/client";
 import {
   createCastIntent,
   isUserFollowingChannels,
@@ -19,6 +22,12 @@ import { validateCaptchaChallenge } from "../../../../../lib/captcha";
 import { appURL } from "../../../../utils";
 import { getTalentPassportByWalletOrId } from "../../../../../lib/talent";
 import { validateReferrer } from "../../../../../lib/db/utils";
+import { publishToQstash } from "../../../../../lib/qstash";
+import {
+  getTokenAddressFromSymbolQuery,
+  getUserTotalBalance,
+  getUserVestingAddresses,
+} from "../../../../../lib/graphql";
 
 const frameHandler = frames(async (ctx) => {
   // Check if the message exists and is valid when sent from Farcaster
@@ -48,20 +57,70 @@ const frameHandler = frames(async (ctx) => {
     throw new Error("Invalid waitlist");
   }
 
-  // If the waitlist is full, show the error frame
+  // Create constant to store if the images mode is the simple one
+  const isAdvancedMode = waitlist.imagesMode === WaitlistImagesMode.ADVANCED;
+
+  // If the waitlist is not in the QUEEN tier
+  // 1. Check if the waitlist is full before going further
+  // 2. Send a notification to the waitlist owner if the waitlist is exactly at 80% capacity
   if (waitlist.tier !== WaitlistTier.QUEEN) {
-    if (waitlist._count.waitlistedUsers >= TIERS[waitlist.tier].size) {
+    const tierLimitSize = TIERS[waitlist.tier].size;
+    const currentWaitlistSize = waitlist._count.waitlistedUsers;
+
+    // If the waitlist is full, show the error frame
+    if (currentWaitlistSize >= tierLimitSize) {
       return {
-        image: waitlist.imageError,
-        imageOptions: {
-          aspectRatio: "1.91:1",
-        },
+        image: isAdvancedMode ? (
+          waitlist.imageError!
+        ) : (
+          <div tw="flex h-full w-full">
+            <img
+              src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+              alt="closed"
+            />
+            <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+              {waitlist.textError}
+            </div>
+            <div tw="absolute bottom-44 w-full flex justify-center items-center">
+              <img
+                tw="rounded-2xl"
+                src={waitlist.logo!}
+                alt="waitlist-logo"
+                width={250}
+                height={250}
+              />
+            </div>
+          </div>
+        ),
         buttons: [
           <Button action="link" key="1" target={waitlist.externalUrl}>
             Learn more
           </Button>,
         ],
       };
+    }
+    // If the waitlist is at 80% capacity, send a notification to the waitlist owner
+    else if (
+      process.env.NODE_ENV === "production" &&
+      currentWaitlistSize === Math.round(tierLimitSize * 0.8) - 1
+    ) {
+      const alertMessage = `📢🐝\n\nAlert!\nYou are receiving this message because your waitlist "${waitlist.name}" has reached 80% of its full capacity.\n\nIf you are looking for an upgrade reach out to @limone.eth or @blackicon.eth`;
+      const ownerFid = await fetchFidFromAddress(waitlist.userAddress);
+      // Send the direct cast by publishing it to Qstash if the waitlist's owner fid is found
+      if (ownerFid) {
+        const res = await publishToQstash(
+          `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
+          { fid: ownerFid, text: alertMessage },
+          0
+        );
+        if (res.response !== "ok") {
+          console.error(
+            "Failed to send limit notification direct cast to the waitlist owner"
+          );
+        }
+      } else {
+        console.error("Owner fid not found");
+      }
     }
   }
 
@@ -87,7 +146,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/captcha/incorrect.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/captcha/incorrect.png`}
+              alt="incorrect-captcha"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -117,7 +180,11 @@ const frameHandler = frames(async (ctx) => {
       return {
         image: (
           <div tw="relative flex items-center justify-center">
-            <img src={`${appURL()}/email/invalid.png`} tw="absolute" />
+            <img
+              src={`${appURL()}/email/invalid.png`}
+              alt="invalid-email"
+              tw="absolute"
+            />
           </div>
         ),
         buttons: [
@@ -161,10 +228,28 @@ const frameHandler = frames(async (ctx) => {
   });
   if (waitlistedUser) {
     return {
-      image: waitlist.imageSuccess,
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
+      image: isAdvancedMode ? (
+        waitlist.imageSuccess!
+      ) : (
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+            alt="success"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textSuccess}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
+        </div>
+      ),
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
@@ -190,10 +275,28 @@ const frameHandler = frames(async (ctx) => {
   // If the waitlist has ended, show the error frame
   if (Date.now() > waitlist.endDate.getTime()) {
     return {
-      image: waitlist.imageError,
-      imageOptions: {
-        aspectRatio: "1.91:1",
-      },
+      image: isAdvancedMode ? (
+        waitlist.imageError!
+      ) : (
+        <div tw="flex h-full w-full">
+          <img
+            src={`${process.env.BASE_URL}/default-frame-images/closed.png`}
+            alt="closed"
+          />
+          <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+            {waitlist.textError}
+          </div>
+          <div tw="absolute bottom-44 w-full flex justify-center items-center">
+            <img
+              tw="rounded-2xl"
+              src={waitlist.logo!}
+              alt="waitlist-logo"
+              width={250}
+              height={250}
+            />
+          </div>
+        </div>
+      ),
       buttons: [
         <Button action="link" key="1" target={waitlist.externalUrl}>
           Learn more
@@ -239,9 +342,10 @@ const frameHandler = frames(async (ctx) => {
     };
   }
 
+  // Check if there are waitlist requirements and if the user meets those requirements
   if (waitlist.waitlistRequirements.length > 0) {
-    const powerBadgeRequirement = waitlist.waitlistRequirements.find(
-      (r) => r.type === WaitlistRequirementType.POWER_BADGE
+    const fanTokenLauncherRequirement = waitlist.waitlistRequirements.find(
+      (r) => r.type === WaitlistRequirementType.FAN_TOKEN_LAUNCHER
     );
     const requiredChannels = waitlist.waitlistRequirements.filter(
       (r) => r.type === WaitlistRequirementType.CHANNEL_FOLLOW
@@ -252,13 +356,34 @@ const frameHandler = frames(async (ctx) => {
     const requiredBuilderScore = waitlist.waitlistRequirements.find(
       (r) => r.type === WaitlistRequirementType.TALENT_BUILDER_SCORE
     );
-    if (powerBadgeRequirement?.value === "true") {
-      if (!userToAdd?.powerBadge) {
+    const requiredFanTokenBalance = waitlist.waitlistRequirements.find(
+      (r) => r.type === WaitlistRequirementType.FAN_TOKEN_BALANCE
+    );
+    if (fanTokenLauncherRequirement?.value === "true") {
+      if (!(await getTokenAddressFromSymbolQuery("fid:" + fid))) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -283,16 +408,35 @@ const frameHandler = frames(async (ctx) => {
       }
     }
     if (requiredChannels.length > 0) {
+      const requiredChannelsList = requiredChannels.map((r) => r.value);
       const isUserFollowingRequiredChannels = await isUserFollowingChannels(
         fid,
-        requiredChannels.map((r) => r.value)
+        requiredChannelsList
       );
       if (!isUserFollowingRequiredChannels) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -309,7 +453,27 @@ const frameHandler = frames(async (ctx) => {
             >
               Try again
             </Button>,
-            <Button action="link" key="1" target={waitlist.externalUrl}>
+            <Button
+              action="link"
+              key="2"
+              target={`https://warpcast.com/~/channel/${requiredChannelsList[0]}`}
+            >
+              {`Follow /${requiredChannelsList[0]}`}
+            </Button>,
+            requiredChannelsList[1] ? (
+              <Button
+                action="link"
+                key="3"
+                target={`https://warpcast.com/~/channel/${requiredChannelsList[1]}`}
+              >
+                {`Follow /${requiredChannelsList[1]}`}
+              </Button>
+            ) : null,
+            <Button
+              action="link"
+              key={requiredChannelsList[1] ? "4" : "3"}
+              target={waitlist.externalUrl}
+            >
               Learn more
             </Button>,
           ],
@@ -323,10 +487,28 @@ const frameHandler = frames(async (ctx) => {
       );
       if (isUserFollowingRequiredUsers.length < requiredUsersFollow.length) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -361,10 +543,103 @@ const frameHandler = frames(async (ctx) => {
           parseInt(requiredBuilderScore.value)
       ) {
         return {
-          image: waitlist.imageNotEligible,
-          imageOptions: {
-            aspectRatio: "1.91:1",
-          },
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
+          buttons: [
+            <Button
+              action="post"
+              key="1"
+              target={{
+                pathname: waitlist.hasCaptcha
+                  ? `/captcha/${slug}`
+                  : `/waitlists/${slug}/join`,
+                search:
+                  `${email ? `email=${email}` : ""}` +
+                  `${ref ? `&ref=${ref}` : ""}` +
+                  `${ref && refSquared ? `&refSquared=${refSquared}` : ""}`,
+              }}
+            >
+              Try again
+            </Button>,
+            <Button action="link" key="2" target={waitlist.externalUrl}>
+              Learn more
+            </Button>,
+          ],
+        };
+      }
+    }
+    if (requiredFanTokenBalance) {
+      try {
+        const [symbol, requiredAmount] =
+          requiredFanTokenBalance.value.split(";");
+        if (!symbol || !requiredAmount || isNaN(parseInt(requiredAmount))) {
+          throw new Error("Invalid fan token balance requirement format");
+        }
+        const userAddresses =
+          ctx.clientProtocol?.id === "xmtp"
+            ? ctx.message.verifiedWalletAddress
+              ? [ctx.message.verifiedWalletAddress]
+              : []
+            : ctx.message.requesterVerifiedAddresses;
+        const userVestingAddresses =
+          await getUserVestingAddresses(userAddresses);
+        const totalUserFanTokenBalance = await getUserTotalBalance(
+          [...userAddresses, ...userVestingAddresses],
+          symbol
+        );
+        if (
+          !totalUserFanTokenBalance ||
+          totalUserFanTokenBalance < parseFloat(requiredAmount) * 10 ** 18
+        ) {
+          throw new Error(
+            "User does not meet the fan token balance requirement"
+          );
+        }
+      } catch (e: any) {
+        console.error("Not eligible: ", e.message);
+        return {
+          image: isAdvancedMode ? (
+            waitlist.imageNotEligible!
+          ) : (
+            <div tw="flex h-full w-full">
+              <img
+                src={`${process.env.BASE_URL}/default-frame-images/not-eligible.png`}
+                alt="not-eligible"
+              />
+              <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+                {waitlist.textNotEligible}
+              </div>
+              <div tw="absolute bottom-44 w-full flex justify-center items-center">
+                <img
+                  tw="rounded-2xl"
+                  src={waitlist.logo!}
+                  alt="waitlist-logo"
+                  width={250}
+                  height={250}
+                />
+              </div>
+            </div>
+          ),
           buttons: [
             <Button
               action="post"
@@ -394,11 +669,43 @@ const frameHandler = frames(async (ctx) => {
     data: userToAdd,
   });
 
+  // Send the user a direct cast to notify them that they have been waitlisted
+  if (process.env.NODE_ENV === "production") {
+    const enrichedMessage = `📢🐝\n\nCongratulations!\nYou have succesfully joined ${waitlist.name} (${waitlist.externalUrl}) waitlist.`;
+    // Send the direct cast by publishing it to Qstash
+    const res = await publishToQstash(
+      `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
+      { fid: fid, text: enrichedMessage },
+      0
+    );
+    if (res.response !== "ok") {
+      console.error("Failed to send join notification direct cast");
+    }
+  }
+
   return {
-    image: waitlist.imageSuccess,
-    imageOptions: {
-      aspectRatio: "1.91:1",
-    },
+    image: isAdvancedMode ? (
+      waitlist.imageSuccess!
+    ) : (
+      <div tw="flex h-full w-full">
+        <img
+          src={`${process.env.BASE_URL}/default-frame-images/success.png`}
+          alt="success"
+        />
+        <div tw="flex absolute top-40 h-[415px] w-full justify-center items-center px-18 text-black font-bold text-[79px] text-center">
+          {waitlist.textSuccess}
+        </div>
+        <div tw="absolute bottom-44 w-full flex justify-center items-center">
+          <img
+            tw="rounded-2xl"
+            src={waitlist.logo!}
+            alt="waitlist-logo"
+            width={250}
+            height={250}
+          />
+        </div>
+      </div>
+    ),
     buttons: [
       <Button action="link" key="1" target={waitlist.externalUrl}>
         Learn more

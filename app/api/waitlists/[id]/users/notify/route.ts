@@ -9,7 +9,7 @@ export const POST = async (
 ) => {
   // Get the payload from the request and extract the offset
   const body = await req.json();
-  const { fids, powerBadge, message } = body;
+  const { fids, message } = body;
   const waitlist = await prisma.waitlist.findUnique({
     where: {
       id: parseInt(id),
@@ -37,7 +37,7 @@ export const POST = async (
   });
 
   // check if lastMessage was sent earlier than cooldown
-  /*if (
+  if (
     lastMessageSent &&
     new Date().getTime() - lastMessageSent.createdAt.getTime() <
       TIERS[waitlist.tier].broadcastDCCooldown
@@ -54,16 +54,13 @@ export const POST = async (
         status: 400,
       }
     );
-  }*/
+  }
 
   let usersToNotify: { fid: number; address: string }[];
   if (!fids || fids[0] === "all") {
     usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
-        ...(powerBadge && {
-          powerBadge: true,
-        }),
       },
       select: {
         fid: true,
@@ -75,9 +72,6 @@ export const POST = async (
     usersToNotify = await prisma.waitlistedUser.findMany({
       where: {
         waitlistId: parseInt(id),
-        ...(powerBadge && {
-          powerBadge: true,
-        }),
         fid: {
           in: fidsToNotify,
         },

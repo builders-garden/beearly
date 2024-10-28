@@ -7,7 +7,6 @@ export interface LeaderboardUser {
   displayName: string;
   username: string;
   avatarUrl: string;
-  powerBadge: string;
 }
 
 export const GET = async (
@@ -46,7 +45,6 @@ export const GET = async (
       displayName: true,
       username: true,
       avatarUrl: true,
-      powerBadge: true,
       // Include any other fields you need
     },
   });

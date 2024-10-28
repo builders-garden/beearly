@@ -1,6 +1,18 @@
 "use client";
 import { DynamicWidget, getAuthToken } from "@dynamic-labs/sdk-react-core";
-import { DatePicker, Checkbox, Input, Button, Link } from "@nextui-org/react";
+import {
+  DatePicker,
+  Checkbox,
+  Input,
+  Button,
+  Link,
+  Select,
+  SelectItem,
+  Tabs,
+  Tab,
+  Switch,
+  Tooltip,
+} from "@nextui-org/react";
 import {
   AlertCircle,
   CircleCheckBig,
@@ -8,7 +20,7 @@ import {
   Info,
   InfoIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import slugify from "slugify";
 import {
@@ -20,14 +32,22 @@ import {
   BASE_USDC_ADDRESS,
   BEEARLY_WALLET_ADDRESS,
 } from "../../../lib/constants";
-import { Checkout, CheckoutStatus, WaitlistTier } from "@prisma/client";
+import {
+  Checkout,
+  CheckoutStatus,
+  WaitlistImagesMode,
+  WaitlistTier,
+} from "@prisma/client";
 import { Image } from "@nextui-org/react";
 import PremiumRequired from "../../../components/PremiumRequired";
 import { BeearlyButton } from "../../../components/BeearlyButton";
-import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
-import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
+import _, { set } from "lodash";
+import { getTokenAddressFromSymbolQuery } from "../../../lib/graphql";
+import { parseUnits } from "viem";
+import { useCreateAndPayRequest } from "../../../lib/hooks/use-create-and-pay-request";
+import { FramePreview } from "../../../components/FramePreview";
 
 const tiers = [
   {
@@ -41,7 +61,7 @@ const tiers = [
   },
   {
     title: "Honey Bee",
-    price: "25$",
+    price: "25 USDC",
     image: "/honey.svg",
     type: WaitlistTier.HONEY,
     waitlistSize: "500 users",
@@ -50,7 +70,7 @@ const tiers = [
   },
   {
     title: "Queen Bee",
-    price: "30$",
+    price: "30 USDC",
     image: "/queen.svg",
     type: WaitlistTier.QUEEN,
     waitlistSize: "Unlimited ∞",
@@ -106,17 +126,19 @@ export default function NewWaitlist() {
   );
   const [externalUrl, setExternalUrl] = useState<string>("");
   const [joinButtonText, setJoinButtonText] = useState<string>("");
-  const [isPowerBadgeRequired, setIsPowerBadgeRequired] = useState<boolean>();
-  const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>();
-  const [requiredChannels, setRequiredChannels] = useState<string>();
+  const [requiredUsersFollow, setRequiredUsersFollow] = useState<string>("");
+  const [requiredChannels, setRequiredChannels] = useState<string>("");
   const [isBuilderScoreRequired, setIsBuilderScoreRequired] =
     useState<boolean>();
+  const [fanTokenType, setFanTokenType] = useState<string>("cid");
+  const [fanTokenName, setFanTokenName] = useState<string>("");
+  const [fanTokenAmount, setFanTokenAmount] = useState<string>("");
+  const [isFanTokenLauncher, setIsFanTokenLauncher] = useState<boolean>();
   const [hasCaptcha, setHasCaptcha] = useState<boolean>(false);
   const [requiresEmail, setRequiresEmail] = useState<boolean>(false);
   const [selectedFileLanding, setSelectedFileLanding] = useState<File | null>(
     null
   );
-
   const [uploadedLandingImage, setUploadedLandingImage] = useState<string>("");
   const [selectedFileSuccess, setSelectedFileSuccess] = useState<File | null>(
     null
@@ -131,7 +153,31 @@ export default function NewWaitlist() {
   );
   const [uploadedClosedImage, setUploadedClosedImage] = useState<string>("");
 
+  const [tokenNotFound, setTokenNotFound] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  const [imagesMode, setImagesMode] = useState<WaitlistImagesMode>(
+    WaitlistImagesMode.SIMPLE
+  );
+  const [selectedFileLogo, setSelectedFileLogo] = useState<File | null>(null);
+  const [uploadedLogo, setUploadedLogo] = useState<string>("");
+  const [imageTexts, setImageTexts] = useState({
+    landing: "",
+    success: "",
+    notEligible: "",
+    closed: "",
+  });
+  const [textsLengthError, setTextsLengthError] = useState({
+    landing: false,
+    success: false,
+    notEligible: false,
+    closed: false,
+  });
+
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+  const [previewType, setPreviewType] = useState<
+    "landing" | "success" | "notEligible" | "closed"
+  >("landing");
 
   const fetchCheckouts = useCallback(async () => {
     try {
@@ -155,7 +201,7 @@ export default function NewWaitlist() {
   const confirmCheckout = async () => {
     const amount = selectedTier === WaitlistTier.HONEY ? 25 : 30;
     const description = `Creation of waitlist ${name} - ${selectedTier} tier`;
-    await createAndPayRequest({
+    createAndPayRequest({
       tier: selectedTier,
       amount,
       setButtonLoadingMessage,
@@ -170,18 +216,30 @@ export default function NewWaitlist() {
       },
     });
   };
+
   const createWaitlist = async () => {
     setLoading(true);
     if (
       !name ||
       !endDate ||
       !externalUrl ||
-      !selectedFileLanding ||
-      !selectedFileSuccess ||
-      !selectedFileNotEligible ||
-      !selectedFileClosed
+      (imagesMode === WaitlistImagesMode.ADVANCED &&
+        (!selectedFileLanding ||
+          !selectedFileSuccess ||
+          !selectedFileNotEligible ||
+          !selectedFileClosed)) ||
+      (imagesMode === WaitlistImagesMode.SIMPLE &&
+        (!selectedFileLogo ||
+          !imageTexts.landing ||
+          !imageTexts.success ||
+          !imageTexts.notEligible ||
+          !imageTexts.closed ||
+          textsLengthError.landing ||
+          textsLengthError.success ||
+          textsLengthError.notEligible ||
+          textsLengthError.closed))
     ) {
-      setError("Please fill all the fields");
+      setError("Please correctly fill all the required fields");
       setLoading(false);
       return;
     }
@@ -190,10 +248,19 @@ export default function NewWaitlist() {
     formData.append("endDate", endDate.toAbsoluteString());
     formData.append("externalUrl", externalUrl);
     formData.append("tier", selectedTier);
-    formData.append("files[0]", selectedFileLanding);
-    formData.append("files[1]", selectedFileSuccess);
-    formData.append("files[2]", selectedFileNotEligible);
-    formData.append("files[3]", selectedFileClosed);
+    formData.append("imagesMode", imagesMode);
+
+    if (imagesMode === WaitlistImagesMode.ADVANCED) {
+      formData.append("files[0]", selectedFileLanding!);
+      formData.append("files[1]", selectedFileSuccess!);
+      formData.append("files[2]", selectedFileNotEligible!);
+      formData.append("files[3]", selectedFileClosed!);
+    } else {
+      formData.append("logoFile", selectedFileLogo!);
+      formData.append("imageTexts", JSON.stringify(imageTexts));
+      formData.append("textsLengthError", JSON.stringify(textsLengthError));
+    }
+
     if (joinButtonText) {
       formData.append("joinButtonText", joinButtonText);
     }
@@ -206,14 +273,26 @@ export default function NewWaitlist() {
     if (isBuilderScoreRequired) {
       formData.append("requiredBuilderScore", "15");
     }
-    if (isPowerBadgeRequired?.toString()) {
-      formData.append("isPowerBadgeRequired", isPowerBadgeRequired.toString());
-    }
     if (requiredChannels) {
       formData.append("requiredChannels", requiredChannels.toString());
     }
     if (requiredUsersFollow) {
       formData.append("requiredUsersFollow", requiredUsersFollow.toString());
+    }
+    if (isFanTokenLauncher) {
+      formData.append("isFanTokenLauncher", isFanTokenLauncher.toString());
+    }
+    if (fanTokenType && fanTokenName && !tokenNotFound) {
+      formData.append(
+        "fanTokenSymbolAndAmount",
+        fanTokenType +
+          ":" +
+          fanTokenName +
+          ";" +
+          (fanTokenAmount && parseFloat(fanTokenAmount) > 0
+            ? fanTokenAmount
+            : "0")
+      );
     }
     try {
       const res = await fetch("/api/waitlists", {
@@ -238,6 +317,28 @@ export default function NewWaitlist() {
     }
   };
 
+  // This function is used to check if the token exists and it's debounced to avoid making too many requests
+  const debouncedCheckToken = useRef(
+    _.debounce(async (fanTokenName, fanTokenType) => {
+      if (!fanTokenType || !fanTokenName) {
+        setTokenNotFound(false);
+        return;
+      }
+      const data = await getTokenAddressFromSymbolQuery(
+        fanTokenType + ":" + fanTokenName
+      );
+      if (!data) {
+        setTokenNotFound(true);
+      } else {
+        setTokenNotFound(false);
+      }
+    }, 300)
+  ).current;
+
+  useEffect(() => {
+    debouncedCheckToken(fanTokenName, fanTokenType);
+  }, [fanTokenType, fanTokenName, debouncedCheckToken]);
+
   const selectedTierDetails = tiers.find((tier) => tier.type === selectedTier);
   const hasHoneyAvailable = checkouts.some(
     (checkout) => checkout.tier === WaitlistTier.HONEY
@@ -253,10 +354,21 @@ export default function NewWaitlist() {
     name &&
     endDate &&
     externalUrl &&
-    selectedFileLanding &&
-    selectedFileSuccess &&
-    selectedFileNotEligible &&
-    selectedFileClosed;
+    ((imagesMode === WaitlistImagesMode.ADVANCED &&
+      selectedFileLanding &&
+      selectedFileSuccess &&
+      selectedFileNotEligible &&
+      selectedFileClosed) ||
+      (imagesMode === WaitlistImagesMode.SIMPLE &&
+        selectedFileLogo &&
+        imageTexts.landing &&
+        imageTexts.success &&
+        imageTexts.notEligible &&
+        imageTexts.closed &&
+        !textsLengthError.landing &&
+        !textsLengthError.success &&
+        !textsLengthError.notEligible &&
+        !textsLengthError.closed));
 
   const isDisabled = !isWaitlistFormValid || !isTierAvailable;
 
@@ -265,6 +377,7 @@ export default function NewWaitlist() {
       fetchCheckouts();
     }
   }, [jwt, isConnected, fetchCheckouts]);
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -308,12 +421,15 @@ export default function NewWaitlist() {
                       className="rounded-sm h-32 w-32 flex flex-col items-center text-center justify-center border border-gray-300 opacity-50 gap-1"
                       onClick={() => {
                         if (tier.type === WaitlistTier.FREE) {
-                          setIsPowerBadgeRequired(false);
+                          setIsFanTokenLauncher(false);
                           setHasCaptcha(false);
                           setRequiresEmail(false);
                           setIsBuilderScoreRequired(false);
                           setJoinButtonText("");
                           setRequiredUsersFollow("");
+                          setFanTokenAmount("");
+                          setFanTokenName("");
+                          setTokenNotFound(false);
                         }
                         setSelectedTier(tier.type);
                       }}
@@ -507,61 +623,254 @@ export default function NewWaitlist() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row gap-2 justify-between">
+          <div className="flex">
             <div className="flex flex-col gap-2">
-              <div className="flex flex-row justify-between">
-                <div className="font-semibold text-lg">Add images</div>
-                <div className="text-xs flex flex-row  text-gray-600 p-1 items-center rounded-md gap-1">
-                  <Info size={12} className="text-gray-600" />
-                  Recommended 955x500px - max 1MB (.jpg, .png, .gif)
-                </div>
-              </div>
-              <div className="flex flex-row gap-1">
-                <div className="w-[50%]">
-                  <FrameImage
-                    selectedFile={selectedFileLanding!}
-                    uploadedImage={uploadedLandingImage}
-                    onSelectedFile={onSelectedImageFile(
-                      setUploadedLandingImage,
-                      setSelectedFileLanding
-                    )}
-                    label="Cover"
-                  />
-                </div>
-                <div className="w-[50%]">
-                  <FrameImage
-                    selectedFile={selectedFileSuccess!}
-                    uploadedImage={uploadedSuccessImage}
-                    onSelectedFile={onSelectedImageFile(
-                      setUploadedSuccessImage,
-                      setSelectedFileSuccess
-                    )}
-                    label="Success"
-                  />
-                </div>
-                <div className="w-[50%]">
-                  <FrameImage
-                    selectedFile={selectedFileNotEligible!}
-                    uploadedImage={uploadedNotEligibleImage}
-                    onSelectedFile={onSelectedImageFile(
-                      setUploadedNotEligibleImage,
-                      setSelectedFileNotEligible
-                    )}
-                    label="Not Eligible"
-                  />
-                </div>
-                <div className="w-[50%]">
-                  <FrameImage
-                    selectedFile={selectedFileClosed!}
-                    uploadedImage={uploadedClosedImage}
-                    onSelectedFile={onSelectedImageFile(
-                      setUploadedClosedImage,
-                      setSelectedFileClosed
-                    )}
-                    label="Closed (deadline or size limit)"
-                  />
-                </div>
-              </div>
+              <div className="font-semibold text-lg">Add images</div>
+              <Tabs
+                aria-label="Image upload options"
+                selectedKey={imagesMode}
+                onSelectionChange={(key) =>
+                  setImagesMode(key as WaitlistImagesMode)
+                }
+              >
+                <Tab key={WaitlistImagesMode.SIMPLE} title="Simple Mode">
+                  <div className="text-xs flex flex-row text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
+                    <Info size={12} className="text-gray-600" />
+                    <span className="py-1">
+                      Recommended 250x250px - max 1MB (.jpg, .png, .gif)
+                    </span>
+                    <Switch
+                      className="ml-6"
+                      size="sm"
+                      onValueChange={() =>
+                        setIsPreviewVisible(!isPreviewVisible)
+                      }
+                      isSelected={isPreviewVisible}
+                    >
+                      Show Preview
+                    </Switch>
+                  </div>
+                  <div className="flex relative items-center flex-row gap-1 -mb-3">
+                    <FramePreview
+                      imageTexts={imageTexts}
+                      uploadedLogo={uploadedLogo}
+                      setPreviewType={setPreviewType}
+                      previewType={previewType}
+                    />
+                    <div
+                      className={`z-10 bg-white flex transition-all duration-300 ${isPreviewVisible ? "ml-[320px]" : "ml-0"}`}
+                    >
+                      <div className="w-[22%]">
+                        <FrameImage
+                          selectedFile={selectedFileLogo!}
+                          uploadedImage={uploadedLogo}
+                          onSelectedFile={onSelectedImageFile(
+                            setUploadedLogo,
+                            setSelectedFileLogo
+                          )}
+                          label="Logo"
+                          aspectRatio="1:1"
+                        />
+                      </div>
+                      <div
+                        className={`flex flex-row items-center transition-all duration-300 ${isPreviewVisible ? "gap-5 ml-8" : "gap-8 ml-10"}`}
+                      >
+                        <div
+                          className={`flex flex-col transition-all duration-300 ${isPreviewVisible ? "w-[350px]" : "w-[450px]"} gap-2`}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm text-gray-500 font-bold">
+                              Cover Image Text
+                            </div>
+                            <Input
+                              type="text"
+                              variant={"bordered"}
+                              value={imageTexts.landing}
+                              onValueChange={(value) => {
+                                setImageTexts((prev) => ({
+                                  ...prev,
+                                  landing: value,
+                                }));
+                                setTextsLengthError((prev) => ({
+                                  ...prev,
+                                  landing: value.length > 120,
+                                }));
+                              }}
+                              placeholder="Click on the button to join the waitlist!"
+                            />
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>
+                                The text that will appear on the cover image
+                              </span>
+                              {textsLengthError.landing && (
+                                <span className="text-red-500 pr-1">
+                                  Max 120 characters
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm text-gray-500 font-bold">
+                              Success Image Text
+                            </div>
+                            <Input
+                              type="text"
+                              variant={"bordered"}
+                              value={imageTexts.success}
+                              onValueChange={(value) => {
+                                setImageTexts((prev) => ({
+                                  ...prev,
+                                  success: value,
+                                }));
+                                setTextsLengthError((prev) => ({
+                                  ...prev,
+                                  success: value.length > 120,
+                                }));
+                              }}
+                              placeholder="You're in! You're now part of the waitlist!"
+                            />
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>
+                                The text that will appear on the success image
+                              </span>
+                              {textsLengthError.success && (
+                                <span className="text-red-500 pr-1">
+                                  Max 120 characters
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className={`flex flex-col transition-all duration-300 ${isPreviewVisible ? "w-[350px]" : "w-[450px]"} gap-2`}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm text-gray-500 font-bold">
+                              Not Eligible Image Text
+                            </div>
+                            <Input
+                              type="text"
+                              variant={"bordered"}
+                              value={imageTexts.notEligible}
+                              onValueChange={(value) => {
+                                setImageTexts((prev) => ({
+                                  ...prev,
+                                  notEligible: value,
+                                }));
+                                setTextsLengthError((prev) => ({
+                                  ...prev,
+                                  notEligible: value.length > 120,
+                                }));
+                              }}
+                              placeholder="You're not eligible to join this waitlist."
+                            />
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>
+                                The text that will appear on the not eligible
+                                image
+                              </span>
+                              {textsLengthError.notEligible && (
+                                <span className="text-red-500 pr-1">
+                                  Max 120 characters
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm text-gray-500 font-bold">
+                              Closed Image Text
+                            </div>
+                            <Input
+                              type="text"
+                              variant={"bordered"}
+                              value={imageTexts.closed}
+                              onValueChange={(value) => {
+                                setImageTexts((prev) => ({
+                                  ...prev,
+                                  closed: value,
+                                }));
+                                setTextsLengthError((prev) => ({
+                                  ...prev,
+                                  closed: value.length > 120,
+                                }));
+                              }}
+                              placeholder="The waitlist is now closed."
+                            />
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>
+                                The text that will appear on the closed image
+                              </span>
+                              {textsLengthError.closed && (
+                                <span className="text-red-500 pr-1">
+                                  Max 120 characters
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Tab>
+                <Tab key={WaitlistImagesMode.ADVANCED} title="Advanced Mode">
+                  <div className="text-xs flex flex-row  text-gray-600 ml-2 -mt-2 items-center rounded-md gap-1">
+                    <Info size={12} className="text-gray-600" />
+                    <span className="py-1">
+                      Recommended 955x500px - max 1MB (.jpg, .png, .gif)
+                    </span>
+                  </div>
+                  <div className="flex flex-row gap-1 -mb-3">
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileLanding!}
+                        uploadedImage={uploadedLandingImage}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedLandingImage,
+                          setSelectedFileLanding
+                        )}
+                        label="Cover"
+                        aspectRatio="1.91:1"
+                      />
+                    </div>
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileSuccess!}
+                        uploadedImage={uploadedSuccessImage}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedSuccessImage,
+                          setSelectedFileSuccess
+                        )}
+                        label="Success"
+                        aspectRatio="1.91:1"
+                      />
+                    </div>
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileNotEligible!}
+                        uploadedImage={uploadedNotEligibleImage}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedNotEligibleImage,
+                          setSelectedFileNotEligible
+                        )}
+                        label="Not Eligible"
+                        aspectRatio="1.91:1"
+                      />
+                    </div>
+                    <div className="w-[50%]">
+                      <FrameImage
+                        selectedFile={selectedFileClosed!}
+                        uploadedImage={uploadedClosedImage}
+                        onSelectedFile={onSelectedImageFile(
+                          setUploadedClosedImage,
+                          setSelectedFileClosed
+                        )}
+                        label="Closed (deadline or size limit)"
+                        aspectRatio="1.91:1"
+                      />
+                    </div>
+                  </div>
+                </Tab>
+              </Tabs>
             </div>
           </div>
           <div className="flex flex-col gap-4">
@@ -588,21 +897,131 @@ export default function NewWaitlist() {
                   <div className="text-sm text-gray-500">Follow users</div>
                   <PremiumRequired />
                 </div>
-                <Input
-                  type="text"
-                  variant={"bordered"}
-                  value={requiredUsersFollow}
-                  onValueChange={setRequiredUsersFollow}
-                  placeholder="dwr.eth,v,horsefacts"
-                  isDisabled={selectedTier === WaitlistTier.FREE}
-                />
+                <div className="flex flex-row items-center gap-1">
+                  <Input
+                    type="text"
+                    variant={"bordered"}
+                    value={requiredUsersFollow}
+                    onValueChange={setRequiredUsersFollow}
+                    placeholder="dwr.eth,v,horsefacts"
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                  <Tooltip
+                    content={
+                      <div>
+                        Click me to add{" "}
+                        <span className="font-bold">@beearlybot</span> to the
+                        follow list!
+                        {selectedTier === WaitlistTier.FREE && (
+                          <div>
+                            This feature is only available with Honey Bee or
+                            Queen Bee tier.
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    {/* This div is needed to prevent the tooltip from breaking if button is disabled */}
+                    <div>
+                      <button
+                        className={`text-xl ${selectedTier === WaitlistTier.FREE ? "opacity-50 cursor-default" : ""}`}
+                        onClick={() =>
+                          setRequiredUsersFollow((prev) => {
+                            if (prev.includes("beearlybot")) return prev;
+                            if (prev === "") return "beearlybot";
+                            return (
+                              prev +
+                              (prev.endsWith(",")
+                                ? "beearlybot"
+                                : ",beearlybot")
+                            );
+                          })
+                        }
+                        disabled={selectedTier === WaitlistTier.FREE}
+                      >
+                        🐝
+                      </button>
+                    </div>
+                  </Tooltip>
+                </div>
                 <div className="text-xs text-gray-500">
                   Comma separated list of usernames that the users must follow
                   to be eligible
                 </div>
               </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-1 items-center">
+                  <div className="text-sm text-gray-500">
+                    Fan Token by{" "}
+                    <span className="underline">
+                      <Link
+                        href="https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens"
+                        target="_blank"
+                        className="underline"
+                      >
+                        Moxie
+                      </Link>
+                    </span>
+                  </div>
+                  <PremiumRequired />
+                  {tokenNotFound ? (
+                    <div className="text-xs text-red-700 pl-4">
+                      Token not found
+                    </div>
+                  ) : null}
+                </div>
+                <div className="flex flex-row gap-1">
+                  <Select
+                    aria-label="Fan Token"
+                    className="w-[60%]"
+                    defaultSelectedKeys="1"
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setFanTokenType(
+                        newValue === "1" ? "cid" : newValue === "2" ? "fid" : ""
+                      );
+                    }}
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  >
+                    <SelectItem key="1">Channel</SelectItem>
+                    <SelectItem key="2">User FID</SelectItem>
+                  </Select>
+                  <Input
+                    type="text"
+                    variant={"bordered"}
+                    value={fanTokenName}
+                    onValueChange={async (e) => {
+                      setFanTokenName(e);
+                    }}
+                    placeholder={
+                      fanTokenType === "cid"
+                        ? "Channel ID (e.g. farcaster)"
+                        : fanTokenType === "fid"
+                          ? "User FID (e.g. 3)"
+                          : "User FID or Channel ID"
+                    }
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                  <Input
+                    className="w-[80%]"
+                    type="Number"
+                    min={0}
+                    variant={"bordered"}
+                    value={fanTokenAmount}
+                    onValueChange={(e) => {
+                      setFanTokenAmount(e);
+                    }}
+                    placeholder="amount"
+                    isDisabled={selectedTier === WaitlistTier.FREE}
+                  />
+                </div>
+                <div className="text-xs text-gray-500">
+                  A channel or user fan token and the amount required to be
+                  eligible to join the waitlist
+                </div>
+              </div>
             </div>
-            <div className="flex flex-row w-full">
+            <div className="flex flex-row gap-8 w-full">
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
                   <div className="text-sm text-gray-500">
@@ -633,19 +1052,30 @@ export default function NewWaitlist() {
               </div>
               <div className="flex flex-col gap-1 w-[25%]">
                 <div className="flex flex-row gap-1 items-center">
-                  <div className="text-sm text-gray-500">Power Badge</div>
+                  <div className="text-sm text-gray-500">
+                    Launched a Fan Token with{" "}
+                    <span className="underline">
+                      <Link
+                        href="https://build.moxie.xyz/the-moxie-protocol/moxie-protocol/fan-tokens"
+                        target="_blank"
+                        className="underline"
+                      >
+                        Moxie
+                      </Link>
+                    </span>
+                  </div>
                   <PremiumRequired />
                 </div>
                 <Checkbox
-                  isSelected={isPowerBadgeRequired}
-                  onValueChange={setIsPowerBadgeRequired}
+                  isSelected={isFanTokenLauncher}
+                  onValueChange={setIsFanTokenLauncher}
                   isDisabled={selectedTier === WaitlistTier.FREE}
                 >
-                  Power Badge required
+                  Must be a fan token launcher
                 </Checkbox>
 
                 <div className="text-xs text-gray-500">
-                  Users must have a Warpcast power badge to be eligible
+                  Users must have launched his own fan token to be eligible
                 </div>
               </div>
             </div>
