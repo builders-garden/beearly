@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { Raleway } from "next/font/google";
-const raleway = Raleway({ subsets: ["latin"] });
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { Button, Image } from "@nextui-org/react";
 import { BeearlyButton } from "./BeearlyButton";

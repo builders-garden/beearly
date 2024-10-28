@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
       }
     } else if (address) {
       // Try sending the XMTP message
-      const response = await sendXMTPMessage(address, text);
-      if (!response.ok) {
-        throw new Error("Error sending XMTP message");
-      }
+      // const response = await sendXMTPMessage(address, text);
+      // if (!response.ok) {
+      //   throw new Error("Error sending XMTP message");
+      // }
     }
   } catch (error) {
     return NextResponse.json(
