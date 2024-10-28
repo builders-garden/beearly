@@ -88,7 +88,7 @@ export const POST = async (
   try {
     await Promise.all([
       notifyOnWarpcast(usersToNotify, enrichedMessage),
-      notifyOnXMTP(usersToNotify, enrichedMessage),
+      // notifyOnXMTP(usersToNotify, enrichedMessage),
     ]);
   } catch (e) {
     console.error("Failed to send broadcast", e);
