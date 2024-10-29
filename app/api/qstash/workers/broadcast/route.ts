@@ -22,7 +22,14 @@ export async function POST(request: NextRequest) {
       // Try sending the direct cast
       const response = await sendDirectCast(fid, text);
       if (!response.ok) {
-        throw new Error("Error sending direct cast");
+        return NextResponse.json(
+          {
+            message: `Error sending direct cast to FID: ${fid}`,
+          },
+          {
+            status: 500,
+          }
+        );
       }
     } else if (address) {
       // Try sending the XMTP message
