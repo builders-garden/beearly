@@ -3,6 +3,8 @@ import prisma from "../../../../../../lib/prisma";
 import { publishToQstash } from "../../../../../../lib/qstash";
 import { TIERS } from "../../../../../../lib/constants";
 
+export const maxDuration = 300 
+
 export const POST = async (
   req: NextRequest,
   { params: { id } }: { params: { id: string } }
