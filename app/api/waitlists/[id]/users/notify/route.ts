@@ -119,17 +119,22 @@ export const POST = async (
 };
 
 const notifyOnWarpcast = async (users: { fid: number }[], text: string) => {
-  // Send Warpcast message to all the desired users
+  // Send Warpcast message to all the desired users in chunks of 300
   try {
-    await Promise.all(
-      users.map((user) =>
-        publishToQstash(
-          `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
-          { fid: user.fid, text },
-          0
+    for (let i = 0; i < users.length; i += 300) {
+      const chunk = users.slice(i, i + 300);
+      await Promise.all(
+        chunk.map((user) =>
+          publishToQstash(
+            `${process.env.BASE_URL}/api/qstash/workers/broadcast`,
+            { fid: user.fid, text },
+            0
+          )
         )
-      )
-    );
+      );
+      // Add delay between chunks to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   } catch (e) {
     console.error("Failed to send broadcast on Warpcast", e);
     return NextResponse.json(
