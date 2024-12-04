@@ -24,7 +24,7 @@ export const Navbar = () => {
             className="rounded-none"
           />
           <div className="flex flex-row gap-4">
-            <NavbarLink isActive={isActive("/")} text="Home" link="/" />
+            {/* <NavbarLink isActive={isActive("/")} text="Home" link="/" />
             <NavbarLink
               isActive={isActive("/waitlists")}
               text="Waitlists"
@@ -35,7 +35,7 @@ export const Navbar = () => {
               isActive={isActive("/pricing")}
               text="Pricing"
               link="/pricing"
-            />
+            /> */}
           </div>
         </div>
 
@@ -57,7 +57,7 @@ export const Navbar = () => {
               </div>
             </Button>
           </Link>
-          <BeearlyButton
+          {/* <BeearlyButton
             link="/waitlists/new"
             icon={
               <div className="rounded-2xl">
@@ -71,7 +71,7 @@ export const Navbar = () => {
             }
             text="New waitlist"
           />
-          <DynamicWidget />
+          <DynamicWidget /> */}
         </div>
       </nav>
     </div>
