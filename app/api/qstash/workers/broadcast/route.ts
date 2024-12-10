@@ -20,17 +20,17 @@ export async function POST(request: NextRequest) {
     }
     if (fid) {
       // Try sending the direct cast
-      // const response = await sendDirectCast(fid, text);
-      // if (!response.ok) {
-      //   return NextResponse.json(
-      //     {
-      //       message: `Error sending direct cast to FID: ${fid}`,
-      //     },
-      //     {
-      //       status: 500,
-      //     }
-      //   );
-      // }
+      const response = await sendDirectCast(fid, text);
+      if (!response.ok) {
+        return NextResponse.json(
+          {
+            message: `Error sending direct cast to FID: ${fid}`,
+          },
+          {
+            status: 500,
+          }
+        );
+      }
     } else if (address) {
       // Try sending the XMTP message
       // const response = await sendXMTPMessage(address, text);
