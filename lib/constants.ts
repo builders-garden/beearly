@@ -6,9 +6,9 @@ export const BASE_FRAME_URL = `${BASE_URL}/w`;
 
 // BEEARLY WALLET ADDRESS FOR PAYMENTS
 export const BEEARLY_WALLET_ADDRESS =
-  BASE_URL === "http://localhost:3000"
-    ? "0x1358155a15930f89eBc787a34Eb4ccfd9720bC62"
-    : "0x65De452f106bdea2a438C9ba48bD2a0A2A7B825e";
+  (process.env.NODE_ENV === "development"
+    ? process.env.BEEARLY_WALLET_ADDRESS_DEV
+    : process.env.BEEARLY_WALLET_ADDRESS_PROD)?.toLowerCase();
 
 // MOXIE GRAPHQL CLIENTS URLS
 export const MOXIE_STATS_GRAPHQL_URL =

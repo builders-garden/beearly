@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `Beearly - ${waitlist?.name} Leaderboard`,
       description: `Check out the top referrers on the ${waitlist?.name} waitlist.`,
       type: "website",
-      url: "https://beearly.club",
+      url: process.env.NEXT_PUBLIC_HOST!,
       images: [waitlist?.imageLanding!],
     },
     twitter: {

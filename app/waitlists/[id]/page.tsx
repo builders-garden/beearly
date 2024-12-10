@@ -79,7 +79,7 @@ const WaitlistPage = ({ params: { id } }: { params: { id: string } }) => {
             <div className="flex flex-row gap-2 items-center">
               <div className="text-2xl font-medium">{waitlist?.name}</div>
               <Link
-                href={`https://warpcast.com/~/developers/frames?url=https%3A%2F%2Fbeearly.club/w/${waitlist.slug}`}
+                href={`https://warpcast.com/~/developers/frames?url=${encodeURIComponent(process.env.NEXT_PUBLIC_HOST!)}/w/${waitlist.slug}`}
                 target="_blank"
               >
                 <Button
