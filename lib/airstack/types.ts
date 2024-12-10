@@ -705,6 +705,7 @@ export type FarcasterMoxieEarningStatV2 = {
   earningsDistribution: Maybe<Array<EarningsDistribution>>;
   entityId: Scalars['String']['output'];
   entityType: FarcasterMoxieEarningStatsV2EntityType;
+  isFtaUser: Maybe<Scalars['Boolean']['output']>;
   isNonFtaEarner: Maybe<Scalars['Boolean']['output']>;
   nonFtaEarnerLimits: Maybe<Scalars['Int']['output']>;
   socials: Maybe<Array<Maybe<Social>>>;
@@ -754,6 +755,7 @@ export type FarcasterMoxieEarningStatsOutput = {
 };
 
 export enum FarcasterMoxieEarningStatsTimeframe {
+  Hourly = 'HOURLY',
   Lifetime = 'LIFETIME',
   Today = 'TODAY',
   Weekly = 'WEEKLY'
@@ -774,6 +776,7 @@ export type FarcasterMoxieEarningStatsV2Filter = {
   earning_source: InputMaybe<String_Eq_In_Comparator_Exp>;
   entityId: InputMaybe<String_Eq_In_Comparator_Exp>;
   entityType: FarcasterMoxieEarningStatsV2EntityType_Comparator_Exp;
+  isFtaUser: InputMaybe<Boolean_Comparator_Exp>;
 };
 
 export type FarcasterMoxieEarningStatsV2Input = {
@@ -1125,6 +1128,54 @@ export type MoxieFanTokenOutput = {
   pageInfo: Maybe<PageInfo>;
 };
 
+export type MoxieOrdersCandlestick = {
+  blockTimestamp: Maybe<Scalars['Int']['output']>;
+  /** Closing price at the end of the duration */
+  closingPrice: Maybe<Scalars['Float']['output']>;
+  /** fan token address */
+  fanTokenAddress: Maybe<Scalars['String']['output']>;
+  /** Highest price during the duration */
+  maxPrice: Maybe<Scalars['Float']['output']>;
+  /** Lowest price during the duration */
+  minPrice: Maybe<Scalars['Float']['output']>;
+  /** Opening price at the start of the duration */
+  openingPrice: Maybe<Scalars['Float']['output']>;
+  /** Number of orders during the duration */
+  orderCount: Maybe<Scalars['Int']['output']>;
+  /** Moxie spent on the orders */
+  orderVolume: Maybe<Scalars['Float']['output']>;
+};
+
+export type MoxieOrdersCandlestickFilter = {
+  candleDuration: MoxieOrdersCandlestickTimeframe;
+  endTimestamp: Scalars['Int']['input'];
+  fanTokenAddress: Scalars['String']['input'];
+  startTimestamp: Scalars['Int']['input'];
+};
+
+export type MoxieOrdersCandlestickInput = {
+  blockchain: InputMaybe<EveryBlockchain>;
+  cursor: InputMaybe<Scalars['String']['input']>;
+  filter: MoxieOrdersCandlestickFilter;
+  limit: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type MoxieOrdersCandlestickOutput = {
+  MoxieOrdersCandleStick: Maybe<Array<MoxieOrdersCandlestick>>;
+  pageInfo: Maybe<PageInfo>;
+};
+
+export enum MoxieOrdersCandlestickTimeframe {
+  FiveMin = 'FIVE_MIN',
+  OneDay = 'ONE_DAY',
+  OneHour = 'ONE_HOUR',
+  OneMin = 'ONE_MIN',
+  OneMonth = 'ONE_MONTH',
+  OneWeek = 'ONE_WEEK',
+  ThirtyMin = 'THIRTY_MIN',
+  TwelveHour = 'TWELVE_HOUR'
+}
+
 export type MoxieUserPortfolio = {
   beneficiaryVestingAddress: Maybe<Array<Maybe<BeneficiaryVestingAddress>>>;
   currentPrice: Maybe<Scalars['Float']['output']>;
@@ -1265,6 +1316,7 @@ export type Query = {
   FarcasterReplies: Maybe<FarcasterRepliesOutput>;
   FarcasterValidateFrameMessage: Maybe<FarcasterFrameMessageOutput>;
   MoxieFanTokens: Maybe<MoxieFanTokenOutput>;
+  MoxieOrdersCandlesticks: Maybe<MoxieOrdersCandlestickOutput>;
   MoxieUserPortfolios: Maybe<MoxieUserPortfolioOutput>;
   SocialFollowers: Maybe<SocialFollowerOutput>;
   SocialFollowings: Maybe<SocialFollowingOutput>;
@@ -1346,6 +1398,11 @@ export type QueryFarcasterValidateFrameMessageArgs = {
 
 export type QueryMoxieFanTokensArgs = {
   input: MoxieFanTokenInput;
+};
+
+
+export type QueryMoxieOrdersCandlesticksArgs = {
+  input: MoxieOrdersCandlestickInput;
 };
 
 
