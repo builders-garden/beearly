@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { BeearlyButton } from "../../../components/BeearlyButton";
 import { ExternalLinkIcon } from "lucide-react";
 import { Image } from "@nextui-org/react";
+import { WaitlistImagesMode } from "@prisma/client";
 
 export async function generateMetadata({
   params,
@@ -42,7 +43,11 @@ export async function generateMetadata({
       description: `${waitlist!.name} waitlist, powered by Beearly`,
       type: "website",
       url: frameUrl.toString(),
-      images: [waitlist?.imageLanding! || waitlist?.logo!],
+      images: [
+        waitlist?.imagesMode === WaitlistImagesMode.ADVANCED
+          ? waitlist?.imageLanding!
+          : waitlist?.logo!,
+      ],
     },
     other: {
       ...(await fetchMetadata(frameUrl)),
@@ -66,8 +71,10 @@ export default async function WaitlistShortPage({
   return (
     <div className="flex flex-col justify-center items-center gap-2">
       <Image
-          src={
-            waitlist?.imageLanding! || waitlist?.logo!
+        src={
+          waitlist?.imagesMode === WaitlistImagesMode.ADVANCED
+            ? waitlist?.imageLanding!
+            : waitlist?.logo!
         }
         alt="waitlist"
       />

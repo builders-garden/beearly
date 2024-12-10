@@ -23,18 +23,7 @@ export default function Home() {
             Easily gather early users for your product on Farcaster
           </div>
         </div>
-        <div className="text-danger-400 p-4 bg-danger-50 rounded-lg">
-          Beearly is sunsetting, reach out to{" "}
-          <Link
-            className="font-bold"
-            href="https://warpcast.com/limone.eth"
-            target="_blank"
-          >
-            limone.eth
-          </Link>{" "}
-          if you still need the service up or if need any support
-        </div>
-        {/* <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-row items-center gap-4">
           {isConnected ? (
             <BeearlyButton
               text="Launch app"
@@ -61,7 +50,7 @@ export default function Home() {
               </div>
             </Button>
           </Link>
-        </div> */}
+        </div>
         <div className="flex flex-row gap-4 mt-16">
           <Link
             href="https://warpcast.com/limone.eth/0xfb8963b9"
